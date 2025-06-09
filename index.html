@@ -3,55 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1 Course</title>
-    <!-- Common CDN links for all pages -->
+    <title>Welcome to Mechatronics 1 by Dr. Tipton</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        .week-card {
+            display: block;
+            padding: 1.5rem; /* Increased padding */
+            border: 1px solid #e0e7ff; /* Lighter blue border */
+            border-radius: 0.75rem; /* More rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+            transition: all 0.2s ease-in-out; /* Smooth transition for hover effects */
+            background-color: #f0f4ff; /* Lighter blue background */
+            position: relative;
+            overflow: hidden;
+            text-decoration: none; /* Remove underline from links */
+        }
+        .week-card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* Enhanced shadow on hover */
+            transform: translateY(-5px); /* Lift effect on hover */
+            background-color: #e0e7ff; /* Slightly darker blue on hover */
+        }
+        .week-card h3 {
+            font-size: 1.25rem; /* Larger heading */
+            font-weight: 700; /* Bolder heading */
+            color: #1a202c; /* Darker text for heading */
+            margin-bottom: 0.5rem;
+        }
+        .week-card p {
+            font-size: 0.95rem; /* Slightly larger paragraph text */
+            color: #4a5568; /* Darker text for description */
+        }
+        .week-card-status {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px; /* Pill shape */
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-available {
+            background-color: #d1fae5; /* Green-100 */
+            color: #065f46; /* Green-800 */
+        }
+        .status-coming-soon {
+            background-color: #ffeccf; /* Yellow-100 */
+            color: #92400e; /* Yellow-800 */
+        }
+        .hero-section {
+            background-image: linear-gradient(to right, #1d4ed8, #3b82f6); /* Gradient background */
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        .hero-section h1 {
+            font-size: 3.5rem; /* Much larger title */
+            font-weight: 800; /* Extra bold */
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2); /* Text shadow for pop */
+        }
+        .hero-section p {
+            font-size: 1.3rem; /* Larger intro paragraph */
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
-    <header class="bg-blue-700 text-white shadow-md">
+    <header class="bg-gray-900 text-white shadow-md">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <h1 class="text-3xl font-bold">Mechatronics 1 Course</h1>
         </nav>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <section class="bg-white p-6 rounded-lg shadow mb-8">
-            <h2 class="text-2xl font-bold mb-4 text-gray-900">Welcome to Mechatronics 1!</h2>
-            <p class="text-gray-700 mb-4">This website serves as an interactive resource for the Mechatronics 1 course, covering fundamental electrical engineering concepts, circuit analysis techniques, and their applications in integrated systems. Each week's content is designed to be explored interactively, with examples, sandboxes, and practice problems.</p>
-            <p class="text-gray-700">Use the links below to navigate to the topics covered each week.</p>
+    <main>
+        <section class="hero-section">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1>Welcome to Mechatronics 1 by Dr. Tipton</h1>
+                <p>Embark on an exciting journey into the world of **Mechatronics** – the synergistic integration of mechanical engineering, electronics, computer engineering, and control systems. This course will equip you with the foundational knowledge and practical skills to design, build, and control intelligent machines. Each week's content is meticulously crafted to offer a world-class learning experience, featuring interactive lessons, real-world examples, hands-on sandboxes, and challenging practice problems to solidify your understanding. Get ready to transform theoretical concepts into tangible, functional systems!</p>
+            </div>
         </section>
 
-        <section class="bg-white p-6 rounded-lg shadow">
-            <h2 class="text-2xl font-bold mb-4 text-gray-900">Course Weeks</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Example Week 1 Card -->
-                <a href="week1.html" class="block p-4 border border-gray-200 rounded-lg shadow hover:shadow-md transition-shadow duration-200 bg-blue-50 hover:bg-blue-100">
-                    <h3 class="text-lg font-semibold text-blue-800 mb-2">Week 1: Introduction & Basic Electrical Concepts</h3>
-                    <p class="text-sm text-gray-600">Review of basic quantities, Ohm's Law, KVL, KCL, series/parallel circuits.</p>
-                </a>
-                <!-- Link to your existing Week 2 app -->
-                <a href="week2.html" class="block p-4 border border-gray-200 rounded-lg shadow hover:shadow-md transition-shadow duration-200 bg-blue-50 hover:bg-blue-100">
-                    <h3 class="text-lg font-semibold text-blue-800 mb-2">Week 2: DC Circuit Analysis Techniques</h3>
-                    <p class="text-sm text-gray-600">Nodal, Mesh, Superposition, Thevenin's, Norton's Theorems (Interactive App).</p>
-                </a>
-                <!-- Placeholder for future weeks -->
-                <div class="p-4 border border-gray-200 rounded-lg shadow bg-gray-100">
-                    <h3 class="text-lg font-semibold text-gray-500 mb-2">Week 3: [Topic]</h3>
-                    <p class="text-sm text-gray-400">Content coming soon...</p>
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="bg-white p-8 rounded-lg shadow-xl mb-8">
+                <h2 class="text-3xl font-bold mb-6 text-gray-900 border-b-2 border-blue-600 pb-2">Course Weeks Overview</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                    <a href="week1.html" class="week-card">
+                        <span class="week-card-status status-available">Available</span>
+                        <h3 class="text-blue-700">Week 1: Introduction & Basic Electrical Concepts</h3>
+                        <p>Review of fundamental quantities, Ohm's Law, Kirchhoff's Laws (KVL, KCL), and analysis of series/parallel circuits.</p>
+                    </a>
+                    <a href="week2.html" class="week-card">
+                        <span class="week-card-status status-available">Available</span>
+                        <h3 class="text-blue-700">Week 2: DC Circuit Analysis Techniques</h3>
+                        <p>In-depth exploration of Nodal Analysis, Mesh Analysis, Superposition, Thevenin's and Norton's Theorems.</p>
+                    </a>
+                    <a href="week3.html" class="week-card">
+                        <span class="week-card-status status-available">Available</span>
+                        <h3 class="text-blue-700">Week 3: Capacitors, Inductors, and First-Order Circuits</h3>
+                        <p>Understanding energy storage elements, transient analysis of RC and RL circuits, and step responses.</p>
+                    </a>
+                    <a href="week4.html" class="week-card">
+                        <span class="week-card-status status-available">Available</span>
+                        <h3 class="text-blue-700">Week 4: Operational Amplifiers (Op-Amps)</h3>
+                        <p>Ideal op-amp characteristics, inverting/non-inverting amplifiers, voltage followers, and basic op-amp applications.</p>
+                    </a>
+                    <a href="week5.html" class="week-card">
+                        <span class="week-card-status status-available">Available</span>
+                        <h3 class="text-blue-700">Week 5: AC Circuit Fundamentals</h3>
+                        <p>Introduction to phasors, impedance, reactance, and basic AC circuit analysis.</p>
+                    </a>
+                    <a href="week6.html" class="week-card">
+                        <span class="week-card-status status-available">Available</span>
+                        <h3 class="text-blue-700">Week 6: Diodes and Rectifier Circuits</h3>
+                        <p>Diode characteristics, half-wave and full-wave rectifiers, and simple power supply design.</p>
+                    </a>
+                    <a href="week7.html" class="week-card">
+                        <span class="week-card-status status-available">Available</span>
+                        <h3 class="text-blue-700">Week 7: Transistors (BJTs and MOSFETs)</h3>
+                        <p>Introduction to Bipolar Junction Transistors and Metal-Oxide-Semiconductor Field-Effect Transistors as switches and amplifiers.</p>
+                    </a>
+                    <a href="week8.html" class="week-card">
+                        <span class="week-card-status status-available">Available</span>
+                        <h3 class="text-blue-700">Week 8: Control Systems and Feedback</h3>
+                        <p>Fundamentals of open-loop and closed-loop control, feedback principles, and stability concepts.</p>
+                    </a>
+                    <a href="week9.html" class="week-card">
+                        <span class="week-card-status status-available">Available</span>
+                        <h3 class="text-blue-700">Week 9: Digital Logic and Microcontroller Interfacing</h3>
+                        <p>Introduction to logic gates, Boolean algebra, combinational/sequential logic, and digital communication protocols (UART, SPI, I2C).</p>
+                    </a>
+                    <div class="week-card">
+                        <span class="week-card-status status-coming-soon">Coming Soon</span>
+                        <h3 class="text-gray-600">Week 10: Microcontroller Programming Basics</h3>
+                        <p class="text-gray-500">Introduction to embedded C programming, digital I/O, and basic microcontroller peripherals.</p>
+                    </div>
+                    <div class="week-card">
+                        <span class="week-card-status status-coming-soon">Coming Soon</span>
+                        <h3 class="text-gray-600">Week 11: Analog-to-Digital and Digital-to-Analog Conversion</h3>
+                        <p class="text-gray-500">Understanding ADC/DAC principles, sampling, quantization, and interfacing with analog sensors.</p>
+                    </div>
+                    <div class="week-card">
+                        <span class="week-card-status status-coming-soon">Coming Soon</span>
+                        <h3 class="text-gray-600">Week 12: Sensors and Actuators</h3>
+                        <p class="text-gray-500">Classification of common sensors (e.g., proximity, temperature, force) and actuators (motors, solenoids).</p>
+                    </div>
+                    <div class="week-card">
+                        <span class="week-card-status status-coming-soon">Coming Soon</span>
+                        <h3 class="text-gray-600">Week 13: DC Motors and Motor Control</h3>
+                        <p class="text-gray-500">DC motor principles, H-bridge drivers, and Pulse Width Modulation (PWM) for speed control.</p>
+                    </div>
+                    <div class="week-card">
+                        <span class="week-card-status status-coming-soon">Coming Soon</span>
+                        <h3 class="text-gray-600">Week 14: Stepper Motors and Servo Motors</h3>
+                        <p class="text-gray-500">Operation and control of precise positioning motors essential for robotics.</p>
+                    </div>
+                    <div class="week-card">
+                        <span class="week-card-status status-coming-soon">Coming Soon</span>
+                        <h3 class="text-gray-600">Week 15: Introduction to Robotics and Kinematics</h3>
+                        <p class="text-gray-500">Basic robotic systems, degrees of freedom, and forward/inverse kinematics concepts.</p>
+                    </div>
+                    <div class="week-card">
+                        <span class="week-card-status status-coming-soon">Coming Soon</span>
+                        <h3 class="text-gray-600">Week 16: System Integration & Project Showcase</h3>
+                        <p class="text-gray-500">Bringing all concepts together for final project development and presentation.</p>
+                    </div>
                 </div>
-                <!-- Repeat for all 16 weeks -->
             </div>
         </section>
     </main>
 
-    <footer class="bg-gray-800 text-white text-center py-4 mt-8">
-        <p>&copy; 2025 Mechatronics 1 Course. All rights reserved.</p>
+    <footer class="bg-gray-900 text-white text-center py-6 mt-12">
+        <p>&copy; 2025 Mechatronics 1 Course by Dr. Tipton. All rights reserved.</p>
     </footer>
 </body>
 </html>
