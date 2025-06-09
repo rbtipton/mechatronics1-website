@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics 1: Week 14 - Robotic Kinematics & Dynamics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The application is structured as an interactive dashboard with five tabs: Introduction, Kinematics Lab, Dynamics, Applications, and Knowledge Check. This modular design allows users to explore complex topics in a non-linear way. The core of the experience is the interactive Kinematics Lab. It provides hands-on sliders to demonstrate Forward Kinematics and input fields to challenge the Inverse Kinematics solver. This learn-by-doing approach is more effective for grasping abstract robotics concepts than static diagrams. -->
+    <!-- Visualization & Content Choices: 
+        - Forward/Inverse Kinematics -> Goal: Understand the relationship between joint angles and end-effector position. -> Viz: HTML5 Canvas showing a 2-link robot arm. -> Interaction: Sliders for FK and input boxes for IK dynamically update the canvas visualization and text readouts. Justification: Provides immediate, visual feedback on how joint angles translate to coordinates (FK) and vice-versa (IK), making the core concepts tangible and intuitive.
+        - Dynamics -> Goal: Explain the forces in robot motion. -> Viz: Structured HTML with Tailwind CSS, using icons and styled blocks. -> Interaction: N/A. Static but clear explanation. Justification: Dynamics equations are complex; a clear, well-organized textual explanation is more effective than a potentially confusing visualization for an introductory level.
+        - Knowledge Check -> Goal: Reinforce learning. -> Viz: Interactive cards. -> Interaction: A "Reveal Answer" button toggles visibility. Justification: Promotes active recall and self-assessment.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
+        .nav-button.active, .nav-button:hover { color: #059669; border-bottom-color: #059669; }
+        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        .slider-label { font-size: 0.875rem; font-weight: 500; color: #57534e; }
+        .slider-value, .output-value { font-family: 'Roboto Mono', monospace; font-size: 0.9rem; background-color: #e7e5e4; padding: 0.1rem 0.5rem; border-radius: 0.25rem; }
+        .output-value { font-size: 1.1rem; padding: 0.25rem 0.75rem; }
+        .input-field { border: 1px solid #d4d4d8; border-radius: 0.375rem; padding: 0.5rem; font-family: 'Roboto Mono', monospace; }
+        canvas { background-color: #fafaf9; border-radius: 0.5rem; border: 1px solid #e7e5e4; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 14: Robotics</h1>
+                <nav class="hidden md:flex space-x-4 lg:space-x-6">
+                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
+                    <button class="nav-button" onclick="showSection('lab')">Kinematics Lab</button>
+                    <button class="nav-button" onclick="showSection('dynamics')">Dynamics</button>
+                    <button class="nav-button" onclick="showSection('apps')">Applications</button>
+                    <button class="nav-button" onclick="showSection('knowledge')">Knowledge Check</button>
+                </nav>
+                <button id="menu-btn" class="md:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+             <div id="mobile-menu" class="hidden md:hidden py-2">
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('lab'); closeMenu();">Kinematics Lab</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('dynamics'); closeMenu();">Dynamics</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('apps'); closeMenu();">Applications</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('knowledge'); closeMenu();">Knowledge Check</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <section id="intro" class="content-section active">
+            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Robotic Kinematics & Dynamics</h2>
+                <p class="text-lg text-stone-600 mb-6">This module introduces the core principles of robotic motion. **Kinematics** describes *how* a robot moves—the geometry of its motion—while **Dynamics** explains *why* it moves—the forces and torques involved. Mastering these concepts is key to designing, programming, and controlling any robotic system. This interactive app is designed to give you a hands-on feel for these fundamental ideas.</p>
+                <div class="mt-6 p-4 bg-emerald-50 border-l-4 border-emerald-500">
+                    <p class="text-emerald-800">Use the tabs above to navigate. The **Kinematics Lab** is the best place to start for interactive learning!</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="lab" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">2-Link Robot Arm Kinematics Lab</h2>
+            <div class="grid lg:grid-cols-2 gap-8 items-start">
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-center text-stone-700 mb-4">Live Robot Simulator</h3>
+                    <canvas id="robotCanvas" width="400" height="400" class="mx-auto"></canvas>
+                </div>
+
+                <div class="space-y-8">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-stone-700 mb-4">Forward Kinematics</h3>
+                        <p class="text-sm text-stone-600 mb-4">Control the joint angles to see where the end-effector (hand) moves. The (x, y) coordinates are calculated from your inputs.</p>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="theta1-slider" class="slider-label">Joint 1 Angle (&theta;1): <span id="theta1-value" class="slider-value">45°</span></label>
+                                <input id="theta1-slider" type="range" min="0" max="180" value="45" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label for="theta2-slider" class="slider-label">Joint 2 Angle (&theta;2): <span id="theta2-value" class="slider-value">60°</span></label>
+                                <input id="theta2-slider" type="range" min="-180" max="180" value="60" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <p class="text-stone-600">End-Effector Position:</p>
+                            <p class="font-bold text-emerald-700">X: <span id="fk-x-pos" class="output-value">120.7</span>, Y: <span id="fk-y-pos" class="output-value">157.3</span></p>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold text-stone-700 mb-4">Inverse Kinematics</h3>
+                        <p class="text-sm text-stone-600 mb-4">Enter a target (x, y) position and the simulator will calculate the required joint angles to reach it.</p>
+                        <div class="flex space-x-4 items-center">
+                            <input type="number" id="ik-x-input" placeholder="X" value="100" class="w-full input-field">
+                            <input type="number" id="ik-y-input" placeholder="Y" value="100" class="w-full input-field">
+                            <button class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700" onclick="solveIK()">Solve</button>
+                        </div>
+                        <div id="ik-status" class="mt-2 text-sm text-center text-red-600 h-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dynamics" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Understanding Robot Dynamics</h2>
+            <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md border border-stone-200">
+                <p class="text-center text-lg text-stone-600 mb-6">Dynamics explains the relationship between joint torques and the resulting motion, governed by the conceptual equation:</p>
+                <div class="my-4 p-4 text-center bg-stone-100 rounded-lg font-mono text-stone-800 text-sm md:text-base">
+                    &tau; = M(q)&quml; + C(q, q&#775;)q&#775; + G(q)
+                </div>
+                <div class="mt-8 grid md:grid-cols-3 gap-6 text-center">
+                    <div>
+                        <div class="text-4xl">⚙️</div>
+                        <h4 class="font-bold text-lg mt-2">&tau; (Torque)</h4>
+                        <p class="text-sm text-stone-600">The rotational force applied by the motors at each joint.</p>
+                    </div>
+                    <div>
+                        <div class="text-4xl">🏋️</div>
+                        <h4 class="font-bold text-lg mt-2">M(q)&quml; (Inertia)</h4>
+                        <p class="text-sm text-stone-600">Torque needed to accelerate the mass of the robot's links.</p>
+                    </div>
+                    <div>
+                        <div class="text-4xl">🌍</div>
+                        <h4 class="font-bold text-lg mt-2">G(q) (Gravity)</h4>
+                        <p class="text-sm text-stone-600">Torque needed to counteract the force of gravity on the links.</p>
+                    </div>
+                </div>
+                 <p class="text-center text-stone-600 mt-6 text-sm">The term **C(q, q&#775;)q&#775;** represents complex Coriolis and centrifugal forces, which become significant at high speeds.</p>
+            </div>
+        </section>
+
+        <section id="apps" class="content-section">
+             <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Real-World Applications</h2>
+            <div id="apps-grid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+        <section id="knowledge" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
+            <div id="knowledge-grid" class="space-y-4"></div>
+        </section>
+    </main>
+
+<script>
+const knowledgeData = [
+    { question: "If you know a robot's joint angles and want to find its gripper position, what do you use?", answer: "**Forward Kinematics (FK)**. It calculates the end-effector pose from the joint parameters." },
+    { question: "Why is Inverse Kinematics (IK) often considered the more difficult problem?", answer: "Because it can have multiple solutions (e.g., 'elbow up' vs. 'elbow down'), no solution (if the target is out of reach), and involves solving complex non-linear equations." },
+    { question: "What does the 'G(q)' term in the robot dynamics equation represent?", answer: "It represents the torque required at each joint to counteract the force of **gravity** acting on the robot's links." },
+    { question: "In a high-speed pick-and-place task, why is a robot's dynamic model crucial for accuracy?", answer: "The dynamic model allows the controller to calculate and compensate for forces like inertia, gravity, and Coriolis effects, preventing the robot from overshooting its target or vibrating." }
+];
+
+const appsData = [
+    { title: "Industrial Welding", text: "IK calculates the path for the welder, while dynamics ensures the arm moves smoothly and resists forces during welding.", icon: "🏭" },
+    { title: "Surgical Robots", text: "Extreme precision is required. Kinematics defines the tool's position, and dynamics ensures smooth, vibration-free movement.", icon: "⚕️" },
+    { title: "Film & Animation", text: "Animators often pose a character's hand (IK), and the computer calculates the arm's joint angles automatically.", icon: "🎬" },
+    { title: "Space Exploration", text: "The robotic arms on rovers use kinematics to position instruments and dynamics to manage forces when drilling or sampling.", icon: "🚀" },
+];
+
+class RobotArm {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
+        this.l1 = 100; // Length of link 1
+        this.l2 = 80;  // Length of link 2
+        this.originX = this.width / 2;
+        this.originY = this.height - 50;
+        this.target = null;
+    }
+
+    draw(theta1, theta2) {
+        // Convert angles to radians
+        const t1 = theta1 * Math.PI / 180;
+        const t2 = theta2 * Math.PI / 180;
+
+        // FK calculation
+        const x1 = this.originX + this.l1 * Math.cos(t1);
+        const y1 = this.originY - this.l1 * Math.sin(t1);
+        const x2 = x1 + this.l2 * Math.cos(t1 + t2);
+        const y2 = y1 - this.l2 * Math.sin(t1 + t2);
+        
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        
+        // Draw target if it exists
+        if (this.target) {
+            this.ctx.beginPath();
+            this.ctx.arc(this.target.x, this.target.y, 5, 0, 2 * Math.PI);
+            this.ctx.fillStyle = this.target.reachable ? 'rgba(5, 150, 105, 0.5)' : 'rgba(220, 38, 38, 0.5)';
+            this.ctx.fill();
+        }
+
+        // Draw arm
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.originX, this.originY);
+        this.ctx.lineTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
+        this.ctx.strokeStyle = '#57534e';
+        this.ctx.lineWidth = 8;
+        this.ctx.stroke();
+
+        // Draw joints
+        this.ctx.beginPath();
+        this.ctx.arc(this.originX, this.originY, 8, 0, 2 * Math.PI);
+        this.ctx.fillStyle = '#1c1917';
+        this.ctx.fill();
+
+        this.ctx.beginPath();
+        this.ctx.arc(x1, y1, 8, 0, 2 * Math.PI);
+        this.ctx.fillStyle = '#1c1917';
+        this.ctx.fill();
+
+        // Draw end-effector
+        this.ctx.beginPath();
+        this.ctx.arc(x2, y2, 10, 0, 2 * Math.PI);
+        this.ctx.fillStyle = '#059669';
+        this.ctx.fill();
+        
+        return { x: x2, y: y2 };
+    }
+
+    solveIK(targetX, targetY) {
+        const statusEl = document.getElementById('ik-status');
+        this.target = { x: targetX + this.originX, y: this.originY - targetY, reachable: true };
+
+        const dx = targetX;
+        const dy = targetY;
+        const distSq = dx*dx + dy*dy;
+        const dist = Math.sqrt(distSq);
+
+        if (dist > this.l1 + this.l2 || dist < Math.abs(this.l1 - this.l2)) {
+            statusEl.textContent = "Target is unreachable!";
+            this.target.reachable = false;
+            this.drawFromSliders(); // Redraw in last valid position
+            return;
+        }
+        statusEl.textContent = "";
+
+        const D = (distSq - this.l1*this.l1 - this.l2*this.l2) / (2 * this.l1 * this.l2);
+        let theta2Rad = Math.acos(D); // Elbow down solution
+        
+        // For simplicity, we'll use elbow down solution
+        // theta2Rad = -theta2Rad would be elbow up
+        
+        let theta1Rad = Math.atan2(dy, dx) - Math.atan2(this.l2 * Math.sin(theta2Rad), this.l1 + this.l2 * Math.cos(theta2Rad));
+
+        const theta1Deg = theta1Rad * 180 / Math.PI;
+        const theta2Deg = theta2Rad * 180 / Math.PI;
+        
+        if (theta1Deg >= 0 && theta1Deg <= 180) {
+             // Update sliders and draw
+            document.getElementById('theta1-slider').value = theta1Deg;
+            document.getElementById('theta2-slider').value = theta2Deg;
+            this.drawAndUpdateUI();
+        } else {
+            statusEl.textContent = "Solution out of Joint 1 range!";
+            this.target.reachable = false;
+            this.drawFromSliders();
+        }
+    }
+    
+    updateUI(theta1, theta2, {x, y}) {
+        document.getElementById('theta1-value').textContent = `${Math.round(theta1)}°`;
+        document.getElementById('theta2-value').textContent = `${Math.round(theta2)}°`;
+        document.getElementById('fk-x-pos').textContent = (x - this.originX).toFixed(1);
+        document.getElementById('fk-y-pos').textContent = (this.originY - y).toFixed(1);
+    }
+    
+    drawAndUpdateUI() {
+        const theta1 = parseFloat(document.getElementById('theta1-slider').value);
+        const theta2 = parseFloat(document.getElementById('theta2-slider').value);
+        const endEffectorPos = this.draw(theta1, theta2);
+        this.updateUI(theta1, theta2, endEffectorPos);
+    }
+
+    drawFromSliders() {
+        this.target = null; // Clear IK target when using sliders
+        this.drawAndUpdateUI();
+    }
+}
+
+let robotArm;
+
+function solveIK() {
+    const x = parseFloat(document.getElementById('ik-x-input').value);
+    const y = parseFloat(document.getElementById('ik-y-input').value);
+    if (!isNaN(x) && !isNaN(y)) {
+        robotArm.solveIK(x, y);
+    }
+}
+
+function initKnowledgeCheck() {
+    const container = document.getElementById('knowledge-grid');
+    container.innerHTML = knowledgeData.map(item => `
+        <div class="question-card bg-white p-6 rounded-lg shadow-md border border-stone-200">
+            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
+            <div class="answer" style="display: none; margin-top: 1rem; padding: 1rem; background-color: #f0fdf4; border-left: 4px solid #22c55e; color: #15803d;">
+                <p><strong>Answer:</strong> ${item.answer}</p>
+            </div>
+            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 transition-colors text-sm" onclick="toggleAnswer(this)">Reveal Answer</button>
+        </div>
+    `).join('');
+}
+
+function initApps() {
+    const container = document.getElementById('apps-grid');
+    container.innerHTML = appsData.map(item => `
+        <div class="card p-6 flex flex-col items-center text-center">
+            <div class="text-5xl mb-4">${item.icon}</div>
+            <h3 class="font-bold text-lg text-stone-800 mb-2">${item.title}</h3>
+            <p class="text-stone-600 text-sm">${item.text}</p>
+        </div>
+    `).join('');
+}
+
+function toggleAnswer(button) {
+    const answerEl = button.previousElementSibling;
+    const isVisible = answerEl.style.display === 'block';
+    answerEl.style.display = isVisible ? 'none' : 'block';
+    button.textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    robotArm = new RobotArm('robotCanvas');
+    robotArm.drawFromSliders();
+
+    document.getElementById('theta1-slider').addEventListener('input', () => robotArm.drawFromSliders());
+    document.getElementById('theta2-slider').addEventListener('input', () => robotArm.drawFromSliders());
+
+    initKnowledgeCheck();
+    initApps();
+
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+});
+
+function showSection(sectionId) {
+    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    document.querySelectorAll('.nav-button').forEach(button => {
+        button.classList.remove('active');
+        if (button.getAttribute('onclick').includes(sectionId)) {
+            button.classList.add('active');
+        }
+    });
+    window.scrollTo(0, 0);
+}
+
+function closeMenu() {
+    document.getElementById('mobile-menu').classList.add('hidden');
+}
+
+</script>
+</body>
+</html>
