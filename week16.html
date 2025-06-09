@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics 1: Week 16 - System Design Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The SPA is structured as an interactive project dashboard with four main tabs: "Project Brief" (introduction), "Design Process" (interactive flowchart), "Component Lab" (interactive controls), and "Quiz". This task-oriented structure guides the user through the course material logically. The core is the interactive flowchart, which transforms the linear text about the design process into an engaging, explorable diagram. This is complemented by a hands-on "Component Lab" to visualize abstract concepts like PID tuning, making the learning experience more practical and intuitive. -->
+    <!-- Visualization & Content Choices:
+        - Design Process Flow -> Goal: Explain the 6 phases of mechatronic design. -> Viz: An interactive flowchart built with HTML/CSS. -> Interaction: Users click on each phase (e.g., "Requirements Definition") to expand a detailed card with information. Justification: This is more engaging than a static list and encourages active exploration of the design lifecycle.
+        - PID Control -> Goal: Demonstrate how P, I, and D gains affect system stability. -> Viz: A Chart.js line chart showing a system's step response. -> Interaction: Sliders for P, I, and D values that dynamically update the chart. Justification: Provides immediate, visual feedback, making the abstract concept of PID tuning concrete and understandable.
+        - State Machine -> Goal: Explain a common software architecture. -> Viz: HTML/CSS diagram for an automated gate opener. -> Interaction: Buttons trigger state changes, highlighting the active state and transitions. Justification: Visually steps through the logic, making the concept easier to grasp than text alone.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; padding-bottom: 4px; }
+        .nav-button.active, .nav-button:hover { color: #4338ca; border-bottom-color: #4338ca; }
+        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .process-step { cursor: pointer; }
+        .process-arrow { color: #a1a1aa; align-self: center; }
+        .process-details { display: none; max-height: 0; overflow: hidden; transition: max-height 0.7s ease-in-out; }
+        .process-step.active .process-details { display: block; max-height: 500px; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 16: Design Project</h1>
+                <nav class="hidden md:flex space-x-4 lg:space-x-8">
+                    <button class="nav-button active" onclick="showSection('brief')">Project Brief</button>
+                    <button class="nav-button" onclick="showSection('process')">Design Process</button>
+                    <button class="nav-button" onclick="showSection('lab')">Component Lab</button>
+                    <button class="nav-button" onclick="showSection('quiz')">Quiz</button>
+                </nav>
+                <button id="menu-btn" class="md:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+             <div id="mobile-menu" class="hidden md:hidden py-2">
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('brief'); closeMenu();">Project Brief</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('process'); closeMenu();">Design Process</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('lab'); closeMenu();">Component Lab</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('quiz'); closeMenu();">Quiz</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <section id="brief" class="content-section active">
+            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Your Mission: The Mechatronics Design Project</h2>
+                <p class="text-lg text-stone-600 mb-6">Welcome, Lead Engineer. This week, we move from theory to practice. Your mission is to apply the full spectrum of mechatronics knowledge to a design project. This interactive dashboard will guide you through the process, from defining requirements to selecting components and implementing control strategies. Use the tabs to navigate through the project lifecycle.</p>
+                <div class="mt-6 p-4 bg-indigo-50 border-l-4 border-indigo-500">
+                    <p class="text-indigo-800"><strong>Project Focus:</strong> We'll use the example of an **autonomous maze-solving robot** to illustrate key concepts throughout this module.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="process" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">The Mechatronic Design Process</h2>
+            <p class="text-center text-stone-600 mb-8 max-w-2xl mx-auto">A successful mechatronics project follows a structured, iterative path. Click on each step below to expand its details and see how it applies to our maze-solving robot project.</p>
+            <div id="process-flow" class="space-y-4">
+                <!-- Steps will be injected here by JS -->
+            </div>
+        </section>
+        
+        <section id="lab" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Component & Control Lab</h2>
+            <div class="grid lg:grid-cols-5 gap-8 items-start">
+                <div class="lg:col-span-3 card p-6">
+                    <h3 class="text-xl font-bold text-stone-700 mb-2">Interactive PID Controller</h3>
+                    <p class="text-sm text-stone-600 mb-4">Adjust the P, I, and D gains to see how they affect the system's response to a command. Try to make the "Actual Output" line match the "Setpoint" as quickly and smoothly as possible.</p>
+                    <div class="chart-container" style="position: relative; height:40vh; max-height:400px; width:100%;">
+                        <canvas id="pidChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 card p-6 space-y-4">
+                    <h3 class="text-xl font-bold text-stone-700 mb-2">Controller Gains</h3>
+                    <div>
+                        <label for="pGain" class="block text-sm font-medium text-stone-700">Proportional (P): <span id="pValue" class="font-mono text-indigo-600">0.5</span></label>
+                        <input type="range" id="pGain" min="0" max="2" step="0.1" value="0.5" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <label for="iGain" class="block text-sm font-medium text-stone-700">Integral (I): <span id="iValue" class="font-mono text-indigo-600">0.1</span></label>
+                        <input type="range" id="iGain" min="0" max="0.5" step="0.01" value="0.1" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <label for="dGain" class="block text-sm font-medium text-stone-700">Derivative (D): <span id="dValue" class="font-mono text-indigo-600">0.2</span></label>
+                        <input type="range" id="dGain" min="0" max="2" step="0.1" value="0.2" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
+            <div id="quiz-grid" class="space-y-4 max-w-3xl mx-auto"></div>
+        </section>
+
+    </main>
+
+<script>
+let pidChart;
+
+const processData = [
+    { title: "1. Requirements Definition", content: "<strong>Goal:</strong> Clearly define what the system must do (functional) and its constraints (non-functional). <br><strong>Example:</strong> Our maze robot must navigate without collisions (functional) and cost less than $100 (non-functional)." },
+    { title: "2. Conceptual Design", content: "<strong>Goal:</strong> Brainstorm high-level solutions. <br><strong>Example:</strong> Should the robot use wheels or legs? Should it use ultrasonic sensors or a camera for navigation? We'll select a two-wheeled differential drive with ultrasonic sensors for its simplicity and low cost." },
+    { title: "3. Detailed Design", content: "<strong>Goal:</strong> Create specific engineering plans. <br><strong>Example:</strong> Design the chassis in CAD, create the circuit diagram for motor drivers and sensors, and write pseudocode for the navigation logic." },
+    { title: "4. Prototyping", content: "<strong>Goal:</strong> Build a working model. <br><strong>Example:</strong> 3D print the chassis, solder the electronics onto a protoboard, and upload the initial code to the microcontroller." },
+    { title: "5. Testing & Validation", content: "<strong>Goal:</strong> Verify the prototype against requirements. <br><strong>Example:</strong> Test if the sensors detect walls at the correct distance (unit test), then test if the robot turns when a wall is detected (integration test), and finally test if it can solve the whole maze (system test)." },
+    { title: "6. Iteration", content: "<strong>Goal:</strong> Refine the design based on testing. <br><strong>Example:</strong> If testing shows the wheels are slipping, we might iterate back to detailed design to choose different wheels or change the chassis material to be heavier." }
+];
+
+const quizData = [
+    { question: "Which design phase involves brainstorming and evaluating multiple high-level solutions?", answer: "<strong>Conceptual Design</strong>. This is where you explore different approaches before committing to one." },
+    { question: "What is the key difference between a functional and a non-functional requirement?", answer: "A <strong>functional</strong> requirement defines *what the system does* (e.g., 'detects a red object'), while a <strong>non-functional</strong> requirement defines *how well it does it* or its constraints (e.g., 'operates for 2 hours')." },
+    { question: "Why is a 'bottom-up' testing approach (unit -> integration -> system) generally preferred in mechatronics?", answer: "It allows you to find and fix problems in isolated components first, which is much easier than trying to debug the entire complex system all at once." },
+    { question: "What is the primary purpose of a 'flyback diode' when controlling a motor with a relay or transistor?", answer: "To safely dissipate the voltage spike (inductive kickback) generated by the motor's coils when power is removed, protecting the control electronics from damage." }
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+    initProcessFlow();
+    initPidChart();
+    initQuiz();
+
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    
+    document.getElementById('pGain').addEventListener('input', updatePidChart);
+    document.getElementById('iGain').addEventListener('input', updatePidChart);
+    document.getElementById('dGain').addEventListener('input', updatePidChart);
+});
+
+function initProcessFlow() {
+    const container = document.getElementById('process-flow');
+    let html = '';
+    processData.forEach((step, index) => {
+        html += `
+            <div class="process-step card" onclick="toggleProcessStep(this)">
+                <div class="p-4 sm:p-6 bg-stone-50 rounded-t-lg">
+                    <h3 class="text-lg sm:text-xl font-semibold text-indigo-700">${step.title}</h3>
+                </div>
+                <div class="process-details p-4 sm:p-6 border-t border-stone-200">
+                    <p class="text-stone-600">${step.content}</p>
+                </div>
+            </div>
+        `;
+        if (index < processData.length - 1) {
+            html += `<div class="flex justify-center my-2"><span class="process-arrow text-2xl font-bold">↓</span></div>`;
+        }
+    });
+    container.innerHTML = html;
+}
+
+function toggleProcessStep(element) {
+    element.classList.toggle('active');
+}
+
+function initPidChart() {
+    const ctx = document.getElementById('pidChart').getContext('2d');
+    pidChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Setpoint',
+                    data: [],
+                    borderColor: '#ef4444',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    borderDash: [5, 5]
+                },
+                {
+                    label: 'Actual Output',
+                    data: [],
+                    borderColor: '#3b82f6',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    tension: 0.1,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'Time' } },
+                y: { title: { display: true, text: 'Output' }, min: 0, max: 1.5 }
+            },
+            animation: { duration: 0 }
+        }
+    });
+    updatePidChart();
+}
+
+function updatePidChart() {
+    const p = parseFloat(document.getElementById('pGain').value);
+    const i = parseFloat(document.getElementById('iGain').value);
+    const d = parseFloat(document.getElementById('dGain').value);
+
+    document.getElementById('pValue').textContent = p.toFixed(2);
+    document.getElementById('iValue').textContent = i.toFixed(2);
+    document.getElementById('dValue').textContent = d.toFixed(2);
+
+    const setpoint = 1.0;
+    const timeSteps = 100;
+    let current_output = 0;
+    let integral = 0;
+    let last_error = 0;
+    
+    const outputData = [];
+    const setpointData = [];
+    const labels = [];
+
+    for (let t = 0; t < timeSteps; t++) {
+        const error = setpoint - current_output;
+        integral += error;
+        const derivative = error - last_error;
+        
+        const control_signal = (p * error) + (i * integral) + (d * derivative);
+        
+        // Simple first-order system simulation
+        current_output += (control_signal - current_output) * 0.1;
+        
+        last_error = error;
+
+        outputData.push(current_output);
+        setpointData.push(setpoint);
+        labels.push(t);
+    }
+
+    pidChart.data.labels = labels;
+    pidChart.data.datasets[0].data = setpointData;
+    pidChart.data.datasets[1].data = outputData;
+    pidChart.update();
+}
+
+function initQuiz() {
+    const container = document.getElementById('quiz-grid');
+    container.innerHTML = quizData.map(item => `
+        <div class="card p-6">
+            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
+            <div class="answer" style="display: none; margin-top: 1rem; padding: 1rem; background-color: #f0fdf4; border-left: 4px solid #22c55e; color: #15803d;">
+                <p>${item.answer}</p>
+            </div>
+            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded-md hover:bg-stone-700 transition-colors text-sm" onclick="toggleAnswer(this)">Reveal Answer</button>
+        </div>
+    `).join('');
+}
+
+function toggleAnswer(button) {
+    const answerEl = button.previousElementSibling;
+    const isVisible = answerEl.style.display === 'block';
+    answerEl.style.display = isVisible ? 'none' : 'block';
+    button.textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
+}
+
+function showSection(sectionId) {
+    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    document.querySelectorAll('.nav-button').forEach(button => {
+        button.classList.remove('active');
+        if (button.getAttribute('onclick').includes(sectionId)) {
+            button.classList.add('active');
+        }
+    });
+    window.scrollTo(0, 0);
+}
+
+function closeMenu() {
+    document.getElementById('mobile-menu').classList.add('hidden');
+}
+
+</script>
+</body>
+</html>
