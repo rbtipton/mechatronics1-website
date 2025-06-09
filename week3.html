@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics 1: Week 3 - AC Circuit Fundamentals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Academic Blue -->
+    <!-- Application Structure Plan: The SPA is structured using a main navigation bar to switch between three core sections: 'AC Concepts', 'Interactive Sandbox', and 'Practice Problems'. The 'AC Concepts' section uses a sub-navigation (tabs) for 'AC Basics', 'Phasors', 'Reactance', 'Impedance', and 'AC Power'. This architecture organizes the content thematically, allowing students to focus on one concept at a time. The 'Interactive Sandbox' visually compares how impedance changes with frequency for capacitors and inductors. The user flow is designed for progressive learning: grasp a concept, see it applied interactively, explore its behavior visually, and finally, test knowledge with practice problems. This is more engaging and effective than a static document. -->
+    <!-- Visualization & Content Choices: Concepts/Steps -> Styled text blocks (HTML/Tailwind). Math Examples -> Interactive step-by-step reveal with a button (JS). Circuit diagrams -> HTML/CSS divs for generic components. Sandbox Comparison -> Line chart (Chart.js/Canvas) to show frequency dependence of reactance/impedance. Practice Problems -> Cards with a 'show answer' toggle (JS). This mix of static and interactive content enhances engagement and comprehension. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-active { 
+            border-color: #3b82f6; /* blue-500 */
+            color: #1d4ed8; /* blue-700 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .step-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .step-content.visible {
+            display: block;
+            opacity: 1;
+        }
+        .solution-box {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .btn {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .btn:hover { background-color: #2563eb; }
+        .btn-secondary {
+            background-color: #6b7280;
+        }
+        .btn-secondary:hover { background-color: #4b5563; }
+        .hidden { display: none; }
+        .katex-display { display: block; overflow-x: auto; white-space: nowrap; }
+
+        /* Generic Component Styling for AC Diagrams (simplified) */
+        .component-box {
+            border: 2px solid #374151;
+            padding: 0.5rem;
+            margin: 0.5rem;
+            font-size: 0.8rem;
+            display: inline-block;
+            text-align: center;
+        }
+        .inductor-symbol {
+            width: 40px;
+            height: 20px;
+            border: 2px solid #374151;
+            border-radius: 50%; /* Just a simple circle to represent */
+            display: inline-block;
+            transform: scaleX(1.5); /* Make it look like a coil */
+        }
+         .capacitor-symbol {
+            width: 30px;
+            height: 20px;
+            border-left: 2px solid #374151;
+            border-right: 2px solid #374151;
+            display: inline-block;
+            position: relative;
+        }
+        .capacitor-symbol::before, .capacitor-symbol::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #374151;
+        }
+        .capacitor-symbol::before { left: 0; }
+        .capacitor-symbol::after { right: 0; }
+        
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-blue-700">Mechatronics 1: Week 3 - AC Circuit Fundamentals</h1>
+                <div class="flex space-x-4 text-sm font-medium">
+                    <button data-target="concepts" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">AC Concepts</button>
+                    <button data-target="sandbox" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Interactive Sandbox</button>
+                    <button data-target="practice" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Practice Problems</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="app-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Section: AC Concepts -->
+        <section id="concepts" class="app-section">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-3xl font-bold mb-4 text-gray-900">Alternating Current (AC) Circuit Fundamentals</h2>
+                <p class="text-gray-600 mb-6">Building on our DC foundations, this week we dive into Alternating Current (AC) circuits, which are ubiquitous in modern technology. Understanding AC is crucial for working with power systems, communications, and many sensor applications. Explore the key concepts below.</p>
+
+                <!-- Tabs -->
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex flex-wrap" aria-label="Tabs">
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="ac_basics">AC Basics</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="phasors">Phasors & Complex Numbers</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="reactance">Reactance (X)</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="impedance">Impedance (Z)</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="ac_power">AC Power</button>
+                    </nav>
+                </div>
+
+                <!-- Content Area for Concepts -->
+                <div id="concept-content" class="mt-6">
+                    <!-- Content will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Interactive Sandbox -->
+        <section id="sandbox" class="app-section hidden">
+             <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-3xl font-bold mb-2 text-gray-900">Interactive Sandbox: Reactance vs. Frequency</h2>
+                <p class="text-gray-600 mb-6">This sandbox illustrates how the opposition to current flow (reactance) for capacitors and inductors changes dramatically with frequency. Observe the inverse relationship for capacitors and the direct relationship for inductors. Try different frequencies to see the effect.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Component Reactance</h3>
+                        <p class="mb-2 text-gray-700">Set the frequency and see how reactances change:</p>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <label for="frequencyInput" class="font-medium">Frequency (Hz):</label>
+                            <input type="range" id="frequencyInput" min="100" max="10000" value="1000" class="flex-grow">
+                            <span id="frequencyValue" class="font-bold w-16 text-right">1000 Hz</span>
+                        </div>
+                        <p class="text-sm text-gray-600">Capacitor: 100nF ($100 \times 10^{-9}$ F)</p>
+                        <p class="text-sm text-gray-600">Inductor: 10mH ($10 \times 10^{-3}$ H)</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Reactance Graph</h3>
+                        <div class="chart-container w-full max-w-lg mx-auto h-64 md:h-80 relative">
+                            <canvas id="reactanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Practice Problems -->
+        <section id="practice" class="app-section hidden">
+            <div class="bg-white p-6 rounded-lg shadow">
+                 <h2 class="text-3xl font-bold mb-4 text-gray-900">Practice Problems</h2>
+                 <p class="text-gray-600 mb-6">Test your understanding with these problems from the course notes. Click "Show Answer" to reveal the detailed solution.</p>
+                 <div id="practice-problems-container" class="space-y-6">
+                    <!-- Practice problems will be injected here -->
+                 </div>
+                 <h2 class="text-3xl font-bold mt-8 mb-4 text-gray-900">Quiz</h2>
+                 <p class="text-gray-600 mb-6">Challenge your knowledge with these multiple-choice questions. Select your answer and click 'Check Answer'.</p>
+                 <div id="quiz-container" class="space-y-6">
+                    <!-- Quiz questions will be injected here -->
+                 </div>
+            </div>
+        </section>
+
+    </main>
+    
+<script>
+const appData = {
+    ac_basics: {
+        title: "AC Basics: Sinusoidal Waveforms",
+        description: "Alternating Current (AC) is characterized by its periodic change in magnitude and direction, typically following a sinusoidal (sine wave) pattern. Understanding these fundamental characteristics is the first step in AC circuit analysis.",
+        steps: [
+            "<strong>Sinusoidal Waveform:</strong> A signal whose amplitude varies periodically with time, described by a sine or cosine function: $v(t) = V_m \\sin(\\omega t + \\phi)$.",
+            "<strong>Amplitude ($V_m$ or $I_m$):</strong> The peak value of the voltage or current from zero. Measured in Volts (V) or Amperes (A).",
+            "<strong>Period (T):</strong> The time it takes for one complete cycle of the waveform. Measured in seconds (s).",
+            "<strong>Frequency (f):</strong> The number of cycles per second. Measured in Hertz (Hz). $f = 1/T$. Real-Life: In North America, household AC is typically 60Hz. In Europe, it's 50Hz.",
+            "<strong>Angular Frequency ($\omega$):</strong> Related to frequency by $\\omega = 2\\pi f$. Measured in radians per second (rad/s).",
+            "<strong>Phase Angle ($\\phi$):</strong> Describes the shift of the waveform relative to a reference. Measured in degrees or radians. A positive $\\phi$ means the waveform is shifted left (leads the reference), a negative $\\phi$ means it's shifted right (lags)."
+        ],
+        example: {
+            problem: "An AC voltage is given by $v(t) = 170 \\sin(377t + \\pi/6)$ V. Find its amplitude, frequency, and phase angle in degrees.",
+            circuitHTML: ``, 
+            solutionSteps: [
+                {
+                    title: "Step 1: Identify Amplitude",
+                    content: `Comparing with the general form $v(t) = V_m \\sin(\\omega t + \\phi)$, the amplitude is the coefficient of the sine function.<br>
+                    <div class="solution-box"> $V_m = 170\\text{ V}$ </div>`
+                },
+                {
+                    title: "Step 2: Identify Angular Frequency and Calculate Frequency",
+                    content: `The angular frequency $\\omega$ is the coefficient of $t$.<br>
+                    $\\omega = 377\\text{ rad/s}$<br>
+                    Frequency $f = \\omega / (2\\pi)$.<br>
+                    <div class="solution-box"> $f = 377 / (2\\pi) \\approx 60\\text{ Hz}$ </div>`
+                },
+                {
+                    title: "Step 3: Identify Phase Angle and Convert to Degrees",
+                    content: `The phase angle $\\phi$ is $\\pi/6$ radians. To convert to degrees, multiply by $180/\\pi$.<br>
+                    <div class="solution-box"> $\\phi = (\\pi/6) \\cdot (180/\\pi) = 30^{\\circ}$ </div>`
+                },
+                {
+                    title: "Final Answer",
+                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">Amplitude: <strong>170 V</strong> <br> Frequency: <strong>60 Hz</strong> <br> Phase Angle: <strong>30°</strong> </div>`
+                }
+            ]
+        }
+    },
+    phasors: {
+        title: "Phasors and Complex Numbers",
+        description: "Phasors are complex numbers that represent sinusoidal signals (voltage or current) in terms of their amplitude and phase angle. This allows us to convert differential equations (from AC circuits) into algebraic equations, greatly simplifying analysis.",
+        steps: [
+            "<strong>Complex Numbers:</strong> A complex number $Z = x + jy$ has a real part $x$ and an imaginary part $jy$. In polar form, $Z = r \\angle \\theta$, where $r = \\sqrt{x^2 + y^2}$ (magnitude) and $\\theta = \\arctan(y/x)$ (angle).",
+            "<strong>Phasor Representation:</strong> A sinusoidal voltage $v(t) = V_m \\cos(\\omega t + \\phi)$ can be represented as a phasor $\\mathbf{V} = V_m \\angle \\phi$. (Note: We use cosine as the reference for phasors in this course, though sine is also used).",
+            "<strong>Amplitude and Phase:</strong> The magnitude of the phasor is the amplitude of the sinusoid, and its angle is the phase angle.",
+            "<strong>Operations:</strong> Addition/subtraction are easier in rectangular form. Multiplication/division are easier in polar form.",
+            "<strong>Why use phasors?</strong> They transform time-domain AC circuit problems into frequency-domain algebraic problems, making calculations simpler, especially for RLC circuits.",
+            "Real-Life Application: Phasors are fundamental in power engineering for analyzing three-phase power systems (e.g., power grids, industrial motors) to manage voltage, current, and power flow efficiently. They are also used in communication systems to describe signals with varying amplitude and phase, like in radio frequency circuits."
+        ],
+        example: {
+            problem: "Convert the voltage phasor $\\mathbf{V} = 10 \\angle 30^{\\circ}$ V to rectangular form.",
+            circuitHTML: ``,
+            solutionSteps: [
+                {
+                    title: "Step 1: Understand Polar to Rectangular Conversion",
+                    content: `Given $r \\angle \\theta$, the rectangular form is $x + jy$, where $x = r \\cos(\\theta)$ and $y = r \\sin(\\theta)$.`
+                },
+                {
+                    title: "Step 2: Calculate Real Part (x)",
+                    content: `For $\\mathbf{V} = 10 \\angle 30^{\\circ}$, $r=10$ and $\\theta=30^{\\circ}$.<br>
+                    <div class="solution-box"> $x = 10 \\cos(30^{\\circ}) = 10 \\cdot (\\sqrt{3}/2) \\approx 10 \\cdot 0.866 = 8.66$ </div>`
+                },
+                {
+                    title: "Step 3: Calculate Imaginary Part (y)",
+                    content: `<div class="solution-box"> $y = 10 \\sin(30^{\\circ}) = 10 \\cdot 0.5 = 5$ </div>`
+                },
+                {
+                    title: "Final Answer",
+                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">The rectangular form is $\\mathbf{V} \\approx$ <strong>8.66 + j5 V</strong> </div>`
+                }
+            ]
+        }
+    },
+    reactance: {
+        title: "Reactance (X): Opposition in AC Circuits",
+        description: "Reactance is the opposition to current flow offered by inductors and capacitors due to energy storage. Unlike resistance (which dissipates energy as heat), reactance stores and releases energy, causing a phase shift between voltage and current.",
+        steps: [
+            "<strong>Inductive Reactance ($X_L$):</strong> Opposition offered by an inductor. It is directly proportional to frequency and inductance. The voltage across an inductor LEADS the current through it by 90°. $X_L = \\omega L = 2\\pi f L$.",
+            "<strong>Capacitive Reactance ($X_C$):</strong> Opposition offered by a capacitor. It is inversely proportional to frequency and capacitance. The current through a capacitor LEADS the voltage across it by 90° (or voltage LAGS current). $X_C = 1 / (\\omega C) = 1 / (2\\pi f C)$.",
+            "<strong>Units:</strong> Both $X_L$ and $X_C$ are measured in Ohms (Ω), just like resistance.",
+            "<strong>Key Difference from Resistance:</strong> Reactance causes a phase shift and does not dissipate real power.",
+            "Real-Life Application: Reactance is crucial in designing filters for audio systems (e.g., crossovers that direct high frequencies to tweeters and low frequencies to woofers), in radio tuners for selecting specific frequencies, and in power electronics for shaping AC waveforms and power factor correction."
+        ],
+        example: {
+            problem: "Calculate the inductive reactance ($X_L$) of a 10mH inductor and the capacitive reactance ($X_C$) of a 100nF capacitor at a frequency of 1kHz.",
+            circuitHTML: ``,
+            solutionSteps: [
+                {
+                    title: "Step 1: Calculate Inductive Reactance ($X_L$)",
+                    content: `Given $L = 10\\text{mH} = 10 \\times 10^{-3}\\text{ H}$ and $f = 1\\text{kHz} = 1000\\text{ Hz}$.<br>
+                    $\\omega = 2\\pi f = 2\\pi \\cdot 1000 \\approx 6283.19\\text{ rad/s}$<br>
+                    <div class="solution-box"> $X_L = \\omega L = 6283.19 \\cdot (10 \\times 10^{-3}) = 62.83\\Omega$ </div>`
+                },
+                {
+                    title: "Step 2: Calculate Capacitive Reactance ($X_C$)",
+                    content: `Given $C = 100\\text{nF} = 100 \\times 10^{-9}\\text{ F}$ and $f = 1000\\text{ Hz}$.<br>
+                    <div class="solution-box"> $X_C = 1 / (\\omega C) = 1 / (6283.19 \\cdot (100 \\times 10^{-9})) = 1 / (6.28319 \\times 10^{-4}) \\approx 1591.55\\Omega$ </div>`
+                },
+                {
+                    title: "Final Answer",
+                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">Inductive Reactance ($X_L$): <strong>62.83 Ω</strong> <br> Capacitive Reactance ($X_C$): <strong>1591.55 Ω</strong> </div>`
+                }
+            ]
+        }
+    },
+    impedance: {
+        title: "Impedance (Z): Total Opposition in AC Circuits",
+        description: "Impedance is the total opposition to current flow in an AC circuit. It is a complex quantity that combines both resistance (R) and reactance (X). It is represented as a complex number and is the AC equivalent of resistance in DC circuits.",
+        steps: [
+            "<strong>Complex Impedance (Z):</strong> $Z = R + jX$. Where $R$ is resistance and $X$ is reactance ($X_L$ or $-X_C$).",
+            "<strong>Resistor Impedance:</strong> For a resistor, $Z_R = R \\angle 0^{\\circ} = R + j0$.",
+            "<strong>Inductor Impedance:</strong> For an inductor, $Z_L = jX_L = j\\omega L = \\omega L \\angle 90^{\\circ}$.",
+            "<strong>Capacitor Impedance:</strong> For a capacitor, $Z_C = -jX_C = 1 / (j\\omega C) = (1 / (\\omega C)) \\angle -90^{\\circ}$.",
+            "<strong>Series Impedances:</strong> Total impedance of components in series is the sum of their individual impedances: $Z_{eq} = Z_1 + Z_2 + ... + Z_n$. (Add in rectangular form).",
+            "<strong>Parallel Impedances:</strong> Total impedance of components in parallel is similar to parallel resistors, but using complex numbers: $1/Z_{eq} = 1/Z_1 + 1/Z_2 + ... + 1/Z_n$. (Easier to convert to admittance $Y=1/Z$, sum, then convert back to impedance).",
+            "Real-Life Application: Impedance matching is a crucial concept in audio amplifiers and antennas. For maximum power transfer, the load impedance must match the source impedance. This principle ensures efficient signal transmission from your phone to headphones or from a radio transmitter to its antenna, minimizing signal reflection and loss."
+        ],
+        example: {
+            problem: "A series RLC circuit has $R=10\\Omega$, $L=20\\text{mH}$, and $C=50\\text{nF}$. If the operating frequency is $f=500\\text{ Hz}$, find the total impedance of the circuit.",
+            circuitHTML: ``,
+            solutionSteps: [
+                {
+                    title: "Step 1: Calculate Angular Frequency ($\\omega$)",
+                    content: `Given $f = 500\\text{ Hz}$.<br>
+                    <div class="solution-box"> $\\omega = 2\\pi f = 2\\pi \\cdot 500 = 1000\\pi \\text{ rad/s} \\approx 3141.59\\text{ rad/s}$ </div>`
+                },
+                {
+                    title: "Step 2: Calculate Inductive Reactance ($X_L$)",
+                    content: `Given $L = 20\\text{mH} = 20 \\times 10^{-3}\\text{ H}$.<br>
+                    <div class="solution-box"> $X_L = \\omega L = (1000\\pi) \\cdot (20 \\times 10^{-3}) = 20\\pi \\approx 62.83\\Omega$ </div>`
+                },
+                {
+                    title: "Step 3: Calculate Capacitive Reactance ($X_C$)",
+                    content: `Given $C = 50\\text{nF} = 50 \\times 10^{-9}\\text{ F}$.<br>
+                    <div class="solution-box"> $X_C = 1 / (\\omega C) = 1 / ((1000\\pi) \\cdot (50 \\times 10^{-9})) = 1 / (5\\pi \\times 10^{-5}) \\approx 6366.2\\Omega$ </div>`
+                },
+                {
+                    title: "Step 4: Formulate Impedance (Z) for Series Circuit",
+                    content: `For a series RLC circuit, $Z = R + j(X_L - X_C)$.<br>
+                    <div class="solution-box"> $Z = 10 + j(62.83 - 6366.2) = 10 - j6303.37\\Omega$ </div>`
+                },
+                {
+                    title: "Final Answer (Polar Form for Magnitude/Phase Insight)",
+                    content: `To get magnitude and phase: $r = \\sqrt{R^2 + X^2}$ and $\\theta = \\arctan(X/R)$.<br>
+                    $|Z| = \\sqrt{10^2 + (-6303.37)^2} \\approx 6303.39\\Omega$<br>
+                    $\\theta = \\arctan(-6303.37 / 10) \\approx -89.9^{\\circ}$ (Highly capacitive)<br>
+                    <div class="p-4 bg-green-100 text-green-800 rounded-lg">Total Impedance $Z \\approx$ <strong>10 - j6303.37 Ω</strong> <br> (or approximately <strong>6303.39 Ω $\\angle -89.9^{\\circ}$</strong>) </div>`
+                }
+            ]
+        }
+    },
+    ac_power: {
+        title: "AC Power: Real, Reactive, Apparent, and Power Factor",
+        description: "In AC circuits, power is more complex than in DC due to phase differences between voltage and current. We define different types of power to fully describe energy flow and dissipation.",
+        steps: [
+            "<strong>Real Power (P):</strong> The average power dissipated by the resistance in the circuit. Measured in Watts (W). This is the 'useful' power that does work (e.g., lights a bulb, spins a motor). $P = V_{RMS} I_{RMS} \\cos(\\theta)$, where $\\theta$ is the phase angle between V and I.",
+            "<strong>Reactive Power (Q):</strong> The power exchanged between the source and the reactive components (inductors and capacitors). Measured in Volt-Amperes Reactive (VAR). This power does no useful work but is necessary for the operation of inductive/capacitive loads. $Q = V_{RMS} I_{RMS} \\sin(\\theta)$.",
+            "<strong>Apparent Power (S):</strong> The total power delivered by the source. Measured in Volt-Amperes (VA). It is the vector sum of real and reactive power. $S = V_{RMS} I_{RMS} = \\sqrt{P^2 + Q^2}$.",
+            "<strong>Power Factor (PF):</strong> The ratio of real power to apparent power. $PF = P/S = \\cos(\\theta)$. It indicates how effectively the current is being converted into useful work. A PF of 1 (unity) is ideal. Real-Life: Power companies penalize industrial users for low power factor, as it means they have to generate more apparent power for the same amount of useful real power.",
+            "Real-Life Application: Power factor correction (PFC) is critical in industrial facilities to minimize wasted energy and reduce electricity bills. Motors and other inductive loads cause a lagging power factor. Capacitors are often installed in parallel to compensate for this reactive power, bringing the power factor closer to unity and improving overall system efficiency."
+        ],
+        example: {
+            problem: "An AC motor draws 5A RMS current from a 240V RMS, 60Hz supply. The current lags the voltage by 30°. Calculate the real power, reactive power, apparent power, and power factor.",
+            circuitHTML: ``,
+            solutionSteps: [
+                {
+                    title: "Step 1: Calculate Real Power (P)",
+                    content: `Given $V_{RMS} = 240\\text{V}$, $I_{RMS} = 5\\text{A}$, $\\theta = 30^{\\circ}$.<br>
+                    <div class="solution-box"> $P = V_{RMS} I_{RMS} \\cos(\\theta) = 240 \\cdot 5 \\cdot \\cos(30^{\\circ}) = 1200 \\cdot 0.866 \\approx 1039.2\\text{ W}$ </div>`
+                },
+                {
+                    title: "Step 2: Calculate Reactive Power (Q)",
+                    content: `<div class="solution-box"> $Q = V_{RMS} I_{RMS} \\sin(\\theta) = 240 \\cdot 5 \\cdot \\sin(30^{\\circ}) = 1200 \\cdot 0.5 = 600\\text{ VAR}$ </div>`
+                },
+                {
+                    title: "Step 3: Calculate Apparent Power (S)",
+                    content: `<div class="solution-box"> $S = V_{RMS} I_{RMS} = 240 \\cdot 5 = 1200\\text{ VA}$ <br> (Alternatively: $S = \\sqrt{P^2 + Q^2} = \\sqrt{1039.2^2 + 600^2} \\approx 1200\\text{ VA}$) </div>`
+                },
+                {
+                    title: "Step 4: Calculate Power Factor (PF)",
+                    content: `<div class="solution-box"> $PF = P/S = 1039.2 / 1200 \\approx 0.866$ <br> (Alternatively: $PF = \\cos(\\theta) = \\cos(30^{\\circ}) \\approx 0.866$) </div>`
+                },
+                {
+                    title: "Final Answer",
+                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">Real Power (P): <strong>1039.2 W</strong> <br> Reactive Power (Q): <strong>600 VAR</strong> <br> Apparent Power (S): <strong>1200 VA</strong> <br> Power Factor (PF): <strong>0.866 lagging</strong> </div>`
+                }
+            ]
+        }
+    }
+};
+
+const practiceProblems = [
+    {
+        id: 1,
+        title: "AC Waveform Analysis",
+        problemHTML: `An AC current is described by $i(t) = 10 \\sin(120\\pi t + \\pi/4)$ A. Determine its peak amplitude, RMS value, frequency, period, and phase angle in degrees.`,
+        answerHTML: `<b>Solution:</b><br>
+        Peak Amplitude ($I_m$) = 10 A<br>
+        RMS Value ($I_{RMS}$) = $I_m / \\sqrt{2} = 10 / \\sqrt{2} \\approx 7.071\\text{ A}$<br>
+        Angular Frequency ($\\omega$) = $120\\pi\\text{ rad/s}$<br>
+        Frequency ($f$) = $\\omega / (2\\pi) = 120\\pi / (2\\pi) = 60\\text{ Hz}$<br>
+        Period (T) = $1/f = 1/60 \\approx 16.67\\text{ ms}$<br>
+        Phase Angle ($\\phi$) = $\\pi/4 \\text{ rad} = (180/\\pi) \\cdot (\\pi/4) = 45^{\\circ}$<br>
+        <div class="solution-box"> Peak Amplitude: 10 A, RMS: 7.071 A, Frequency: 60 Hz, Period: 16.67 ms, Phase: 45° </div>`
+    },
+    {
+        id: 2,
+        title: "Reactance Calculation",
+        problemHTML: `Calculate the inductive reactance ($X_L$) of a 50mH inductor and the capacitive reactance ($X_C$) of a 220nF capacitor at a frequency of 2.5kHz.`,
+        answerHTML: `<b>Solution:</b><br>
+        Angular Frequency ($\\omega$) = $2\\pi f = 2\\pi \\cdot 2500 \\approx 15707.96\\text{ rad/s}$<br>
+        Inductive Reactance ($X_L$) = $\\omega L = 15707.96 \\cdot (50 \\times 10^{-3}) \\approx 785.4\\Omega$<br>
+        Capacitive Reactance ($X_C$) = $1 / (\\omega C) = 1 / (15707.96 \\cdot (220 \\times 10^{-9})) \\approx 289.4\\Omega$<br>
+        <div class="solution-box"> $X_L \\approx 785.4\\Omega$, $X_C \\approx 289.4\\Omega$ </div>`
+    },
+    {
+        id: 3,
+        title: "Series RLC Impedance",
+        problemHTML: `A series RLC circuit has $R = 20\\Omega$, $L = 100\\text{mH}$, and $C = 10\\mu\\text{F}$. If the supply frequency is 100Hz, find the total impedance Z in both rectangular and polar form.`,
+        answerHTML: `<b>Solution:</b><br>
+        $\\omega = 2\\pi f = 2\\pi \\cdot 100 = 200\\pi \\approx 628.32\\text{ rad/s}$<br>
+        $X_L = \\omega L = 628.32 \\cdot 0.1 = 62.832\\Omega$<br>
+        $X_C = 1 / (\\omega C) = 1 / (628.32 \\cdot 10 \\times 10^{-6}) = 1 / (6.2832 \\times 10^{-3}) \\approx 159.15\\Omega$<br>
+        Rectangular form: $Z = R + j(X_L - X_C) = 20 + j(62.832 - 159.15) = 20 - j96.318\\Omega$<br>
+        Polar form: $|Z| = \\sqrt{20^2 + (-96.318)^2} \\approx 98.37\\Omega$<br>
+        $\\theta = \\arctan(-96.318 / 20) \\approx -78.29^{\\circ}$<br>
+        <div class="solution-box"> $Z = 20 - j96.318\\Omega$, or $Z \\approx 98.37\\Omega \\angle -78.29^{\\circ}$ </div>`
+    },
+    {
+        id: 4,
+        title: "AC Power Calculation",
+        problemHTML: `An AC load draws 1.5kW of real power with a lagging power factor of 0.8 from a 240V RMS supply. Calculate the apparent power, reactive power, and the RMS current drawn by the load.`,
+        answerHTML: `<b>Solution:</b><br>
+        Real Power (P) = 1.5kW = 1500W<br>
+        Power Factor (PF) = 0.8 lagging<br>
+        Apparent Power (S) = $P / PF = 1500\\text{W} / 0.8 = 1875\\text{ VA}$<br>
+        Phase Angle ($\\theta$) = $\\arccos(PF) = \\arccos(0.8) \\approx 36.87^{\\circ}$<br>
+        Reactive Power (Q) = $S \\sin(\\theta) = 1875 \\cdot \\sin(36.87^{\\circ}) \\approx 1875 \\cdot 0.6 = 1125\\text{ VAR}$<br>
+        RMS Current ($I_{RMS}$) = $S / V_{RMS} = 1875\\text{VA} / 240\\text{V} \\approx 7.8125\\text{ A}$<br>
+        <div class="solution-box"> S = 1875 VA, Q = 1125 VAR, $I_{RMS} \\approx 7.8125\\text{ A}$ </div>`
+    }
+];
+
+const quizQuestions = [
+    {
+        id: 1,
+        question: "What is the unit of angular frequency ($\\omega$)?",
+        options: ["Hertz (Hz)", "Radians (rad)", "Radians per second (rad/s)", "Cycles per second"],
+        answer: "Radians per second (rad/s)",
+        explanation: "Angular frequency measures cycles per unit time in radians, hence radians per second."
+    },
+    {
+        id: 2,
+        question: "Which component's reactance is inversely proportional to frequency?",
+        options: ["Resistor", "Inductor", "Capacitor", "Transformer"],
+        answer: "Capacitor",
+        explanation: "Capacitive reactance ($X_C = 1 / (2\\pi f C)$) decreases as frequency increases."
+    },
+    {
+        id: 3,
+        question: "If the voltage across an inductor leads the current through it by 90°, what does this indicate?",
+        options: ["Resistive circuit", "Inductive reactance", "Capacitive reactance", "Purely DC circuit"],
+        answer: "Inductive reactance",
+        explanation: "Inductors cause the voltage to lead the current by 90 degrees."
+    },
+    {
+        id: 4,
+        question: "What does a power factor of 1 (unity) signify in an AC circuit?",
+        options: ["High reactive power", "Purely resistive load", "High apparent power", "Purely inductive load"],
+        answer: "Purely resistive load",
+        explanation: "A power factor of 1 means all apparent power is real power, indicating no reactive components or perfect cancellation of reactive power."
+    },
+    {
+        id: 5,
+        question: "How do you calculate the RMS value of a sinusoidal voltage if its peak voltage ($V_m$) is known?",
+        options: ["$V_{RMS} = V_m \\cdot \\sqrt{2}$", "$V_{RMS} = V_m / 2$", "$V_{RMS} = V_m / \\sqrt{2}$", "$V_{RMS} = V_m$"],
+        answer: "$V_{RMS} = V_m / \\sqrt{2}$",
+        explanation: "For a sine wave, the RMS value is the peak value divided by the square root of 2."
+    }
+];
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const appSections = document.querySelectorAll('.app-section');
+    const conceptTabs = document.querySelectorAll('.concept-tab');
+    const conceptContentContainer = document.getElementById('concept-content');
+    
+    // Main navigation
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const targetId = link.dataset.target;
+            appSections.forEach(section => {
+                section.classList.toggle('hidden', section.id !== targetId);
+            });
+            navLinks.forEach(l => l.classList.remove('font-bold', 'text-blue-600'));
+            link.classList.add('font-bold', 'text-blue-600');
+        });
+    });
+
+    // Concept tabs
+    conceptTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const conceptId = tab.dataset.concept;
+            conceptTabs.forEach(t => t.classList.remove('tab-active', 'border-blue-500', 'text-blue-600'));
+            tab.classList.add('tab-active', 'border-blue-500', 'text-blue-600');
+            renderConcept(conceptId);
+        });
+    });
+
+    function renderConcept(conceptId) {
+        const data = appData[conceptId];
+        if (!data) return;
+
+        let stepsHTML = data.steps.map(step => `<li class="mb-2">${step}</li>`).join('');
+        let exampleStepsHTML = data.example.solutionSteps.map((step, index) => `
+            <div id="step-${index}" class="step-content border-t pt-4 mt-4">
+                <h4 class="font-semibold text-lg text-blue-700">${step.title}</h4>
+                <div class="text-gray-700 mt-2">${step.content}</div>
+            </div>
+        `).join('');
+
+        conceptContentContainer.innerHTML = `
+            <h3 class="text-2xl font-bold text-gray-800">${data.title}</h3>
+            <p class="mt-2 mb-4 text-gray-600">${data.description}</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="text-xl font-semibold mb-2">General Steps & Real-Life Application</h4>
+                    <ul class="list-decimal list-inside text-gray-700 space-y-1">${stepsHTML}</ul>
+                </div>
+                <div>
+                    <h4 class="text-xl font-semibold mb-2">Interactive Example: ${data.example.problem}</h4>
+                    ${data.example.circuitHTML || ''}
+                    <div id="example-steps-container">${exampleStepsHTML}</div>
+                    <div class="mt-4 flex space-x-2">
+                         <button id="next-step-btn" class="btn">Start</button>
+                         <button id="reset-steps-btn" class="btn btn-secondary">Reset</button>
+                    </div>
+                </div>
+            </div>`;
+        
+        setupInteractiveExample();
+    }
+    
+    let currentStep = -1;
+    function setupInteractiveExample() {
+        const nextBtn = document.getElementById('next-step-btn');
+        const resetBtn = document.getElementById('reset-steps-btn');
+        const steps = document.querySelectorAll('.step-content');
+        currentStep = -1;
+
+        const showNextStep = () => {
+            if (currentStep >= 0) {
+                steps[currentStep].classList.remove('visible');
+            }
+            currentStep++;
+            if (currentStep < steps.length) {
+                steps[currentStep].classList.add('visible');
+                nextBtn.textContent = 'Next Step';
+            }
+            if (currentStep >= steps.length - 1) {
+                nextBtn.disabled = true;
+                nextBtn.textContent = 'Finished';
+            }
+        };
+
+        const resetSteps = () => {
+            steps.forEach(step => step.classList.remove('visible'));
+            currentStep = -1;
+            nextBtn.disabled = false;
+            nextBtn.textContent = 'Start';
+        };
+
+        nextBtn.addEventListener('click', showNextStep);
+        resetBtn.addEventListener('click', resetSteps);
+    }
+    
+    function renderPracticeProblems() {
+        const container = document.getElementById('practice-problems-container');
+        container.innerHTML = practiceProblems.map(p => `
+            <div class="border rounded-lg p-4">
+                <h4 class="text-lg font-semibold">${p.title}</h4>
+                <p class="mt-2 text-gray-700">${p.problemHTML}</p>
+                <div id="answer-${p.id}" class="mt-4 p-4 bg-blue-50 rounded hidden">
+                   ${p.answerHTML}
+                </div>
+                <button data-answer-id="${p.id}" class="toggle-answer-btn btn mt-4 text-sm">Show Answer</button>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const answerId = btn.dataset.answerId;
+                const answerEl = document.getElementById(`answer-${answerId}`);
+                answerEl.classList.toggle('hidden');
+                btn.textContent = answerEl.classList.contains('hidden') ? 'Show Answer' : 'Hide Answer';
+            });
+        });
+    }
+
+    function renderQuiz() {
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = quizQuestions.map((q, index) => `
+            <div class="border rounded-lg p-4">
+                <h4 class="text-lg font-semibold mb-3">Q${index + 1}: ${q.question}</h4>
+                <div class="space-y-2">
+                    ${q.options.map((option, optIndex) => `
+                        <label class="block">
+                            <input type="radio" name="quiz-q${q.id}" value="${option}" class="mr-2">
+                            ${option}
+                        </label>
+                    `).join('')}
+                </div>
+                <button data-question-id="${q.id}" class="check-quiz-btn btn mt-4 text-sm">Check Answer</button>
+                <div id="quiz-feedback-${q.id}" class="mt-3 text-sm font-semibold"></div>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.check-quiz-btn').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                const questionId = btn.dataset.questionId;
+                const selectedOption = document.querySelector(`input[name="quiz-q${questionId}"]:checked`);
+                const feedbackEl = document.getElementById(`quiz-feedback-${questionId}`);
+                const question = quizQuestions.find(q => q.id == questionId);
+
+                if (!selectedOption) {
+                    feedbackEl.innerHTML = `<span class="text-yellow-600">Please select an option.</span>`;
+                    return;
+                }
+
+                if (selectedOption.value === question.answer) {
+                    feedbackEl.innerHTML = `<span class="text-green-600">Correct!</span> ${question.explanation}`;
+                } else {
+                    feedbackEl.innerHTML = `<span class="text-red-600">Incorrect.</span> The correct answer is: <strong>${question.answer}</strong>. ${question.explanation}`;
+                }
+            });
+        });
+    }
+
+    // Sandbox logic for Reactance Chart
+    const frequencyInput = document.getElementById('frequencyInput');
+    const frequencyValueSpan = document.getElementById('frequencyValue');
+    const reactanceChartCtx = document.getElementById('reactanceChart').getContext('2d');
+    let reactanceChart;
+
+    const CAPACITANCE = 100 * 1e-9; // 100 nF
+    const INDUCTANCE = 10 * 1e-3; // 10 mH
+
+    function updateReactanceChart() {
+        const frequency = parseFloat(frequencyInput.value);
+        frequencyValueSpan.textContent = `${frequency} Hz`;
+        const omega = 2 * Math.PI * frequency;
+
+        const xl = omega * INDUCTANCE;
+        const xc = 1 / (omega * CAPACITANCE);
+
+        if (!reactanceChart) {
+            reactanceChart = new Chart(reactanceChartCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Inductive Reactance ($X_L$)', 'Capacitive Reactance ($X_C$)'],
+                    datasets: [{
+                        label: 'Reactance (Ω)',
+                        data: [xl, xc],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.6)', // Blue for XL
+                            'rgba(234, 179, 8, 0.6)'    // Yellow for XC
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(234, 179, 8, 1)'
+                        ],
+                        borderWidth: 2,
+                        tension: 0.2,
+                        pointRadius: 5,
+                        pointBackgroundColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(234, 179, 8, 1)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Reactance (Ω)'
+                            },
+                            type: 'logarithmic', // Log scale for better visualization of wide range
+                            ticks: {
+                                callback: function (value, index, values) {
+                                    if (value === 0) return '0';
+                                    if (value >= 1000) return value / 1000 + 'k';
+                                    return value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Reactance vs. Frequency'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed.y.toFixed(2) + ' Ω';
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 0 // Disable animation for real-time slider updates
+                    }
+                }
+            });
+        } else {
+            reactanceChart.data.datasets[0].data = [xl, xc];
+            reactanceChart.update();
+        }
+    }
+
+    frequencyInput.addEventListener('input', updateReactanceChart);
+
+    // Initial setup
+    document.querySelector('.nav-link[data-target="concepts"]').click();
+    document.querySelector('.concept-tab[data-concept="ac_basics"]').click();
+    renderPracticeProblems();
+    renderQuiz();
+    updateReactanceChart(); // Initial chart render
+});
+</script>
+</body>
+</html>
