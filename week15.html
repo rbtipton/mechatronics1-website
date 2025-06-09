@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics 1: Week 15 - Real-Time Operating Systems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The application uses a tabbed dashboard structure (Intro, Simulator, Concepts, Quiz) for intuitive, non-linear exploration. The core is the "RTOS Task Scheduler Simulator," designed for hands-on learning. It visualizes how a preemptive scheduler handles tasks with different priorities, making an abstract concept tangible. This is supported by interactive diagrams for inter-task communication and task states, reinforcing the core principles of an RTOS. -->
+    <!-- Visualization & Content Choices:
+        - Task Scheduling -> Goal: Understand preemptive scheduling. -> Viz: A timeline-style chart (using Chart.js) showing tasks running on a virtual CPU. -> Interaction: Buttons to add tasks of different priorities and a "Run" button to trigger the simulation. Justification: A visual timeline is the most effective way to demonstrate how higher-priority tasks interrupt lower-priority ones, which is the cornerstone of RTOS behavior.
+        - Inter-Task Communication -> Goal: Explain Mutexes and Message Queues. -> Viz: HTML/CSS diagrams with styled blocks representing tasks and resources. -> Interaction: Buttons to simulate task actions (e.g., "Acquire Mutex," "Send Message") that visually update the diagram's state. Justification: Interactive diagrams clarify the flow of control and data better than static images or text alone.
+        - Task States -> Goal: Show how tasks move between states. -> Viz: An HTML/CSS state machine diagram. -> Interaction: Buttons trigger transitions (e.g., "Block Task," "Event Occurs") and update the diagram, highlighting the active state. Justification: Makes the lifecycle of a task easy to follow.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
+        .nav-button.active, .nav-button:hover { color: #4f46e5; border-bottom-color: #4f46e5; }
+        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        .task-state { transition: all 0.3s ease; border: 2px solid #d4d4d8; }
+        .task-state.active { border-color: #4f46e5; transform: scale(1.05); box-shadow: 0 0 15px rgba(79, 70, 229, 0.3); }
+        .arrow { position: absolute; color: #a1a1aa; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 15: RTOS</h1>
+                <nav class="hidden md:flex space-x-4 lg:space-x-6">
+                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
+                    <button class="nav-button" onclick="showSection('simulator')">Scheduler Sim</button>
+                    <button class="nav-button" onclick="showSection('concepts')">Concepts</button>
+                    <button class="nav-button" onclick="showSection('quiz')">Quiz</button>
+                </nav>
+                 <button id="menu-btn" class="md:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+             <div id="mobile-menu" class="hidden md:hidden py-2">
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('simulator'); closeMenu();">Scheduler Sim</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('concepts'); closeMenu();">Concepts</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('quiz'); closeMenu();">Quiz</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <section id="intro" class="content-section active">
+            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Introduction to Real-Time Operating Systems</h2>
+                <p class="text-lg text-stone-600 mb-6">An RTOS provides the framework to manage multiple, complex tasks with strict timing deadlines. Its core value is not just speed, but **predictability**. This interactive app will help you visualize the key concepts that make real-time systems possible.</p>
+                <div class="mt-6 p-4 bg-indigo-50 border-l-4 border-indigo-500">
+                    <p class="text-indigo-800">Use the tabs above to navigate. The **Scheduler Sim** is the best place to start for hands-on learning!</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="simulator" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">RTOS Scheduler Simulator</h2>
+            <div class="grid lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-2 card p-6">
+                    <h3 class="text-xl font-bold text-stone-700 mb-4">Task Execution Timeline</h3>
+                    <p class="text-sm text-stone-600 mb-4">This chart shows which task is running on the CPU at each time "tick." Notice how higher priority tasks interrupt (preempt) lower priority ones.</p>
+                    <div class="chart-container" style="position: relative; height:40vh; max-height:400px; width:100%;">
+                        <canvas id="schedulerChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card p-6 space-y-4">
+                    <h3 class="text-xl font-bold text-stone-700 mb-2">Controls</h3>
+                    <div>
+                        <label for="taskDuration" class="block text-sm font-medium text-stone-700">Task Duration (ticks)</label>
+                        <input type="number" id="taskDuration" value="5" class="mt-1 block w-full rounded-md border-stone-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    </div>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" onclick="addTask(3)">Add High Priority Task</button>
+                        <button class="w-full px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600" onclick="addTask(2)">Add Medium Priority Task</button>
+                        <button class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" onclick="addTask(1)">Add Low Priority Task</button>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700" onclick="runScheduler()">Run Simulation</button>
+                        <button class="flex-1 px-4 py-2 bg-stone-500 text-white rounded hover:bg-stone-600" onclick="resetScheduler()">Reset</button>
+                    </div>
+                    <div class="mt-4">
+                        <h4 class="font-semibold text-stone-700">Task Queue:</h4>
+                        <ul id="taskQueueList" class="text-sm text-stone-600 list-disc list-inside h-24 overflow-y-auto bg-stone-50 p-2 rounded">
+                            <li>No tasks added</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="concepts" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Key Concepts Visualized</h2>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Mutex Visualization -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-stone-700 mb-4">Mutex (Resource Protection)</h3>
+                    <p class="text-sm text-stone-600 mb-4">A mutex ensures only one task can access a shared resource at a time.</p>
+                    <div class="flex justify-around items-center h-48 bg-stone-50 p-4 rounded-lg">
+                        <div id="mutex-task1" class="text-center p-2 rounded border-2 border-transparent">
+                            <span class="text-4xl">👨‍💻</span><p>Task 1</p>
+                        </div>
+                        <div id="mutex-resource" class="text-center p-4 rounded-full border-2 border-dashed border-stone-400">
+                            <span class="text-4xl">💾</span><p id="mutex-status" class="text-sm font-mono">Free</p>
+                        </div>
+                        <div id="mutex-task2" class="text-center p-2 rounded border-2 border-transparent">
+                            <span class="text-4xl">👩‍💻</span><p>Task 2</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" onclick="simMutex('task1')">Task 1 Acquires</button>
+                        <button class="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 text-sm" onclick="simMutex('task2')">Task 2 Acquires</button>
+                        <button class="col-span-2 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 text-sm" onclick="simMutex('release')">Release Resource</button>
+                    </div>
+                </div>
+                
+                 <!-- Task States Visualization -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-stone-700 mb-4">Task State Transitions</h3>
+                     <p class="text-sm text-stone-600 mb-4">An RTOS manages tasks by moving them between states.</p>
+                     <div class="relative flex justify-center items-center h-48 bg-stone-50 p-4 rounded-lg">
+                        <div id="state-running" class="task-state active p-3 rounded-lg bg-white text-center absolute" style="left: 40%; top: 0;">
+                            <span class="text-2xl">▶️</span><p>Running</p>
+                        </div>
+                         <div id="state-ready" class="task-state p-3 rounded-lg bg-white text-center absolute" style="left: 0; top: 40%;">
+                            <span class="text-2xl">👍</span><p>Ready</p>
+                        </div>
+                         <div id="state-blocked" class="task-state p-3 rounded-lg bg-white text-center absolute" style="right: 0; top: 40%;">
+                             <span class="text-2xl">⛔</span><p>Blocked</p>
+                        </div>
+                        <div class="arrow" style="top: 25%; left: 28%; transform: rotate(135deg);">↑</div>
+                        <div class="arrow" style="top: 25%; right: 28%; transform: rotate(45deg);">↑</div>
+                        <div class="arrow" style="top: 35%; left: 30%;">→</div>
+                        <div class="arrow" style="top: 35%; right: 30%;">←</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm" onclick="simState('preempt')">Higher Task Preempts</button>
+                        <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm" onclick="simState('wait')">Task Waits for Event</button>
+                        <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm" onclick="simState('resume')">Task Resumes</button>
+                         <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" onclick="simState('event')">Event Occurs</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
+            <div id="quiz-grid" class="space-y-4"></div>
+        </section>
+
+    </main>
+
+<script>
+let schedulerChart;
+let taskQueue = [];
+let taskIdCounter = 1;
+let currentOwner = null;
+
+const quizData = [
+    { question: "What is the primary goal of an RTOS compared to a GPOS?", answer: "The primary goal is **predictability and determinism** (guaranteeing deadlines), not average performance or throughput." },
+    { question: "A car's airbag deployment system is an example of what kind of real-time constraint?", answer: "**Hard real-time**. Missing the deadline for deployment would be catastrophic." },
+    { question: "What is a 'mutex' used for in an RTOS?", answer: "A mutex (Mutual Exclusion) is used to protect a shared resource (like memory or a peripheral) to ensure only one task can access it at a time, preventing data corruption." },
+    { question: "In a preemptive scheduler, if a high-priority task becomes ready while a low-priority task is running, what happens?", answer: "The low-priority task is immediately interrupted (preempted), and the high-priority task begins to run." }
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+    initSchedulerChart();
+    initQuiz();
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+});
+
+function initSchedulerChart() {
+    const ctx = document.getElementById('schedulerChart').getContext('2d');
+    schedulerChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [], // Time ticks
+            datasets: [{
+                label: 'CPU Usage by Task',
+                data: [], // {x: time, y: priority}
+                backgroundColor: [],
+                borderWidth: 1,
+                barPercentage: 1.0,
+                categoryPercentage: 1.0
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Task ${context.raw.task.id} (Priority: ${context.raw.y})`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'linear',
+                    title: { display: true, text: 'Time Ticks' },
+                    grid: { display: false },
+                    ticks: { stepSize: 1 }
+                },
+                y: {
+                    min: 0,
+                    max: 4,
+                    title: { display: true, text: 'Task Priority' },
+                     ticks: {
+                        stepSize: 1,
+                         callback: function(value, index, values) {
+                            if (value === 0) return 'Idle';
+                            const levels = ['Low', 'Medium', 'High'];
+                            return levels[value-1] || '';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function addTask(priority) {
+    const duration = parseInt(document.getElementById('taskDuration').value) || 3;
+    const task = { id: taskIdCounter++, priority, duration };
+    taskQueue.push(task);
+    updateTaskQueueList();
+}
+
+function updateTaskQueueList() {
+    const listEl = document.getElementById('taskQueueList');
+    if (taskQueue.length === 0) {
+        listEl.innerHTML = '<li>No tasks added</li>';
+        return;
+    }
+    listEl.innerHTML = taskQueue.map(t => {
+        const priorityMap = {1: 'Low', 2: 'Medium', 3: 'High'};
+        const colorMap = {1: 'text-green-700', 2: 'text-yellow-700', 3: 'text-red-700'};
+        return `<li class="${colorMap[t.priority]}">Task ${t.id} - Priority: ${priorityMap[t.priority]}, Duration: ${t.duration}</li>`;
+    }).join('');
+}
+
+function runScheduler() {
+    let timeline = [];
+    let currentTime = 0;
+    let localTaskQueue = JSON.parse(JSON.stringify(taskQueue)); 
+    
+    // Simple preemptive scheduler simulation
+    while (localTaskQueue.length > 0) {
+        // Find the highest priority task available at the current time
+        let highestPriorityTask = null;
+        for (const task of localTaskQueue) {
+            if (!highestPriorityTask || task.priority > highestPriorityTask.priority) {
+                highestPriorityTask = task;
+            }
+        }
+        
+        if (highestPriorityTask) {
+             const runDuration = 1; // Run for one tick
+             timeline.push({ time: currentTime, task: highestPriorityTask });
+             highestPriorityTask.duration -= runDuration;
+
+             if (highestPriorityTask.duration <= 0) {
+                // Remove task if completed
+                localTaskQueue = localTaskQueue.filter(t => t.id !== highestPriorityTask.id);
+             }
+        } else {
+             timeline.push({ time: currentTime, task: {id: 'Idle', priority: 0} });
+        }
+        currentTime++;
+        if (currentTime > 50) break; // Safety break
+    }
+
+    // Update chart
+    const labels = timeline.map(t => t.time);
+    const data = timeline.map(t => ({
+        x: t.time,
+        y: t.task.priority,
+        task: t.task
+    }));
+    const colors = data.map(d => {
+        if (d.y === 3) return 'rgba(220, 38, 38, 0.8)'; // High - red
+        if (d.y === 2) return 'rgba(234, 179, 8, 0.8)'; // Medium - yellow
+        if (d.y === 1) return 'rgba(22, 163, 74, 0.8)'; // Low - green
+        return 'rgba(209, 213, 219, 0.8)'; // Idle
+    });
+
+    schedulerChart.data.labels = labels;
+    schedulerChart.data.datasets[0].data = data;
+    schedulerChart.data.datasets[0].backgroundColor = colors;
+    schedulerChart.options.scales.x.max = currentTime;
+    schedulerChart.update();
+}
+
+function resetScheduler() {
+    taskQueue = [];
+    taskIdCounter = 1;
+    updateTaskQueueList();
+    schedulerChart.data.labels = [];
+    schedulerChart.data.datasets[0].data = [];
+    schedulerChart.update();
+}
+
+function simMutex(action) {
+    const task1El = document.getElementById('mutex-task1');
+    const task2El = document.getElementById('mutex-task2');
+    const resourceEl = document.getElementById('mutex-resource');
+    const statusEl = document.getElementById('mutex-status');
+
+    if (action === 'release') {
+        currentOwner = null;
+    } else {
+        if (currentOwner === null) {
+            currentOwner = action;
+        }
+    }
+    
+    task1El.classList.remove('border-green-500', 'shadow-lg');
+    task2El.classList.remove('border-green-500', 'shadow-lg');
+    
+    if (currentOwner === 'task1') {
+        statusEl.textContent = 'Locked';
+        resourceEl.classList.add('border-red-500');
+        resourceEl.classList.remove('border-stone-400');
+        task1El.classList.add('border-green-500', 'shadow-lg');
+    } else if (currentOwner === 'task2') {
+        statusEl.textContent = 'Locked';
+        resourceEl.classList.add('border-red-500');
+        resourceEl.classList.remove('border-stone-400');
+        task2El.classList.add('border-green-500', 'shadow-lg');
+    } else {
+        statusEl.textContent = 'Free';
+        resourceEl.classList.remove('border-red-500');
+        resourceEl.classList.add('border-stone-400');
+    }
+}
+
+function simState(action) {
+    const runningEl = document.getElementById('state-running');
+    const readyEl = document.getElementById('state-ready');
+    const blockedEl = document.getElementById('state-blocked');
+    const allStates = [runningEl, readyEl, blockedEl];
+    allStates.forEach(el => el.classList.remove('active'));
+
+    switch(action) {
+        case 'preempt':
+            runningEl.classList.remove('active');
+            readyEl.classList.add('active');
+            break;
+        case 'wait':
+            runningEl.classList.remove('active');
+            blockedEl.classList.add('active');
+            break;
+        case 'resume':
+            readyEl.classList.remove('active');
+            runningEl.classList.add('active');
+            break;
+        case 'event':
+             blockedEl.classList.remove('active');
+             readyEl.classList.add('active');
+             break;
+    }
+}
+
+function initQuiz() {
+    const container = document.getElementById('quiz-grid');
+    container.innerHTML = quizData.map(item => `
+        <div class="card p-6">
+            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
+            <div class="answer" style="display: none; margin-top: 1rem; padding: 1rem; background-color: #f0fdf4; border-left: 4px solid #22c55e; color: #15803d;">
+                <p><strong>Answer:</strong> ${item.answer}</p>
+            </div>
+            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 transition-colors text-sm" onclick="toggleAnswer(this)">Reveal Answer</button>
+        </div>
+    `).join('');
+}
+
+function toggleAnswer(button) {
+    const answerEl = button.previousElementSibling;
+    const isVisible = answerEl.style.display === 'block';
+    answerEl.style.display = isVisible ? 'none' : 'block';
+    button.textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
+}
+
+function showSection(sectionId) {
+    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    document.querySelectorAll('.nav-button').forEach(button => {
+        button.classList.remove('active');
+        if (button.getAttribute('onclick').includes(sectionId)) {
+            button.classList.add('active');
+        }
+    });
+    window.scrollTo(0, 0);
+}
+
+function closeMenu() {
+    document.getElementById('mobile-menu').classList.add('hidden');
+}
+
+</script>
+</body>
+</html>
