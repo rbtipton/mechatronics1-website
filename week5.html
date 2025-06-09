@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics 1: Week 5 - Digital Logic Gates</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Academic Blue -->
+    <!-- Application Structure Plan: The SPA is structured using a main navigation bar to switch between three core sections: 'Digital Logic Concepts', 'Interactive Sandbox', and 'Practice Problems'. The 'Digital Logic Concepts' section uses a sub-navigation (tabs) for 'Intro & Basics', 'Basic Gates', 'Universal Gates', and 'Exclusive Gates'. This architecture organizes the content thematically, allowing students to focus on one concept or gate type at a time. The 'Interactive Sandbox' allows users to select a logic gate and dynamically set inputs to see the output and truth table, reinforcing understanding. The user flow is designed for progressive learning: grasp a concept, apply it in a simulator, and then test knowledge with practice problems. This is more engaging and effective than a static document. -->
+    <!-- Visualization & Content Choices: Concepts/Steps -> Styled text blocks (HTML/Tailwind). Math Examples -> Interactive step-by-step reveal with a button (JS). Logic gate diagrams -> HTML/CSS divs for symbols and input/output lines. Sandbox Visualization -> Dynamic truth table and output display using JavaScript for clarity, directness, and immediate feedback for logical operations. Practice Problems -> Cards with a 'show answer' toggle (JS). This mix of static and interactive content enhances engagement and comprehension. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-active { 
+            border-color: #3b82f6; /* blue-500 */
+            color: #1d4ed8; /* blue-700 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .step-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .step-content.visible {
+            display: block;
+            opacity: 1;
+        }
+        .solution-box {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .btn {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .btn:hover { background-color: #2563eb; }
+        .btn-secondary {
+            background-color: #6b7280;
+        }
+        .btn-secondary:hover { background-color: #4b5563; }
+        .hidden { display: none; }
+        .katex-display { display: block; overflow-x: auto; white-space: nowrap; }
+
+        /* Logic Gate Diagram Styling */
+        .logic-gate-diagram {
+            position: relative;
+            background-color: #f3f4f6;
+            border: 2px solid #d1d5db;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .gate-body {
+            position: absolute;
+            background-color: #3b82f6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 0.25rem;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+        .input-line, .output-line {
+            position: absolute;
+            background-color: #374151;
+            z-index: 0;
+        }
+        .input-label, .output-label {
+            position: absolute;
+            font-size: 0.75rem;
+            color: #374151;
+            white-space: nowrap;
+        }
+        .inverter-circle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #374151;
+        }
+        .truth-table-container {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            overflow: hidden;
+        }
+        .truth-table-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .truth-table-container th, .truth-table-container td {
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        .truth-table-container th {
+            background-color: #e0f2fe; /* blue-50 */
+            font-weight: bold;
+        }
+        .truth-table-container tr:nth-child(even) {
+            background-color: #f9fafb; /* gray-50 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-blue-700">Mechatronics 1: Week 5 - Digital Logic Gates</h1>
+                <div class="flex space-x-4 text-sm font-medium">
+                    <button data-target="concepts" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Digital Logic Concepts</button>
+                    <button data-target="sandbox" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Interactive Sandbox</button>
+                    <button data-target="practice" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Practice Problems</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="app-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Section: Digital Logic Concepts -->
+        <section id="concepts" class="app-section">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-3xl font-bold mb-4 text-gray-900">Introduction to Digital Logic: The Language of Computers</h2>
+                <p class="text-gray-600 mb-6">Moving from analog signals to the discrete world of digital logic, this week we explore the fundamental building blocks of all digital systems and microcontrollers found in mechatronics. Understanding these gates is crucial for grasping how decisions are made and processes are controlled in automated systems. Select a topic below to delve deeper.</p>
+
+                <!-- Tabs -->
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex flex-wrap" aria-label="Tabs">
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="intro_basics">Intro & Binary</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="basic_gates">Basic Gates</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="universal_gates">Universal Gates</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="exclusive_gates">Exclusive Gates</button>
+                    </nav>
+                </div>
+
+                <!-- Content Area for Concepts -->
+                <div id="concept-content" class="mt-6">
+                    <!-- Content will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Interactive Sandbox -->
+        <section id="sandbox" class="app-section hidden">
+             <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-3xl font-bold mb-2 text-gray-900">Interactive Sandbox: Logic Gate Simulator</h2>
+                <p class="text-gray-600 mb-6">Explore the behavior of different logic gates. Select a gate, then toggle the input switches (0 or 1) to see how the output changes and observe its corresponding truth table. This directly illustrates Boolean logic in action.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Gate Selection & Inputs</h3>
+                        <div class="mb-4">
+                            <label for="gateSelect" class="font-medium">Select a Gate:</label>
+                            <select id="gateSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="AND">AND Gate</option>
+                                <option value="OR">OR Gate</option>
+                                <option value="NOT">NOT Gate</option>
+                                <option value="NAND">NAND Gate</option>
+                                <option value="NOR">NOR Gate</option>
+                                <option value="XOR">XOR Gate</option>
+                                <option value="XNOR">XNOR Gate</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <span class="font-medium">Input A:</span>
+                            <button id="inputA" class="btn w-16" data-value="0">0</button>
+                            <span id="inputA-status" class="text-gray-700">LOW</span>
+                        </div>
+                        <div class="flex items-center space-x-4 mb-4" id="inputB-container">
+                            <span class="font-medium">Input B:</span>
+                            <button id="inputB" class="btn w-16" data-value="0">0</button>
+                            <span id="inputB-status" class="text-gray-700">LOW</span>
+                        </div>
+                        <div class="mt-6 text-xl font-bold text-gray-900">
+                            Output Q: <span id="outputQ" class="text-blue-700">0</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Truth Table</h3>
+                        <div id="truth-table-display" class="truth-table-container">
+                            <!-- Truth table will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Practice Problems -->
+        <section id="practice" class="app-section hidden">
+            <div class="bg-white p-6 rounded-lg shadow">
+                 <h2 class="text-3xl font-bold mb-4 text-gray-900">Practice Problems</h2>
+                 <p class="text-gray-600 mb-6">Test your understanding with these problems from the course notes. Click "Show Answer" to reveal the detailed solution.</p>
+                 <div id="practice-problems-container" class="space-y-6">
+                    <!-- Practice problems will be injected here -->
+                 </div>
+                 <h2 class="text-3xl font-bold mt-8 mb-4 text-gray-900">Quiz</h2>
+                 <p class="text-gray-600 mb-6">Challenge your knowledge with these multiple-choice questions. Select your answer and click 'Check Answer'.</p>
+                 <div id="quiz-container" class="space-y-6">
+                    <!-- Quiz questions will be injected here -->
+                 </div>
+            </div>
+        </section>
+
+    </main>
+    
+<script>
+const appData = {
+    intro_basics: {
+        title: "Introduction to Digital Logic & Binary System",
+        description: "Digital logic is the foundation of all modern computers and control systems. Unlike analog signals which are continuous, digital signals operate on discrete, typically binary, values.",
+        steps: [
+            "<strong>Analog vs. Digital:</strong> Analog signals are continuous (e.g., sound waves, temperature), while digital signals are discrete (e.g., ON/OFF, TRUE/FALSE, 0/1). Mechatronic systems often convert analog sensor data to digital for processing.",
+            "<strong>Binary System:</strong> Digital logic uses the binary number system, which has only two digits: 0 and 1. These represent different voltage levels (e.g., 0V for '0' and 5V for '1').",
+            "<strong>Logic Gates:</strong> The fundamental building blocks of digital circuits. They take one or more binary inputs and produce a single binary output based on a specific logical rule.",
+            "<strong>Boolean Algebra:</strong> The mathematical system used to analyze and simplify digital circuits. It uses variables that can only be 0 or 1, and logical operations (AND, OR, NOT).",
+            "<strong>Why Digital in Mechatronics?</strong> Digital systems offer higher precision, noise immunity, easier data storage, and programmability compared to purely analog systems. Microcontrollers (small computers) are digital devices at the heart of many mechatronic applications.",
+            "Real-Life Application: A simple ON/OFF switch for a motor. When the switch is ON (logical 1), the motor runs. When it's OFF (logical 0), the motor stops. This is the simplest form of digital control."
+        ],
+        example: {
+            problem: "If an analog temperature sensor outputs a voltage from 0V to 5V, how can a digital system interpret 'hot' or 'cold'?",
+            circuitHTML: ``, 
+            solutionSteps: [
+                {
+                    title: "Concept of Thresholding",
+                    content: `A digital system would use a comparator (often an op-amp, as learned last week!) to set a threshold voltage. For instance, if the threshold is 2.5V:`
+                },
+                {
+                    title: "Digital Output",
+                    content: `If sensor voltage > 2.5V, output is '1' (Hot).<br>
+                    If sensor voltage ≤ 2.5V, output is '0' (Cold).<br>
+                    <div class="solution-box">This converts a continuous analog signal into a discrete digital decision.</div>`
+                },
+                {
+                    title: "Mechatronics Context",
+                    content: `This digital output (0 or 1) can then directly control a cooling fan (ON for '1', OFF for '0') or activate a warning light, demonstrating a simple mechatronic control loop.`
+                }
+            ]
+        }
+    },
+    basic_gates: {
+        title: "Basic Logic Gates: AND, OR, NOT",
+        description: "These three gates are the fundamental building blocks from which all other digital logic functions can be derived. Each performs a unique logical operation.",
+        steps: [
+            "<strong>AND Gate:</strong> Output is 1 (HIGH) ONLY IF all inputs are 1 (HIGH). Otherwise, output is 0 (LOW).",
+            "&bull; Boolean Expression: $Q = A \\cdot B$ (or $Q = AB$)",
+            "&bull; Real-Life Example: A safety interlock on a machine where the machine operates (Output = 1) ONLY IF the safety guard is closed (Input A = 1) AND the emergency stop button is not pressed (Input B = 1).",
+            "<strong>OR Gate:</strong> Output is 1 (HIGH) IF AT LEAST ONE input is 1 (HIGH). Output is 0 (LOW) ONLY IF all inputs are 0 (LOW).",
+            "&bull; Boolean Expression: $Q = A + B$",
+            "&bull; Real-Life Example: A security alarm (Output = 1) triggers IF the front door sensor (Input A = 1) OR the back window sensor (Input B = 1) is activated.",
+            "<strong>NOT Gate (Inverter):</strong> Has only one input. The output is always the opposite of the input. If input is 1, output is 0; if input is 0, output is 1.",
+            "&bull; Boolean Expression: $Q = \\bar{A}$ (or $Q = A'$)",
+            "&bull; Real-Life Example: An automatic night light (Output = 1) turns on IF it is NOT (Input A = 0 for light sensor)."
+        ],
+        example: {
+            problem: "For an AND gate with inputs A=1, B=0 and an OR gate with inputs A=1, B=0, what are their respective outputs?",
+            circuitHTML: `<div class="logic-gate-diagram h-48 w-80 relative">
+                            <!-- AND Gate -->
+                            <div class="gate-body" style="left: 10%; top: 25%; width: 60px; height: 40px; border-radius: 50% 0 0 50% / 100% 0 0 100%; box-shadow: none; background-color: #3b82f6; transform: rotate(90deg);"></div>
+                            <div class="gate-body" style="left: 35%; top: 40%; width: 40px; height: 40px; background-color: #3b82f6; border-radius: 0; box-shadow: none; transform: rotate(0deg);"></div>
+                            <div class="input-line" style="left: 5%; top: 20%; width: 15px; height: 2px;"></div>
+                            <div class="input-line" style="left: 5%; top: 30%; width: 15px; height: 2px;"></div>
+                            <div class="output-line" style="left: 60%; top: 25%; width: 15px; height: 2px;"></div>
+                            <div class="input-label" style="left: 0%; top: 15%;">A</div>
+                            <div class="input-label" style="left: 0%; top: 35%;">B</div>
+                            <div class="output-label" style="left: 65%; top: 20%;">Q</div>
+                            <div class="text-label font-bold text-white" style="left: 45%; top: 25%;">AND</div>
+
+                            <!-- OR Gate -->
+                            <div class="gate-body" style="right: 10%; top: 25%; width: 60px; height: 40px; border-radius: 50% 0 0 50% / 100% 0 0 100%; box-shadow: none; background-color: #3b82f6; transform: rotate(90deg);"></div>
+                            <div class="gate-body" style="right: 35%; top: 40%; width: 40px; height: 40px; background-color: #3b82f6; border-radius: 0; box-shadow: none; transform: rotate(0deg);"></div>
+                            <div class="input-line" style="right: 5%; top: 20%; width: 15px; height: 2px;"></div>
+                            <div class="input-line" style="right: 5%; top: 30%; width: 15px; height: 2px;"></div>
+                            <div class="output-line" style="right: 60%; top: 25%; width: 15px; height: 2px;"></div>
+                            <div class="input-label" style="right: 0%; top: 15%;">A</div>
+                            <div class="input-label" style="right: 0%; top: 35%;">B</div>
+                            <div class="output-label" style="right: 65%; top: 20%;">Q</div>
+                            <div class="text-label font-bold text-white" style="right: 45%; top: 25%;">OR</div>
+                        </div>`,
+            solutionSteps: [
+                {
+                    title: "AND Gate (A=1, B=0)",
+                    content: `For an AND gate, the output is 1 ONLY IF both inputs are 1. Since B is 0, the output must be 0.<br>
+                    <div class="solution-box">Output Q = 0</div>`
+                },
+                {
+                    title: "OR Gate (A=1, B=0)",
+                    content: `For an OR gate, the output is 1 IF AT LEAST ONE input is 1. Since A is 1, the output is 1.<br>
+                    <div class="solution-box">Output Q = 1</div>`
+                },
+                {
+                    title: "Summary",
+                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">AND gate output: <strong>0</strong> <br> OR gate output: <strong>1</strong> </div>`
+                }
+            ]
+        }
+    },
+    universal_gates: {
+        title: "Universal Logic Gates: NAND, NOR",
+        description: "NAND and NOR gates are considered 'universal' because any other logic gate (AND, OR, NOT, XOR, XNOR) can be constructed using only NAND gates or only NOR gates. This simplifies integrated circuit design.",
+        steps: [
+            "<strong>NAND Gate:</strong> (NOT AND) The output is 0 (LOW) ONLY IF all inputs are 1 (HIGH). Otherwise, output is 1 (HIGH). It's an AND gate followed by a NOT gate (inverter).",
+            "&bull; Boolean Expression: $Q = \\overline{A \\cdot B}$ (or $Q = (AB)'$)",
+            "&bull; Real-Life Example: A warning light (Output = 1) turns on for a machine IF the safety guard is NOT closed (A=0) OR the power is NOT on (B=0). This is equivalent to 'NOT (A AND B)' for normal operation.",
+            "<strong>NOR Gate:</strong> (NOT OR) The output is 1 (HIGH) ONLY IF all inputs are 0 (LOW). Otherwise, output is 0 (LOW). It's an OR gate followed by a NOT gate (inverter).",
+            "&bull; Boolean Expression: $Q = \\overline{A + B}$ (or $Q = (A+B)'$)",
+            "&bull; Real-Life Example: An automatic garage door opener (Output = 1 to open) ONLY IF the 'open' button is NOT pressed (A=0) AND the 'close' button is NOT pressed (B=0) (i.e., in a neutral state). A simpler example: A light turns on (Output = 1) ONLY IF button A is NOT pressed (A=0) AND button B is NOT pressed (B=0).",
+            "<strong>Universality:</strong> The ability to create ANY digital logic function using only one type of universal gate simplifies manufacturing and reduces component variety, making these gates extremely important in digital electronics."
+        ],
+        example: {
+            problem: "Show how a NOT gate can be made using only a NAND gate.",
+            circuitHTML: `<div class="logic-gate-diagram h-48 w-80 relative">
+                            <!-- NAND Gate base -->
+                            <div class="gate-body" style="left: 20%; top: 50%; width: 60px; height: 40px; border-radius: 50% 0 0 50% / 100% 0 0 100%; box-shadow: none; background-color: #3b82f6; transform: rotate(90deg);"></div>
+                            <div class="gate-body" style="left: 45%; top: 65%; width: 40px; height: 40px; background-color: #3b82f6; border-radius: 0; box-shadow: none; transform: rotate(0deg);"></div>
+                            <div class="input-line" style="left: 15%; top: 45%; width: 15px; height: 2px;"></div>
+                            <div class="input-line" style="left: 15%; top: 55%; width: 15px; height: 2px;"></div>
+                            <div class="output-line" style="left: 70%; top: 50%; width: 15px; height: 2px;"></div>
+                            <div class="inverter-circle" style="left: 68%; top: 50%; transform: translate(-50%, -50%);"></div>
+                            <div class="input-label" style="left: 10%; top: 40%;">A</div>
+                            <div class="input-label" style="left: 10%; top: 60%;">B</div>
+                            <div class="output-label" style="left: 75%; top: 45%;">Q</div>
+                            <div class="text-label font-bold text-white" style="left: 55%; top: 50%;">NAND</div>
+                        </div>`,
+            solutionSteps: [
+                {
+                    title: "Step 1: Connect Inputs Together",
+                    content: `To make a NAND gate behave like a NOT gate, connect both inputs (A and B) of the NAND gate together to a single input signal.`
+                },
+                {
+                    title: "Step 2: Verify Truth Table",
+                    content: `If input A=B=0, NAND(0,0) = 1. (NOT 0 = 1)<br>
+                    If input A=B=1, NAND(1,1) = 0. (NOT 1 = 0)<br>
+                    <div class="solution-box">This replicates the behavior of a NOT gate.</div>`
+                },
+                {
+                    title: "Diagram (Conceptual)",
+                    content: `<!-- Simplified representation -->
+                    <div class="logic-gate-diagram h-40 w-40 relative">
+                        <div class="gate-body" style="left: 50%; top: 50%; width: 50px; height: 35px; border-radius: 50% 0 0 50% / 100% 0 0 100%; box-shadow: none; background-color: #3b82f6; transform: rotate(90deg);"></div>
+                        <div class="gate-body" style="left: 75%; top: 65%; width: 35px; height: 35px; background-color: #3b82f6; border-radius: 0; box-shadow: none; transform: rotate(0deg);"></div>
+                        <div class="input-line" style="left: 15%; top: 50%; width: 35px; height: 2px;"></div>
+                        <div class="output-line" style="left: 85%; top: 50%; width: 15px; height: 2px;"></div>
+                        <div class="inverter-circle" style="left: 83%; top: 50%; transform: translate(-50%, -50%);"></div>
+                        <div class="input-label" style="left: 5%; top: 45%;">Input</div>
+                        <div class="output-label" style="left: 90%; top: 45%;">Output</div>
+                        <div class="text-label font-bold text-white" style="left: 65%; top: 50%;">NAND</div>
+                        <div class="wire-segment" style="left: 30%; top: 40%; width: 2px; height: 20%;"></div>
+                        <div class="wire-segment" style="left: 30%; top: 60%; width: 2px; height: -20%;"></div>
+                        <div class="wire-segment" style="left: 28%; top: 40%; width: 2px; height: 2px;"></div>
+                        <div class="wire-segment" style="left: 28%; top: 60%; width: 2px; height: 2px;"></div>
+                    </div>
+                    <p class="text-sm text-gray-700 mt-2">By shorting the inputs of a NAND gate, it behaves as a NOT gate.</p>`
+                }
+            ]
+        }
+    },
+    exclusive_gates: {
+        title: "Exclusive Logic Gates: XOR, XNOR",
+        description: "Exclusive OR (XOR) and Exclusive NOR (XNOR) gates are special purpose gates commonly used in arithmetic, error detection, and comparison circuits. They provide a 'true' output under specific conditions of input difference or equality.",
+        steps: [
+            "<strong>XOR Gate (Exclusive OR):</strong> The output is 1 (HIGH) IF inputs are DIFFERENT. Output is 0 (LOW) IF inputs are the SAME.",
+            "&bull; Boolean Expression: $Q = A \\oplus B$ (or $Q = A\\bar{B} + \\bar{A}B$)",
+            "&bull; Real-Life Example: A car's seatbelt warning light (Output = 1) turns on IF the car is moving (Input A = 1) XOR the seatbelt is NOT buckled (Input B = 0). It only warns if one condition is true exclusively.",
+            "<strong>XNOR Gate (Exclusive NOR):</strong> The output is 1 (HIGH) IF inputs are the SAME. Output is 0 (LOW) IF inputs are DIFFERENT. It's an XOR gate followed by a NOT gate (inverter).",
+            "&bull; Boolean Expression: $Q = \\overline{A \\oplus B}$ (or $Q = A B + \\bar{A}\\bar{B}$)",
+            "&bull; Real-Life Example: A digital lock (Output = 1 to unlock) ONLY IF all digits entered (multiple inputs) exactly MATCH the stored password (all inputs are the SAME as their respective stored values). It's used for equality detection."
+        ],
+        example: {
+            problem: "Fill in the truth table for a 2-input XOR gate.",
+            circuitHTML: `<div class="logic-gate-diagram h-48 w-80 relative">
+                            <!-- XOR Gate -->
+                            <div class="gate-body" style="left: 30%; top: 50%; width: 70px; height: 40px; border-radius: 50% 0 0 50% / 100% 0 0 100%; box-shadow: none; background-color: #3b82f6; transform: rotate(90deg);"></div>
+                            <div class="gate-body" style="left: 55%; top: 65%; width: 40px; height: 40px; background-color: #3b82f6; border-radius: 0; box-shadow: none; transform: rotate(0deg);"></div>
+                            <div class="input-line" style="left: 5%; top: 40%; width: 25px; height: 2px;"></div>
+                            <div class="input-line" style="left: 5%; top: 60%; width: 25px; height: 2px;"></div>
+                            <div class="output-line" style="left: 70%; top: 50%; width: 15px; height: 2px;"></div>
+                            <div class="input-label" style="left: 0%; top: 35%;">A</div>
+                            <div class="input-label" style="left: 0%; top: 65%;">B</div>
+                            <div class="output-label" style="left: 75%; top: 45%;">Q</div>
+                            <div class="text-label font-bold text-white" style="left: 50%; top: 50%;">XOR</div>
+                            <div style="position:absolute; left:25%; top:35%; width:2px; height:30px; background-color:#374151; transform: rotate(90deg); transform-origin: 0 0;"></div>
+                            <div style="position:absolute; left:25%; top:35%; width:2px; height:30px; background-color:#374151; transform: rotate(90deg); transform-origin: 0 0; left:24%; top:40%;"></div>
+
+                            <!-- Simplified XOR symbol shape -->
+                            <div style="position: absolute; left: 18%; top: 40%; width: 10px; height: 40px; border: 2px solid #374151; border-right: none; border-radius: 50% 0 0 50%; z-index: 1;"></div>
+                            <div style="position: absolute; left: 19%; top: 40%; width: 10px; height: 40px; border: 2px solid #374151; border-right: none; border-radius: 50% 0 0 50%; z-index: 0;"></div>
+                        </div>`,
+            solutionSteps: [
+                {
+                    title: "Truth Table Definition",
+                    content: `The XOR gate outputs 1 only when its inputs are different.`
+                },
+                {
+                    title: "Constructing the Table",
+                    content: `
+                    <div class="truth-table-container">
+                        <table>
+                            <thead>
+                                <tr><th>A</th><th>B</th><th>Q</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>0</td><td>0</td><td>0</td></tr>
+                                <tr><td>0</td><td>1</td><td>1</td></tr>
+                                <tr><td>1</td><td>0</td><td>1</td></tr>
+                                <tr><td>1</td><td>1</td><td>0</td></tr>
+                            </tbody>
+                        </table>
+                    </div>`
+                },
+                {
+                    title: "Final Answer",
+                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">The XOR gate correctly identifies when inputs are different.</div>`
+                }
+            ]
+        }
+    }
+};
+
+const practiceProblems = [
+    {
+        id: 1,
+        title: "Basic Gate Outputs",
+        problemHTML: `For the following inputs, what are the outputs of an AND, OR, and NOT gate?<br>
+        1. AND gate: A=1, B=1<br>
+        2. OR gate: A=0, B=0<br>
+        3. NOT gate: A=1`,
+        answerHTML: `<b>Solution:</b><br>
+        1. AND gate (A=1, B=1): Both inputs are 1, so output is 1. (Q = 1)<br>
+        2. OR gate (A=0, B=0): Both inputs are 0, so output is 0. (Q = 0)<br>
+        3. NOT gate (A=1): Input is 1, so output is 0. (Q = 0)<br>
+        <div class="solution-box"> AND Q=1, OR Q=0, NOT Q=0 </div>`
+    },
+    {
+        id: 2,
+        title: "Universal Gate Outputs",
+        problemHTML: `Determine the outputs for the following universal gates:<br>
+        1. NAND gate: A=0, B=1<br>
+        2. NOR gate: A=1, B=1`,
+        answerHTML: `<b>Solution:</b><br>
+        1. NAND gate (A=0, B=1): AND(0,1) is 0. NOT(0) is 1. So, output is 1. (Q = 1)<br>
+        2. NOR gate (A=1, B=1): OR(1,1) is 1. NOT(1) is 0. So, output is 0. (Q = 0)<br>
+        <div class="solution-box"> NAND Q=1, NOR Q=0 </div>`
+    },
+    {
+        id: 3,
+        title: "Exclusive Gate Outputs",
+        problemHTML: `What are the outputs for an XOR and XNOR gate with inputs A=1, B=0?`,
+        answerHTML: `<b>Solution:</b><br>
+        1. XOR gate (A=1, B=0): Inputs are different, so output is 1. (Q = 1)<br>
+        2. XNOR gate (A=1, B=0): Inputs are different, so output is 0. (Q = 0)<br>
+        <div class="solution-box"> XOR Q=1, XNOR Q=0 </div>`
+    },
+    {
+        id: 4,
+        title: "Boolean Expression Evaluation",
+        problemHTML: `Evaluate the Boolean expression $Q = (A + B) \\cdot \\bar{C}$ if A=1, B=0, C=1.`,
+        answerHTML: `<b>Solution:</b><br>
+        1. Evaluate (A + B): (1 + 0) = 1<br>
+        2. Evaluate $\\bar{C}$: $\\bar{1} = 0$<br>
+        3. Evaluate $(A + B) \\cdot \\bar{C}$: $1 \\cdot 0 = 0$<br>
+        <div class="solution-box"> Q = 0 </div>`
+    }
+];
+
+const quizQuestions = [
+    {
+        id: 1,
+        question: "Which of the following describes the output of an AND gate?",
+        options: ["Output is 1 if any input is 1.", "Output is 0 if all inputs are 0.", "Output is 1 only if all inputs are 1.", "Output is the opposite of the input."],
+        answer: "Output is 1 only if all inputs are 1.",
+        explanation: "The AND gate requires all its inputs to be HIGH (1) for its output to be HIGH (1)."
+    },
+    {
+        id: 2,
+        question: "A NOR gate's output is 1 (HIGH) ONLY IF:",
+        options: ["All inputs are 1 (HIGH).", "At least one input is 1 (HIGH).", "All inputs are 0 (LOW).", "Inputs are different."],
+        answer: "All inputs are 0 (LOW).",
+        explanation: "A NOR gate is an inverted OR gate. So, if all inputs are 0 (OR output is 0), then NOR output is 1."
+    },
+    {
+        id: 3,
+        question: "Which type of gate is considered 'universal' because it can be used to construct any other logic gate?",
+        options: ["XOR", "NOT", "AND", "NAND"],
+        answer: "NAND",
+        explanation: "Both NAND and NOR gates are universal gates. They can be configured to replicate the functionality of AND, OR, NOT, XOR, and XNOR gates."
+    },
+    {
+        id: 4,
+        question: "The output of an XOR gate is 1 (HIGH) when:",
+        options: ["Both inputs are 0.", "Both inputs are 1.", "The inputs are different.", "The inputs are the same."],
+        answer: "The inputs are different.",
+        explanation: "The Exclusive OR (XOR) gate outputs 1 only when its inputs are not identical."
+    },
+    {
+        id: 5,
+        question: "What is the Boolean expression for a NOT gate with input A and output Q?",
+        options: ["Q = A + A", "Q = A", "Q = A \\cdot A", "Q = \\bar{A}"],
+        answer: "Q = \\bar{A}",
+        explanation: "The NOT gate inverts its single input. The bar symbol ($\\bar{A}$) denotes inversion."
+    }
+];
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const appSections = document.querySelectorAll('.app-section');
+    const conceptTabs = document.querySelectorAll('.concept-tab');
+    const conceptContentContainer = document.getElementById('concept-content');
+    
+    // Main navigation
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const targetId = link.dataset.target;
+            appSections.forEach(section => {
+                section.classList.toggle('hidden', section.id !== targetId);
+            });
+            navLinks.forEach(l => l.classList.remove('font-bold', 'text-blue-600'));
+            link.classList.add('font-bold', 'text-blue-600');
+        });
+    });
+
+    // Concept tabs
+    conceptTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const conceptId = tab.dataset.concept;
+            conceptTabs.forEach(t => t.classList.remove('tab-active', 'border-blue-500', 'text-blue-600'));
+            tab.classList.add('tab-active', 'border-blue-500', 'text-blue-600');
+            renderConcept(conceptId);
+        });
+    });
+
+    function renderConcept(conceptId) {
+        const data = appData[conceptId];
+        if (!data) return;
+
+        let stepsHTML = data.steps.map(step => `<li class="mb-2">${step}</li>`).join('');
+        let exampleStepsHTML = data.example.solutionSteps.map((step, index) => `
+            <div id="step-${index}" class="step-content border-t pt-4 mt-4">
+                <h4 class="font-semibold text-lg text-blue-700">${step.title}</h4>
+                <div class="text-gray-700 mt-2">${step.content}</div>
+            </div>
+        `).join('');
+
+        conceptContentContainer.innerHTML = `
+            <h3 class="text-2xl font-bold text-gray-800">${data.title}</h3>
+            <p class="mt-2 mb-4 text-gray-600">${data.description}</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="text-xl font-semibold mb-2">Key Concepts & Real-Life Application</h4>
+                    <ul class="list-decimal list-inside text-gray-700 space-y-1">${stepsHTML}</ul>
+                </div>
+                <div>
+                    <h4 class="text-xl font-semibold mb-2">Interactive Example: ${data.example.problem}</h4>
+                    ${data.example.circuitHTML || ''}
+                    <div id="example-steps-container">${exampleStepsHTML}</div>
+                    <div class="mt-4 flex space-x-2">
+                         <button id="next-step-btn" class="btn">Start</button>
+                         <button id="reset-steps-btn" class="btn btn-secondary">Reset</button>
+                    </div>
+                </div>
+            </div>`;
+        
+        setupInteractiveExample();
+    }
+    
+    let currentStep = -1;
+    function setupInteractiveExample() {
+        const nextBtn = document.getElementById('next-step-btn');
+        const resetBtn = document.getElementById('reset-steps-btn');
+        const steps = document.querySelectorAll('.step-content');
+        currentStep = -1;
+
+        const showNextStep = () => {
+            if (currentStep >= 0) {
+                steps[currentStep].classList.remove('visible');
+            }
+            currentStep++;
+            if (currentStep < steps.length) {
+                steps[currentStep].classList.add('visible');
+                nextBtn.textContent = 'Next Step';
+            }
+            if (currentStep >= steps.length - 1) {
+                nextBtn.disabled = true;
+                nextBtn.textContent = 'Finished';
+            }
+        };
+
+        const resetSteps = () => {
+            steps.forEach(step => step.classList.remove('visible'));
+            currentStep = -1;
+            nextBtn.disabled = false;
+            nextBtn.textContent = 'Start';
+        };
+
+        nextBtn.addEventListener('click', showNextStep);
+        resetBtn.addEventListener('click', resetSteps);
+    }
+    
+    function renderPracticeProblems() {
+        const container = document.getElementById('practice-problems-container');
+        container.innerHTML = practiceProblems.map(p => `
+            <div class="border rounded-lg p-4">
+                <h4 class="text-lg font-semibold">${p.title}</h4>
+                <p class="mt-2 text-gray-700">${p.problemHTML}</p>
+                <div id="answer-${p.id}" class="mt-4 p-4 bg-blue-50 rounded hidden">
+                   ${p.answerHTML}
+                </div>
+                <button data-answer-id="${p.id}" class="toggle-answer-btn btn mt-4 text-sm">Show Answer</button>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const answerId = btn.dataset.answerId;
+                const answerEl = document.getElementById(`answer-${answerId}`);
+                answerEl.classList.toggle('hidden');
+                btn.textContent = answerEl.classList.contains('hidden') ? 'Show Answer' : 'Hide Answer';
+            });
+        });
+    }
+
+    function renderQuiz() {
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = quizQuestions.map((q, index) => `
+            <div class="border rounded-lg p-4">
+                <h4 class="text-lg font-semibold mb-3">Q${index + 1}: ${q.question}</h4>
+                <div class="space-y-2">
+                    ${q.options.map((option, optIndex) => `
+                        <label class="block">
+                            <input type="radio" name="quiz-q${q.id}" value="${option}" class="mr-2">
+                            ${option}
+                        </label>
+                    `).join('')}
+                </div>
+                <button data-question-id="${q.id}" class="check-quiz-btn btn mt-4 text-sm">Check Answer</button>
+                <div id="quiz-feedback-${q.id}" class="mt-3 text-sm font-semibold"></div>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.check-quiz-btn').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                const questionId = btn.dataset.questionId;
+                const selectedOption = document.querySelector(`input[name="quiz-q${questionId}"]:checked`);
+                const feedbackEl = document.getElementById(`quiz-feedback-${questionId}`);
+                const question = quizQuestions.find(q => q.id == questionId);
+
+                if (!selectedOption) {
+                    feedbackEl.innerHTML = `<span class="text-yellow-600">Please select an option.</span>`;
+                    return;
+                }
+
+                if (selectedOption.value === question.answer) {
+                    feedbackEl.innerHTML = `<span class="text-green-600">Correct!</span> ${question.explanation}`;
+                } else {
+                    feedbackEl.innerHTML = `<span class="text-red-600">Incorrect.</span> The correct answer is: <strong>${question.answer}</strong>. ${question.explanation}`;
+                }
+            });
+        });
+    }
+
+    // Sandbox logic for Logic Gate Simulator
+    const gateSelect = document.getElementById('gateSelect');
+    const inputA = document.getElementById('inputA');
+    const inputB = document.getElementById('inputB');
+    const inputBContainer = document.getElementById('inputB-container');
+    const inputAStatus = document.getElementById('inputA-status');
+    const inputBStatus = document.getElementById('inputB-status');
+    const outputQ = document.getElementById('outputQ');
+    const truthTableDisplay = document.getElementById('truth-table-display');
+
+    const truthTables = {
+        AND: {
+            headers: ['A', 'B', 'Q'],
+            data: [
+                [0, 0, 0],
+                [0, 1, 0],
+                [1, 0, 0],
+                [1, 1, 1]
+            ],
+            logic: (a, b) => a && b
+        },
+        OR: {
+            headers: ['A', 'B', 'Q'],
+            data: [
+                [0, 0, 0],
+                [0, 1, 1],
+                [1, 0, 1],
+                [1, 1, 1]
+            ],
+            logic: (a, b) => a || b
+        },
+        NOT: {
+            headers: ['A', 'Q'],
+            data: [
+                [0, 1],
+                [1, 0]
+            ],
+            logic: (a) => !a
+        },
+        NAND: {
+            headers: ['A', 'B', 'Q'],
+            data: [
+                [0, 0, 1],
+                [0, 1, 1],
+                [1, 0, 1],
+                [1, 1, 0]
+            ],
+            logic: (a, b) => !(a && b)
+        },
+        NOR: {
+            headers: ['A', 'B', 'Q'],
+            data: [
+                [0, 0, 1],
+                [0, 1, 0],
+                [1, 0, 0],
+                [1, 1, 0]
+            ],
+            logic: (a, b) => !(a || b)
+        },
+        XOR: {
+            headers: ['A', 'B', 'Q'],
+            data: [
+                [0, 0, 0],
+                [0, 1, 1],
+                [1, 0, 1],
+                [1, 1, 0]
+            ],
+            logic: (a, b) => (a !== b)
+        },
+        XNOR: {
+            headers: ['A', 'B', 'Q'],
+            data: [
+                [0, 0, 1],
+                [0, 1, 0],
+                [1, 0, 0],
+                [1, 1, 1]
+            ],
+            logic: (a, b) => (a === b)
+        }
+    };
+
+    function updateGateSimulator() {
+        const selectedGate = gateSelect.value;
+        const tt = truthTables[selectedGate];
+
+        const aVal = parseInt(inputA.dataset.value);
+        let bVal = 0;
+
+        // Handle NOT gate (single input)
+        if (selectedGate === 'NOT') {
+            inputBContainer.classList.add('hidden');
+        } else {
+            inputBContainer.classList.remove('hidden');
+            bVal = parseInt(inputB.dataset.value);
+        }
+
+        // Calculate output
+        let currentOutput;
+        if (selectedGate === 'NOT') {
+            currentOutput = tt.logic(aVal) ? 1 : 0;
+        } else {
+            currentOutput = tt.logic(aVal, bVal) ? 1 : 0;
+        }
+        outputQ.textContent = currentOutput;
+
+        // Update truth table display
+        let tableHTML = `<table><thead><tr>`;
+        tt.headers.forEach(header => {
+            tableHTML += `<th>${header}</th>`;
+        });
+        tableHTML += `</tr></thead><tbody>`;
+
+        tt.data.forEach(row => {
+            tableHTML += `<tr>`;
+            row.forEach(cell => {
+                tableHTML += `<td>${cell}</td>`;
+            });
+            tableHTML += `</tr>`;
+        });
+        tableHTML += `</tbody></table>`;
+        truthTableDisplay.innerHTML = tableHTML;
+    }
+
+    function toggleInput(button, statusSpan) {
+        let currentValue = parseInt(button.dataset.value);
+        let newValue = 1 - currentValue; // Toggle 0 to 1, 1 to 0
+        button.dataset.value = newValue;
+        button.textContent = newValue;
+        statusSpan.textContent = newValue === 1 ? 'HIGH' : 'LOW';
+        updateGateSimulator();
+    }
+
+    inputA.addEventListener('click', () => toggleInput(inputA, inputAStatus));
+    inputB.addEventListener('click', () => toggleInput(inputB, inputBStatus));
+    gateSelect.addEventListener('change', updateGateSimulator);
+
+    // Initial setup
+    document.querySelector('.nav-link[data-target="concepts"]').click();
+    document.querySelector('.concept-tab[data-concept="intro_basics"]').click();
+    renderPracticeProblems();
+    renderQuiz();
+    updateGateSimulator(); // Initial sandbox render
+});
+</script>
+</body>
+</html>
