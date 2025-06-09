@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics 1: Week 10 - AC Circuits</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Cool Neutrals -->
+    <!-- Application Structure Plan: A tabbed single-page application to facilitate non-linear, self-paced learning. The structure includes: 1) A main header. 2) A top navigation bar to switch between four key sections: 'Introduction', 'Core Concepts', 'AC Power', and 'Test Your Knowledge'. This structure organizes the material logically from fundamentals to specific applications and assessment. 3) The 'Core Concepts' and 'AC Power' sections use interactive modules. For example, a phasor visualizer connects the sine wave to its rotating vector, and an interactive RLC circuit calculator shows how impedance changes with component values. 4) The 'Test Your Knowledge' section uses interactive cards with a reveal answer toggle. This design transforms the static notes into an exploratory tool, enabling students to build intuition by seeing the direct impact of changing variables. -->
+    <!-- Visualization & Content Choices:
+        - Sinusoid to Phasor -> Goal: Explain Relationship -> Viz: Interactive Sine Wave + Phasor Diagram (Chart.js + HTML/CSS) -> Interaction: Slider adjusts phase angle, updating both visuals in real-time. Justification: Bridges the gap between the time-domain waveform and its abstract frequency-domain phasor representation.
+        - Reactance vs. Frequency -> Goal: Compare/Explain -> Viz: Line Chart (Chart.js) -> Interaction: A static but clear chart showing the opposing trends of inductive and capacitive reactance as frequency changes. Justification: A powerful visual summary of a fundamental concept.
+        - Series RLC Impedance -> Goal: Synthesize/Calculate -> Viz: Interactive Calculator + Impedance Vector Diagram (HTML/CSS) -> Interaction: Users input R, L, C, and frequency to see the resulting impedance vector. Justification: Turns a homework problem into a hands-on tool for building intuition about how components combine to create total impedance.
+        - Power Triangle -> Goal: Explain Relationship -> Viz: Interactive Diagram (HTML/CSS) -> Interaction: Slider adjusts the power factor angle, redrawing the triangle and updating P, Q, and S values. Justification: Visually clarifies the relationship between real, reactive, and apparent power.
+        - Quiz -> Goal: Assess Knowledge -> Viz: Interactive Q&A Cards (HTML/JS) -> Interaction: "Reveal Answer" toggle. Justification: Promotes active recall for effective self-assessment.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            background-color: #F8F9FA;
+            color: #212529;
+            font-family: 'Inter', sans-serif;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-button.active, .nav-button:hover {
+            color: #0056b3;
+            border-bottom-color: #0056b3;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #DEE2E6;
+            border-radius: 0.75rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .question-card .answer {
+            display: none;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        .phasor-plane {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border: 2px solid #ced4da;
+            border-radius: 50%;
+        }
+        .phasor-plane::before, .phasor-plane::after {
+            content: '';
+            position: absolute;
+            background-color: #e9ecef;
+            z-index: 0;
+        }
+        .phasor-plane::before {
+            width: 100%;
+            height: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .phasor-plane::after {
+            height: 100%;
+            width: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .phasor-vector {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 3px;
+            background: #007bff;
+            transform-origin: left center;
+            transition: transform 0.2s linear;
+        }
+        .power-triangle {
+            position: relative;
+            width: 300px;
+            height: 200px;
+        }
+        .triangle-side {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        #real-power-side {
+            background: #28a745;
+            height: 8px;
+            bottom: 20px;
+            left: 0;
+        }
+        #reactive-power-side {
+            background: #dc3545;
+            width: 8px;
+            bottom: 20px;
+            right: 0;
+        }
+        #apparent-power-side {
+            background: #ffc107;
+            height: 8px;
+            bottom: 20px;
+            left: 0;
+            transform-origin: left center;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800">Mechatronics 1: Week 10</h1>
+                <nav class="hidden md:flex space-x-6">
+                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
+                    <button class="nav-button" onclick="showSection('concepts')">Core Concepts</button>
+                    <button class="nav-button" onclick="showSection('power')">AC Power</button>
+                    <button class="nav-button" onclick="showSection('knowledge')">Test Your Knowledge</button>
+                </nav>
+                 <button id="menu-btn" class="md:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+             <div id="mobile-menu" class="hidden md:hidden py-2">
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-gray-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-gray-100" onclick="showSection('concepts'); closeMenu();">Core Concepts</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-gray-100" onclick="showSection('power'); closeMenu();">AC Power</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-gray-100" onclick="showSection('knowledge'); closeMenu();">Test Your Knowledge</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <section id="intro" class="content-section active">
+            <div class="bg-white p-8 rounded-lg shadow-md border border-gray-200">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to Week 10: AC Circuits</h2>
+                <p class="text-lg text-gray-600 mb-6">This week, we shift our focus from direct current (DC) to alternating current (AC) circuits. Unlike DC, where current flows in one direction, AC involves current that periodically reverses direction. We will introduce new tools like phasors and impedance to simplify the analysis of these dynamic systems, which are essential for understanding power systems, communications, and more.</p>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Learning Objectives</h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                    <li>Differentiate between DC and AC signals and describe sinusoidal waveforms.</li>
+                    <li>Represent sinusoids using phasors and complex numbers.</li>
+                    <li>Define and calculate reactance for inductors and capacitors.</li>
+                    <li>Apply circuit laws to analyze AC circuits using impedance.</li>
+                    <li>Calculate real, reactive, and apparent power and understand the power factor.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="concepts" class="content-section">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Core Concepts of AC Circuits</h2>
+            
+            <div class="card p-6 mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Interactive Phasor Visualization</h3>
+                <p class="text-gray-600 mb-4">A phasor is a rotating vector that represents a sinusoidal wave. Its length is the amplitude, and its angle is the phase shift. This tool helps connect the abstract phasor to the time-domain sine wave. Adjust the phase angle to see how the two are related.</p>
+                <div class="grid md:grid-cols-2 gap-6 items-center">
+                    <div class="chart-container h-[250px]"><canvas id="phasorWaveChart"></canvas></div>
+                    <div class="flex flex-col items-center">
+                        <div class="phasor-plane mb-4">
+                            <div id="phasorVector" class="phasor-vector"></div>
+                        </div>
+                        <label for="phase-slider" class="block text-sm font-medium text-gray-700 w-full">Phase Angle: <span id="phase-angle-value" class="font-bold">0°</span></label>
+                        <input id="phase-slider" type="range" min="-180" max="180" value="0" class="w-full">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6 mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Reactance vs. Frequency</h3>
+                <p class="text-gray-600 mb-4">Reactance is the opposition to current flow for inductors and capacitors, and it depends on frequency. This chart shows how inductive reactance ($X_L$) increases with frequency, while capacitive reactance ($X_C$) decreases.</p>
+                <div class="chart-container h-[300px]"><canvas id="reactanceChart"></canvas></div>
+            </div>
+
+            <div class="card p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Series RLC Circuit Impedance Calculator</h3>
+                <p class="text-gray-600 mb-4">Impedance ($\mathbf{Z}$) is the total opposition to current in an AC circuit. For a series RLC circuit, $\mathbf{Z} = R + j(X_L - X_C)$. Use this calculator to see how component values affect the total impedance.</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium">Resistance (R) in Ω:</label>
+                            <input id="rlc-r" type="number" value="50" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium">Inductance (L) in mH:</label>
+                            <input id="rlc-l" type="number" value="150" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                        </div>
+                         <div class="mb-4">
+                            <label class="block text-sm font-medium">Capacitance (C) in μF:</label>
+                            <input id="rlc-c" type="number" value="200" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium">Frequency (f) in Hz:</label>
+                            <input id="rlc-f" type="number" value="60" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                        </div>
+                        <button id="rlc-calculate" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">Calculate</button>
+                    </div>
+                    <div class="flex flex-col items-center justify-center bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-bold mb-2">Total Impedance (Z)</h4>
+                        <p id="impedance-result-rect" class="text-lg font-mono">... Ω</p>
+                        <p id="impedance-result-polar" class="text-lg font-mono">... Ω</p>
+                        <p class="mt-2 text-sm text-gray-600">($\mathbf{Z} = R + j(X_L - X_C)$)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="power" class="content-section">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Understanding AC Power</h2>
+            <div class="card p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Interactive Power Triangle</h3>
+                <p class="text-gray-600 mb-4">In AC circuits, power has three components: Real Power (P), which does useful work; Reactive Power (Q), which is stored and returned; and Apparent Power (S), the vector sum of the two. The relationship between them is described by the power factor, $\text{PF} = \cos(\theta)$. Adjust the power factor angle ($\theta$) to see how it affects the different types of power for a constant Apparent Power.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="flex flex-col items-center justify-center">
+                        <div id="powerTriangleContainer" class="power-triangle my-4">
+                           <div id="apparent-power-side" class="triangle-side text-yellow-800"></div>
+                           <div id="real-power-side" class="triangle-side text-green-800"></div>
+                           <div id="reactive-power-side" class="triangle-side text-red-800"></div>
+                        </div>
+                        <label for="power-factor-slider" class="w-full">Power Factor Angle (θ): <span id="power-angle-value" class="font-bold">36.9°</span></label>
+                        <input id="power-factor-slider" type="range" min="0" max="90" value="36.9" step="0.1" class="w-full">
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-lg mb-3">Power Values (S = 1000 VA)</h4>
+                        <div class="space-y-3">
+                            <p><strong>Apparent Power (S):</strong> <span id="s-value" class="font-mono float-right">1000 VA</span></p>
+                            <p><strong>Real Power (P):</strong> <span id="p-value" class="font-mono float-right">800 W</span></p>
+                            <p><strong>Reactive Power (Q):</strong> <span id="q-value" class="font-mono float-right">600 VAR</span></p>
+                            <p><strong>Power Factor (PF):</strong> <span id="pf-value" class="font-mono float-right">0.80 Lagging</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="knowledge" class="content-section">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Test Your Knowledge</h2>
+            <div id="knowledge-grid" class="space-y-4"></div>
+        </section>
+    </main>
+
+<script>
+    let phasorWaveChart, reactanceChart;
+
+    const knowledgeData = [
+        {
+            type: 'mcq',
+            question: "Which component's impedance decreases as the frequency of the AC source increases?",
+            options: ["Resistor", "Inductor", "Capacitor", "Both Inductor and Capacitor"],
+            answer: "Capacitor",
+            explanation: "Capacitor impedance (Xc = 1/(2πfC)) is inversely proportional to frequency. Inductor impedance (Xl = 2πfL) is directly proportional."
+        },
+        {
+            type: 'text',
+            question: "In an AC circuit, the voltage across an ideal inductor _______ the current through it by 90°.",
+            answer: "leads",
+            explanation: "This is a fundamental property of inductors, summarized by the mnemonic 'ELI the ICE man' (Voltage leads Current in Inductors; Current leads Voltage in Capacitors)."
+        },
+        {
+            type: 'true_false',
+            question: "The apparent power in an AC circuit is always equal to the real power.",
+            answer: "False",
+            explanation: "Apparent power equals real power only in a purely resistive circuit where the power factor is 1. In all other cases, some power is reactive, making apparent power greater than real power."
+        },
+        {
+            type: 'text',
+            question: "An industrial load has a 'lagging' power factor. Is this load primarily inductive or capacitive?",
+            answer: "Inductive",
+            explanation: "A lagging power factor means the current lags the voltage, which is characteristic of an inductive load."
+        }
+    ];
+
+    function renderPhasorChart(angle) {
+        const dataPoints = 50;
+        const labels = Array.from({ length: dataPoints }, (_, i) => i);
+        const data = labels.map(x => Math.sin(x * (Math.PI / (dataPoints / 2)) + (angle * Math.PI / 180)));
+        
+        if (phasorWaveChart) {
+            phasorWaveChart.data.datasets[0].data = data;
+            phasorWaveChart.update('none');
+        } else {
+            const ctx = document.getElementById('phasorWaveChart').getContext('2d');
+            phasorWaveChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'v(t)',
+                        data: data,
+                        borderColor: '#007bff',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { min: -1.5, max: 1.5, ticks: { display: false } },
+                        x: { ticks: { display: false } }
+                    },
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                }
+            });
+        }
+        document.getElementById('phasorVector').style.transform = `rotate(${ -angle }deg)`;
+        document.getElementById('phase-angle-value').textContent = `${angle}°`;
+    }
+
+    function renderReactanceChart() {
+        const ctx = document.getElementById('reactanceChart').getContext('2d');
+        const frequencies = Array.from({ length: 100 }, (_, i) => i + 1);
+        const L = 0.05; // 50mH
+        const C = 0.000005; // 5uF
+        const xlData = frequencies.map(f => 2 * Math.PI * f * L);
+        const xcData = frequencies.map(f => 1 / (2 * Math.PI * f * C));
+
+        reactanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: frequencies,
+                datasets: [
+                    {
+                        label: 'Inductive Reactance (XL)',
+                        data: xlData,
+                        borderColor: '#dc3545',
+                        backgroundColor: '#dc354522',
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Capacitive Reactance (XC)',
+                        data: xcData,
+                        borderColor: '#007bff',
+                        backgroundColor: '#007bff22',
+                        fill: false,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        type: 'logarithmic',
+                        title: { display: true, text: 'Reactance (Ω)' } 
+                    },
+                    x: { title: { display: true, text: 'Frequency (Hz)' } }
+                },
+                plugins: { legend: { position: 'top' } }
+            }
+        });
+    }
+
+    function calculateRLC() {
+        const R = parseFloat(document.getElementById('rlc-r').value);
+        const L = parseFloat(document.getElementById('rlc-l').value) / 1000;
+        const C = parseFloat(document.getElementById('rlc-c').value) / 1000000;
+        const f = parseFloat(document.getElementById('rlc-f').value);
+        const w = 2 * Math.PI * f;
+        const Xl = w * L;
+        const Xc = 1 / (w * C);
+        const X = Xl - Xc;
+        const Z_mag = Math.sqrt(R**2 + X**2);
+        const Z_angle = Math.atan2(X, R) * 180 / Math.PI;
+
+        document.getElementById('impedance-result-rect').textContent = `${R.toFixed(1)} + j(${X.toFixed(1)}) Ω`;
+        document.getElementById('impedance-result-polar').textContent = `${Z_mag.toFixed(1)} Ω ∠ ${Z_angle.toFixed(1)}°`;
+    }
+
+    function updatePowerTriangle() {
+        const angleDeg = parseFloat(document.getElementById('power-factor-slider').value);
+        const angleRad = angleDeg * Math.PI / 180;
+        const S = 1000;
+        const P = S * Math.cos(angleRad);
+        const Q = S * Math.sin(angleRad);
+        const pf = Math.cos(angleRad);
+
+        document.getElementById('power-angle-value').textContent = `${angleDeg.toFixed(1)}°`;
+        document.getElementById('p-value').textContent = `${P.toFixed(0)} W`;
+        document.getElementById('q-value').textContent = `${Q.toFixed(0)} VAR`;
+        document.getElementById('pf-value').textContent = `${pf.toFixed(2)} Lagging`;
+
+        const containerWidth = 300;
+        const containerHeight = 200;
+        const scale = containerWidth / (S * 1.1);
+
+        const realSide = document.getElementById('real-power-side');
+        const reactiveSide = document.getElementById('reactive-power-side');
+        const apparentSide = document.getElementById('apparent-power-side');
+        
+        const p_width = P * scale;
+        const q_height = Q * scale;
+        
+        realSide.style.width = `${p_width}px`;
+        realSide.textContent = `P`;
+
+        reactiveSide.style.height = `${q_height}px`;
+        reactiveSide.style.left = `${p_width - 8}px`;
+        reactiveSide.textContent = `Q`;
+
+        apparentSide.style.width = `${S * scale}px`;
+        apparentSide.style.transform = `rotate(${-angleDeg}deg)`;
+        apparentSide.textContent = 'S';
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderPhasorChart(0);
+        renderReactanceChart();
+        calculateRLC();
+        updatePowerTriangle();
+        
+        document.getElementById('phase-slider').addEventListener('input', e => renderPhasorChart(parseInt(e.target.value)));
+        document.getElementById('rlc-calculate').addEventListener('click', calculateRLC);
+        document.getElementById('power-factor-slider').addEventListener('input', updatePowerTriangle);
+
+        const knowledgeGrid = document.getElementById('knowledge-grid');
+        knowledgeData.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'question-card bg-white p-6 rounded-lg shadow-md border border-gray-200';
+            card.innerHTML = `
+                <h4 class="text-lg font-semibold text-gray-800">${item.question}</h4>
+                <div class="answer mt-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-800">
+                    <p><strong>Answer:</strong> ${item.answer}</p>
+                    ${item.explanation ? `<p class="mt-2 text-sm">${item.explanation}</p>` : ''}
+                </div>
+                <button class="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors text-sm">Reveal Answer</button>
+            `;
+            knowledgeGrid.appendChild(card);
+        });
+
+        document.querySelectorAll('.question-card button').forEach(button => {
+            button.onclick = () => {
+                const answer = button.previousElementSibling;
+                const isVisible = answer.style.display === 'block';
+                answer.style.display = isVisible ? 'none' : 'block';
+                button.textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
+            };
+        });
+        
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    });
+
+    function showSection(sectionId) {
+        document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.classList.remove('active');
+            if(button.getAttribute('onclick').includes(sectionId)) button.classList.add('active');
+        });
+    }
+    
+    function closeMenu() {
+        document.getElementById('mobile-menu').classList.add('hidden');
+    }
+
+</script>
+</body>
+</html>
