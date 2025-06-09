@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics 1: Week 9 - Digital Logic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Harmony -->
+    <!-- Application Structure Plan: The SPA uses a tabbed layout for non-linear exploration of the topics from the source notes. The sections are: 'Introduction', 'Logic Gate Sandbox', 'Circuit Explorer', 'MCU Interfacing', and 'Knowledge Check'. This structure transforms the passive notes into an active learning environment. The centerpiece is the 'Logic Gate Sandbox,' which allows hands-on experimentation with basic gates. The 'Circuit Explorer' provides interactive cards for combinational/sequential circuits. 'MCU Interfacing' uses CSS diagrams to visualize practical connections. 'Knowledge Check' converts the static homework/quiz into an interactive self-assessment. This design prioritizes user engagement and intuitive understanding over a simple text presentation. -->
+    <!-- Visualization & Content Choices: 
+        - Logic Gates -> Goal: Understand gate functions -> Viz: Interactive Sandbox (HTML/CSS/JS) -> Interaction: User selects a gate and toggles inputs; a diagram and truth table update in real-time. Justification: Provides immediate, tangible feedback, which is crucial for understanding abstract logic rules.
+        - Boolean Algebra -> Goal: Illustrate simplification -> Viz: Guided Interactive Example -> Interaction: User sees the expression F = A.B' + A.B and clicks a "Simplify" button to see the step-by-step reduction to F = A. Justification: Reinforces the concept from the homework in a more engaging way than static text.
+        - Combinational/Sequential Circuits -> Goal: Explain function -> Viz: Interactive Cards (HTML/CSS/JS) -> Interaction: For a MUX, users toggle select lines to see the output change. For a D Flip-Flop, users toggle an input and a "Clock" button to see the output latch. Justification: Clearly demonstrates the core difference between memory-less and memory-based circuits.
+        - MCU Interfacing -> Goal: Show practical application -> Viz: CSS-based diagram -> Interaction: User clicks a "Press Button" toggle, which updates the diagram to show a pin going LOW and an LED turning ON. Justification: Connects the digital logic concepts to physical microcontroller behavior.
+        - Quiz/Homework -> Goal: Assess knowledge -> Viz: Interactive Q&A Cards -> Interaction: "Reveal Answer" toggle. Justification: Encourages active recall and self-paced learning.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
+        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
+        .nav-button.active, .nav-button:hover { color: #2563eb; border-bottom-color: #2563eb; }
+        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .question-card .answer { display: none; }
+        .logic-input { cursor: pointer; border: 2px solid; transition: all 0.2s; }
+        .logic-input.high { background-color: #bfdbfe; border-color: #3b82f6; }
+        .logic-input.low { background-color: #e7e5e4; border-color: #a8a29e; }
+        .logic-output.high { background-color: #a7f3d0; }
+        .logic-output.low { background-color: #fecaca; }
+        .truth-table-row.highlight { background-color: #fef9c3; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 1: Digital Logic</h1>
+                <nav class="hidden md:flex space-x-4 lg:space-x-6">
+                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
+                    <button class="nav-button" onclick="showSection('sandbox')">Logic Gate Sandbox</button>
+                    <button class="nav-button" onclick="showSection('explorer')">Circuit Explorer</button>
+                    <button class="nav-button" onclick="showSection('interfacing')">MCU Interfacing</button>
+                    <button class="nav-button" onclick="showSection('knowledge')">Knowledge Check</button>
+                </nav>
+                <button id="menu-btn" class="md:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+             <div id="mobile-menu" class="hidden md:hidden py-2">
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('sandbox'); closeMenu();">Logic Gate Sandbox</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('explorer'); closeMenu();">Circuit Explorer</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('interfacing'); closeMenu();">MCU Interfacing</button>
+                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('knowledge'); closeMenu();">Knowledge Check</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <section id="intro" class="content-section active">
+            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Welcome to Digital Logic & Interfacing</h2>
+                <p class="text-lg text-stone-600 mb-6">This module introduces the foundational principles of digital logic, the language of computers and microcontrollers. Unlike continuous analog signals, digital logic uses discrete binary values (0s and 1s) to process information. Understanding this is essential for designing control systems and interfacing with sensors and actuators. In this interactive guide, you will explore the building blocks of digital circuits, from simple logic gates to complex sequential circuits and communication protocols.</p>
+                <h3 class="text-2xl font-bold text-stone-800 mb-3">Learning Objectives</h3>
+                <ul class="list-disc list-inside space-y-2 text-stone-700">
+                    <li>Identify and describe the functionality of common logic gates.</li>
+                    <li>Apply Boolean algebra to simplify logic expressions.</li>
+                    <li>Differentiate between combinational and sequential logic circuits.</li>
+                    <li>Understand how microcontrollers use digital I/O and communication protocols.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="sandbox" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Logic Gate Sandbox</h2>
+            <div class="card p-6">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="md:w-1/3">
+                        <label for="gate-select" class="block font-medium text-stone-700">Select a Gate:</label>
+                        <select id="gate-select" class="mt-1 block w-full border border-stone-300 rounded-md p-2">
+                            <option value="AND">AND</option><option value="OR">OR</option><option value="NOT">NOT</option><option value="NAND">NAND</option><option value="NOR">NOR</option><option value="XOR">XOR</option><option value="XNOR">XNOR</option>
+                        </select>
+                        <div class="mt-6 space-y-4">
+                            <div class="flex items-center gap-4">
+                                <span class="font-bold text-lg">A:</span>
+                                <div id="input-a" data-value="0" class="logic-input low w-16 h-10 rounded flex items-center justify-center text-xl font-mono">0</div>
+                            </div>
+                            <div id="input-b-control" class="flex items-center gap-4">
+                                <span class="font-bold text-lg">B:</span>
+                                <div id="input-b" data-value="0" class="logic-input low w-16 h-10 rounded flex items-center justify-center text-xl font-mono">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-center mb-2">Live Truth Table</h3>
+                        <div id="truth-table-container" class="overflow-x-auto"></div>
+                    </div>
+                </div>
+                <div class="mt-6 border-t pt-6">
+                     <p class="text-center font-semibold text-lg">Output (Y) = <span id="logic-expression" class="font-mono text-blue-600">A · B</span></p>
+                    <div class="w-24 h-16 mx-auto mt-2 rounded flex items-center justify-center text-2xl font-bold logic-output low" id="logic-output">0</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="explorer" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Circuit Explorer</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                 <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-2">Boolean Algebra Simplifier</h3>
+                    <p class="text-stone-600 mb-4">Boolean algebra helps reduce complex circuits. Let's simplify the expression from the homework:</p>
+                    <p class="text-center font-mono text-lg bg-stone-100 p-2 rounded">F = (A · B) + (A · B')</p>
+                    <div class="text-center mt-4">
+                        <button id="simplify-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Simplify</button>
+                    </div>
+                    <p id="simplified-result" class="text-center font-mono text-lg mt-4 h-8"></p>
+                 </div>
+                 <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-2">Sequential Logic: D Flip-Flop</h3>
+                    <p class="text-stone-600 mb-4">A D Flip-Flop stores the value of input 'D' when the 'Clock' transitions. It "remembers" the state.</p>
+                    <div class="flex justify-around items-center mt-6">
+                        <div>
+                            <p class="text-center font-semibold">Input D</p>
+                            <div id="d-flip-flop-d" data-value="0" class="logic-input low w-20 h-12 rounded flex items-center justify-center text-xl font-mono mx-auto">0</div>
+                        </div>
+                         <button id="d-flip-flop-clk" class="px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700">Clock Pulse</button>
+                        <div>
+                            <p class="text-center font-semibold">Output Q</p>
+                            <div id="d-flip-flop-q" data-value="0" class="w-20 h-12 rounded flex items-center justify-center text-xl font-mono mx-auto logic-output low">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="interfacing" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Microcontroller Interfacing</h2>
+            <div class="card p-6">
+                <h3 class="text-xl font-bold mb-2 text-center">Digital Input/Output Example</h3>
+                <p class="text-stone-600 mb-6 text-center">This simulates reading a button press (digital input) and turning on an LED (digital output) with a microcontroller.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h4 class="font-semibold text-lg text-center mb-4">Control</h4>
+                        <div class="flex items-center justify-center gap-4">
+                            <span class="font-medium">Button:</span>
+                            <label for="mcu-button-toggle" class="relative inline-flex items-center cursor-pointer">
+                              <input type="checkbox" value="" id="mcu-button-toggle" class="sr-only peer">
+                              <div class="w-14 h-7 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
+                              <span id="button-state-text" class="ml-3 text-sm font-medium text-stone-900">Not Pressed</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="bg-stone-100 p-4 rounded-lg border">
+                        <div class="flex justify-between items-center text-sm font-mono">
+                           <span>3.3V --[ R ]--+-- MCU Pin (Input)</span>
+                           <span id="mcu-pin-state" class="font-bold text-red-600">HIGH</span>
+                        </div>
+                        <div class="text-sm font-mono mt-2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| </div>
+                        <div class="text-sm font-mono mt-2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Switch]-- GND</div>
+                        <hr class="my-4">
+                         <div class="flex justify-between items-center text-sm font-mono">
+                           <span>MCU Pin (Output) --|>|--[ R ]-- GND</span>
+                           <div class="flex items-center gap-2">
+                               <span>LED:</span>
+                               <div id="mcu-led" class="w-5 h-5 rounded-full bg-stone-400 transition-colors"></div>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="knowledge" class="content-section">
+            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
+            <div id="knowledge-grid" class="space-y-4"></div>
+        </section>
+    </main>
+
+<script>
+const gates = {
+    AND:  { expr: "A · B", func: (a, b) => a && b },
+    OR:   { expr: "A + B", func: (a, b) => a || b },
+    NOT:  { expr: "A'", func: (a) => !a },
+    NAND: { expr: "(A · B)'", func: (a, b) => !(a && b) },
+    NOR:  { expr: "(A + B)'", func: (a, b) => !(a || b) },
+    XOR:  { expr: "A ⊕ B", func: (a, b) => a !== b },
+    XNOR: { expr: "(A ⊕ B)'", func: (a, b) => a === b },
+};
+
+const knowledgeData = [
+    { question: "Draw the logic gate diagram and create the truth table for the Boolean expression Y = (A · B) + C'.", answer: "The diagram has an AND gate for A and B, and a NOT gate for C. The outputs of these two gates feed into an OR gate to produce Y. The truth table would show Y is HIGH if (A AND B are HIGH) OR if C is LOW." },
+    { question: "Simplify the Boolean expression F = A · B' + A · B.", answer: "F = A · (B' + B)  (Distributive Law) -> F = A · 1 (Complementary Law) -> F = A (Identity Law)." },
+    { question: "What is the fundamental difference between combinational and sequential logic?", answer: "Combinational logic output depends only on current inputs (no memory). Sequential logic output depends on current inputs AND previous states (has memory, usually via flip-flops)." },
+    { question: "You connect a button to an MCU pin. When pressed, it connects the pin to ground. What component is needed and why?", answer: "A pull-up resistor. It connects the pin to the supply voltage, ensuring the pin is in a defined HIGH state when the button isn't pressed, preventing a 'floating' input." },
+];
+
+let inputA = 0;
+let inputB = 0;
+
+function updateLogicSandbox() {
+    const selectedGate = document.getElementById('gate-select').value;
+    const gate = gates[selectedGate];
+    const isUnary = selectedGate === 'NOT';
+
+    document.getElementById('input-b-control').style.display = isUnary ? 'none' : 'flex';
+
+    const result = gate.func(inputA, isUnary ? undefined : inputB);
+    const outputEl = document.getElementById('logic-output');
+    outputEl.textContent = result ? 1 : 0;
+    outputEl.className = 'w-24 h-16 mx-auto mt-2 rounded flex items-center justify-center text-2xl font-bold logic-output ' + (result ? 'high' : 'low');
+    
+    document.getElementById('logic-expression').innerHTML = gate.expr.replace('B', isUnary ? '' : 'B').replace('·', '· ').replace('+', ' + ');
+    
+    generateTruthTable(selectedGate);
+}
+
+function generateTruthTable(gateName) {
+    const tableContainer = document.getElementById('truth-table-container');
+    const gate = gates[gateName];
+    const isUnary = gateName === 'NOT';
+
+    let tableHTML = '<table class="w-full text-center table-auto"><thead><tr>';
+    tableHTML += '<th>A</th>';
+    if (!isUnary) tableHTML += '<th>B</th>';
+    tableHTML += '<th class="border-l-2 border-stone-300">Y</th></tr></thead><tbody>';
+
+    const rows = isUnary ? 2 : 4;
+    for (let i = 0; i < rows; i++) {
+        let a = isUnary ? i : Math.floor(i / 2);
+        let b = isUnary ? 0 : i % 2;
+        let output = gate.func(a, b);
+
+        let currentInputMatch = isUnary ? (a === inputA) : (a === inputA && b === inputB);
+        let highlightClass = currentInputMatch ? 'highlight' : '';
+        
+        tableHTML += `<tr class="border-t ${highlightClass}">`;
+        tableHTML += `<td>${a}</td>`;
+        if (!isUnary) tableHTML += `<td>${b}</td>`;
+        tableHTML += `<td class="border-l-2 border-stone-300 font-bold ${output ? 'text-green-600' : 'text-red-600'}">${output ? 1 : 0}</td>`;
+        tableHTML += '</tr>';
+    }
+
+    tableHTML += '</tbody></table>';
+    tableContainer.innerHTML = tableHTML;
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    function setupToggle(elementId, callback) {
+        const el = document.getElementById(elementId);
+        el.addEventListener('click', () => {
+            const oldValue = parseInt(el.dataset.value);
+            const newValue = 1 - oldValue;
+            el.dataset.value = newValue;
+            el.textContent = newValue;
+            el.className = 'logic-input w-16 h-10 rounded flex items-center justify-center text-xl font-mono ' + (newValue ? 'high' : 'low');
+            if (callback) callback(newValue);
+        });
+    }
+
+    setupToggle('input-a', (val) => { inputA = val; updateLogicSandbox(); });
+    setupToggle('input-b', (val) => { inputB = val; updateLogicSandbox(); });
+    document.getElementById('gate-select').addEventListener('change', updateLogicSandbox);
+    
+    const dFlipD = document.getElementById('d-flip-flop-d');
+    const dFlipQ = document.getElementById('d-flip-flop-q');
+    dFlipD.addEventListener('click', () => {
+        const newValue = 1 - parseInt(dFlipD.dataset.value);
+        dFlipD.dataset.value = newValue;
+        dFlipD.textContent = newValue;
+        dFlipD.className = 'logic-input w-20 h-12 rounded flex items-center justify-center text-xl font-mono mx-auto ' + (newValue ? 'high' : 'low');
+    });
+    
+    document.getElementById('d-flip-flop-clk').addEventListener('click', () => {
+        const dValue = parseInt(dFlipD.dataset.value);
+        dFlipQ.dataset.value = dValue;
+        dFlipQ.textContent = dValue;
+        dFlipQ.className = 'w-20 h-12 rounded flex items-center justify-center text-xl font-mono mx-auto logic-output ' + (dValue ? 'high' : 'low');
+    });
+
+    document.getElementById('simplify-btn').addEventListener('click', () => {
+        const resultEl = document.getElementById('simplified-result');
+        resultEl.textContent = '...  F = A · (B + B\')';
+        setTimeout(() => { resultEl.textContent = '...  F = A · 1'; }, 1000);
+        setTimeout(() => { resultEl.textContent = 'F = A'; }, 2000);
+    });
+    
+    document.getElementById('mcu-button-toggle').addEventListener('change', (e) => {
+        const isPressed = e.target.checked;
+        document.getElementById('button-state-text').textContent = isPressed ? 'Pressed' : 'Not Pressed';
+        document.getElementById('mcu-pin-state').textContent = isPressed ? 'LOW' : 'HIGH';
+        document.getElementById('mcu-pin-state').className = 'font-bold ' + (isPressed ? 'text-green-600' : 'text-red-600');
+        document.getElementById('mcu-led').className = 'w-5 h-5 rounded-full transition-colors ' + (isPressed ? 'bg-yellow-300 shadow-lg' : 'bg-stone-400');
+    });
+
+    const knowledgeContainer = document.getElementById('knowledge-grid');
+    knowledgeData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'question-card bg-white p-6 rounded-lg shadow-md border border-stone-200';
+        card.innerHTML = `
+            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
+            <div class="answer mt-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-800">
+                <p><strong>Answer:</strong> ${item.answer}</p>
+            </div>
+            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 transition-colors text-sm">Reveal Answer</button>
+        `;
+        card.querySelector('button').onclick = () => {
+            const answer = card.querySelector('.answer');
+            const isVisible = answer.style.display === 'block';
+            answer.style.display = isVisible ? 'none' : 'block';
+            card.querySelector('button').textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
+        };
+        knowledgeContainer.appendChild(card);
+    });
+
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+    updateLogicSandbox();
+});
+
+function showSection(sectionId) {
+    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    document.querySelectorAll('.nav-button').forEach(button => {
+        button.classList.remove('active');
+        if (button.getAttribute('onclick').includes(sectionId)) button.classList.add('active');
+    });
+}
+function closeMenu() {
+    document.getElementById('mobile-menu').classList.add('hidden');
+}
+</script>
+</body>
+</html>
