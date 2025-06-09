@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics 1: Week 7 - Sensors and Actuators</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Academic Blue -->
+    <!-- Application Structure Plan: The SPA is structured using a main navigation bar to switch between three core sections: 'Sensing & Actuation Concepts', 'Interactive Sandbox', and 'Practice Problems'. The 'Sensing & Actuation Concepts' section uses a sub-navigation (tabs) for 'Intro to Sensors', 'Types of Sensors', 'Intro to Actuators', 'Types of Actuators', and 'Interfacing'. This architecture organizes the content thematically, allowing students to focus on one concept or type at a time. The 'Interactive Sandbox' provides a simple simulation of a sensor controlling an actuator, reinforcing understanding of input-process-output. The user flow is designed for progressive learning: grasp a concept, apply it in a simulator, and then test knowledge with practice problems. This is more engaging and effective than a static document. -->
+    <!-- Visualization & Content Choices: Concepts/Steps -> Styled text blocks (HTML/Tailwind). Examples -> Interactive step-by-step reveal with a button (JS). Diagrams -> Simple HTML/CSS representations for sensors/actuators. Sandbox Visualization -> Dynamic UI elements (slider for sensor input, color-changing div for LED output, and text display for motor speed) to illustrate basic control. Practice Problems -> Cards with a 'show answer' toggle (JS). This mix of static and interactive content enhances engagement and comprehension. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-active { 
+            border-color: #3b82f6; /* blue-500 */
+            color: #1d4ed8; /* blue-700 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .step-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .step-content.visible {
+            display: block;
+            opacity: 1;
+        }
+        .solution-box {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .btn {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .btn:hover { background-color: #2563eb; }
+        .btn-secondary {
+            background-color: #6b7280;
+        }
+        .btn-secondary:hover { background-color: #4b5563; }
+        .hidden { display: none; }
+        .katex-display { display: block; overflow-x: auto; white-space: nowrap; }
+
+        /* General component styling for diagrams */
+        .component-box {
+            background-color: #e0f2fe; /* Light blue */
+            border: 1px solid #93c5fd; /* Blue-300 */
+            border-radius: 0.25rem;
+            padding: 0.75rem;
+            text-align: center;
+            font-weight: 500;
+            color: #1d4ed8; /* Blue-700 */
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 0.5rem;
+        }
+        .diagram-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background-color: #f3f4f6;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            min-height: 150px;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+        .diagram-arrow {
+            font-size: 2rem;
+            color: #374151;
+            margin: 0.5rem 0;
+        }
+        .sensor-img, .actuator-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Sandbox specific styling */
+        #sim-output-led {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #ef4444; /* Red for OFF */
+            border: 4px solid #b91c1c;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            margin: 2rem auto;
+        }
+        #sim-output-led.on {
+            background-color: #22c55e; /* Green for ON */
+            border-color: #166534;
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.7);
+        }
+        #light-sensor-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+        #light-sensor-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+        #light-sensor-slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+        #pseudo-code-display {
+            background-color: #1e293b; /* Dark slate */
+            color: #e2e8f0; /* Light gray */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            white-space: pre-wrap;
+            min-height: 150px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold text-blue-700">Mechatronics 1: Week 7 - Sensors and Actuators</h1>
+                <div class="flex space-x-4 text-sm font-medium">
+                    <button data-target="concepts" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Sensing & Actuation Concepts</button>
+                    <button data-target="sandbox" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Interactive Sandbox</button>
+                    <button data-target="practice" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Practice Problems</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="app-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Section: Sensing & Actuation Concepts -->
+        <section id="concepts" class="app-section">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-3xl font-bold mb-4 text-gray-900">Sensors and Actuators: The Bridge to the Physical World</h2>
+                <p class="text-gray-600 mb-6">This week, we explore the crucial components that allow mechatronic systems to interact with the physical world: sensors for gathering information and actuators for taking action. Understanding these elements is vital for designing intelligent and responsive systems.</p>
+
+                <!-- Tabs -->
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex flex-wrap" aria-label="Tabs">
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="intro_sensors">Intro to Sensors</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="types_sensors">Types of Sensors</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="intro_actuators">Intro to Actuators</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="types_actuators">Types of Actuators</button>
+                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="interfacing">Interfacing with MCUs</button>
+                    </nav>
+                </div>
+
+                <!-- Content Area for Concepts -->
+                <div id="concept-content" class="mt-6">
+                    <!-- Content will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Interactive Sandbox -->
+        <section id="sandbox" class="app-section hidden">
+             <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-3xl font-bold mb-2 text-gray-900">Interactive Sandbox: Smart Lighting System</h2>
+                <p class="text-gray-600 mb-6">This simulation demonstrates a basic smart lighting system. Adjust the 'Ambient Light' slider (simulating a photoresistor/LDR) to see how the LED brightness changes and how a simulated DC motor (e.g., for blinds) responds based on programmed logic.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Input: Ambient Light Sensor</h3>
+                        <div class="flex flex-col items-center space-y-4 my-8">
+                            <label for="light-sensor-slider" class="font-medium">Ambient Light Level:</label>
+                            <input type="range" min="0" max="1023" value="500" class="w-full" id="light-sensor-slider">
+                            <span id="light-sensor-value" class="text-gray-700 text-sm">Value: 500 (Medium)</span>
+                        </div>
+                        <h4 class="text-lg font-semibold mb-2">Pseudo-Code:</h4>
+                        <div id="pseudo-code-display" class="min-h-[250px]">
+                            <!-- Pseudo-code will be displayed here -->
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center">
+                        <h3 class="text-xl font-semibold mb-4">Outputs: LED & Motor</h3>
+                        <div class="mb-4 text-center">
+                            <h4 class="text-md font-medium mb-2">LED Brightness</h4>
+                            <div id="sim-output-led" class="w-20 h-20 rounded-full bg-yellow-400 opacity-50 shadow-lg" style="box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);"></div>
+                            <span id="led-brightness-status" class="text-gray-700 text-sm mt-2 block">Brightness: 50%</span>
+                        </div>
+                        <div class="mt-8 text-center">
+                            <h4 class="text-md font-medium mb-2">DC Motor (for Blinds)</h4>
+                            <div class="w-24 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
+                                <span id="motor-status" class="text-gray-800 text-sm">Stopped</span>
+                            </div>
+                            <span id="motor-direction" class="text-gray-600 text-xs mt-1 block"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Practice Problems -->
+        <section id="practice" class="app-section hidden">
+            <div class="bg-white p-6 rounded-lg shadow">
+                 <h2 class="text-3xl font-bold mb-4 text-gray-900">Practice Problems</h2>
+                 <p class="text-gray-600 mb-6">Test your understanding with these problems from the course notes. Click "Show Answer" to reveal the detailed solution.</p>
+                 <div id="practice-problems-container" class="space-y-6">
+                    <!-- Practice problems will be injected here -->
+                 </div>
+                 <h2 class="text-3xl font-bold mt-8 mb-4 text-gray-900">Quiz</h2>
+                 <p class="text-gray-600 mb-6">Challenge your knowledge with these multiple-choice questions. Select your answer and click 'Check Answer'.</p>
+                 <div id="quiz-container" class="space-y-6">
+                    <!-- Quiz questions will be injected here -->
+                 </div>
+            </div>
+        </section>
+
+    </main>
+    
+<script>
+const appData = {
+    intro_sensors: {
+        title: "Introduction to Sensors",
+        description: "Sensors are transducers that convert a physical quantity (like temperature, light, pressure) into an electrical signal (voltage, current, resistance). They are the 'eyes and ears' of a mechatronic system, providing the necessary feedback for intelligent control.",
+        steps: [
+            "<strong>What is a Sensor?</strong> A device that detects events or changes in its environment and sends the information to other electronics, often a microcontroller.",
+            "<strong>Role in Mechatronics:</strong> Sensors provide input data to the microcontroller, enabling the system to perceive its surroundings and react intelligently. Without sensors, a mechatronic system would operate 'blindly'.",
+            "<strong>Transduction:</strong> The process by which a sensor converts one form of energy (e.g., light) into another (e.g., electrical signal).",
+            "<strong>Active vs. Passive Sensors:</strong>",
+            "&bull; <strong>Passive Sensors:</strong> Generate an electrical signal directly in response to a physical stimulus without requiring external power (e.g., thermistor changing resistance with temperature, thermocouple generating voltage).",
+            "&bull; <strong>Active Sensors:</strong> Require an external power source to operate and produce an output signal (e.g., ultrasonic sensor emitting sound waves, proximity sensor emitting light).",
+            "Real-Life Example: A common household thermostat uses a temperature sensor (often a thermistor) to measure the room's temperature. This analog measurement is converted into a digital signal that the thermostat's microcontroller uses to decide whether to turn on the heating or cooling system."
+        ],
+        example: {
+            problem: "Describe how an automatic door system uses a sensor to detect a person's presence and open the door.",
+            circuitHTML: `<div class="diagram-container">
+                            <div class="component-box">Human Presence</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Proximity Sensor (e.g., Infrared)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Electrical Signal (Input to MCU)</div>
+                        </div>`, 
+            solutionSteps: [
+                {
+                    title: "Sensor Detection",
+                    content: `An automatic door typically uses a **proximity sensor**, often an infrared (IR) sensor or a microwave radar sensor. This sensor constantly emits a signal (light or radio waves).`
+                },
+                {
+                    title: "Signal Interpretation",
+                    content: `When a person walks into the detection zone, the emitted signal reflects off the person and returns to the sensor. The sensor detects this reflected signal.`
+                },
+                {
+                    title: "Electrical Output",
+                    content: `The sensor then converts this physical detection (presence of reflected signal) into an electrical signal (e.g., a change in voltage or a digital HIGH/LOW signal).`
+                },
+                {
+                    title: "MCU Processing",
+                    content: `This electrical signal is fed into a microcontroller. The microcontroller's program continuously monitors this input. When it detects the specific signal indicating presence, it triggers the door opening mechanism.`
+                },
+                {
+                    title: "Feedback Loop",
+                    content: `This forms a basic feedback loop: The environment changes (person present) -> Sensor detects -> MCU processes -> Actuator (door motor) acts.`
+                }
+            ]
+        }
+    },
+    types_sensors: {
+        title: "Types of Sensors: Analog and Digital",
+        description: "Sensors can be broadly categorized by the nature of their output signal: analog or digital. Each type has specific interfacing requirements with microcontrollers.",
+        steps: [
+            "<strong>Analog Sensors:</strong> Output a continuous range of electrical values (e.g., voltage, resistance) that are proportional to the physical quantity being measured.",
+            "&bull; <strong>Examples:</strong> Potentiometer (position/angle), Thermistor (temperature), Photoresistor/LDR (light intensity), Force/Pressure Sensors, Analog Accelerometers/Gyroscopes.",
+            "&bull; <strong>Interfacing:</strong> Requires an Analog-to-Digital Converter (ADC) on the microcontroller to convert the continuous analog signal into discrete digital values for processing.",
+            "&bull; Real-Life Example: A joystick on a gaming controller uses potentiometers. Moving the joystick changes the resistance, producing a varying voltage that the console's MCU reads via its ADC to determine the precise direction and magnitude of the input.",
+            "<strong>Digital Sensors:</strong> Output discrete, binary values (e.g., ON/OFF, HIGH/LOW, 0/1) or a digital data stream (e.g., I2C, SPI).",
+            "&bull; <strong>Examples:</strong> Limit Switches (end-stop detection), Encoders (rotary/linear position, speed), Hall Effect Sensors (magnetic field, proximity), PIR Motion Sensors (presence detection), Digital Temperature Sensors (e.g., DHT11/22), Ultrasonic Distance Sensors.",
+            "&bull; <strong>Interfacing:</strong> Connect directly to digital I/O pins of the microcontroller. For complex digital sensors, specific communication protocols (I2C, SPI, UART) are used to transfer data.",
+            "&bull; Real-Life Example: A garage door opener uses limit switches to detect when the door is fully open or fully closed. These switches provide a simple ON/OFF signal to the microcontroller, telling it when to stop the motor."
+        ],
+        example: {
+            problem: "Explain why a Light Dependent Resistor (LDR) needs an ADC, while a simple push button does not.",
+            circuitHTML: `<div class="diagram-container">
+                            <div class="component-box">Ambient Light</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">LDR (Resistance changes)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Voltage Divider (Analog Voltage)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Microcontroller (ADC Input)</div>
+                            <div class="my-4"></div>
+                            <div class="component-box">Finger Press</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Push Button (Open/Closed)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Digital Signal (HIGH/LOW)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Microcontroller (Digital Input)</div>
+                        </div>`,
+            solutionSteps: [
+                {
+                    title: "LDR: Analog Output",
+                    content: `A Light Dependent Resistor (LDR) changes its resistance continuously based on the intensity of light. To convert this resistance change into a voltage that a microcontroller can read, it's typically used in a voltage divider circuit. The output of this voltage divider is a continuous analog voltage range (e.g., 0V to 5V).`
+                },
+                {
+                    title: "Need for ADC (Analog-to-Digital Converter)",
+                    content: `Microcontrollers are digital devices; they understand only discrete binary values (0s and 1s). They cannot directly interpret a continuous analog voltage. Therefore, an **ADC** is required to sample the analog voltage from the LDR and convert it into a discrete digital number (e.g., 0 to 1023) that the microcontroller can process.`
+                },
+                {
+                    title: "Push Button: Digital Output",
+                    content: `A simple push button, on the other hand, is a digital device. When pressed, it makes a connection (or breaks one), providing a clear ON/OFF state (e.g., 5V for pressed, 0V for not pressed, or vice versa). This is a binary output.`
+                },
+                {
+                    title: "No Need for ADC",
+                    content: `Since the push button already produces a discrete digital signal (HIGH or LOW), the microcontroller can directly read this state using its **digital input pin** without the need for an Analog-to-Digital Converter. The signal is already in a format the digital MCU understands.`
+                }
+            ]
+        }
+    },
+    intro_actuators: {
+        title: "Introduction to Actuators",
+        description: "Actuators are transducers that convert an electrical signal into a physical action (like motion, force, light, sound). They are the 'muscles' of a mechatronic system, allowing it to perform tasks and interact with its environment.",
+        steps: [
+            "<strong>What is an Actuator?</strong> A component of a machine that is responsible for moving or controlling a mechanism or system. It takes energy, usually electrical, and converts it into some kind of motion or force.",
+            "<strong>Role in Mechatronics:</strong> Actuators receive commands from the microcontroller and execute physical actions. This completes the loop of sensing, processing, and acting.",
+            "<strong>Examples of Physical Actions:</strong> Linear motion (push/pull), rotary motion (spinning), light emission, sound generation, heat generation, fluid flow control.",
+            "<strong>Energy Domains:</strong> Actuators can operate using various energy forms:",
+            "&bull; <strong>Electrical:</strong> Motors, Solenoids, LEDs, Heaters.",
+            "&bull; <strong>Hydraulic:</strong> Use incompressible fluid to create force (e.g., heavy machinery).",
+            "&bull; <strong>Pneumatic:</strong> Use compressed gas to create force (e.g., factory automation).",
+            "Real-Life Example: A robot arm's joints are moved by electric motors (actuators). The microcontroller sends electrical signals to motor drivers, which then supply power to the motors, causing the arm to move to a desired position or perform a specific task like gripping an object."
+        ],
+        example: {
+            problem: "Describe the role of an actuator in a smart window system that automatically closes when it starts raining.",
+            circuitHTML: `<div class="diagram-container">
+                            <div class="component-box">Rain Detection (Sensor)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Microcontroller (Processes data)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Electrical Signal (Command to Actuator)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Window Motor (Actuator)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">Window Closes (Physical Action)</div>
+                        </div>`,
+            solutionSteps: [
+                {
+                    title: "Sensor Input",
+                    content: `A rain sensor (e.g., a conductive pad where resistance changes when wet) detects rainfall and sends a signal to the microcontroller.`
+                },
+                {
+                    title: "Microcontroller Decision",
+                    content: `The microcontroller's program constantly monitors the rain sensor. When it detects rain (sensor signal crosses a threshold), it makes the decision to close the window.`
+                },
+                {
+                    title: "Actuator Command",
+                    content: `The microcontroller then sends an electrical control signal (e.g., a digital HIGH to turn on a motor driver) to the **actuator** responsible for closing the window.`
+                },
+                {
+                    title: "Actuator Action",
+                    content: `The primary actuator in this system is likely an **electric motor** (e.g., a DC motor or a stepper motor) attached to the window mechanism. Upon receiving the command from the microcontroller, the motor activates and applies mechanical force to close the window.`
+                },
+                {
+                    title: "System Completion",
+                    content: `This demonstrates the complete mechatronic control loop: sensing the environment (rain), processing the data (microcontroller), and acting on it (motor closing the window).`
+                }
+            ]
+        }
+    },
+    types_actuators: {
+        title: "Types of Actuators",
+        description: "Different types of actuators are chosen based on the required type of motion, force, precision, and power requirements for a mechatronic system.",
+        steps: [
+            "<strong>Electric Motors:</strong> Convert electrical energy into rotational motion.",
+            "&bull; <strong>DC Motors (Brushed/Brushless):</strong> Simple, continuous rotation. Speed controlled by voltage (brushed) or PWM (brushless). BLDC motors are more efficient and durable. Used in fans, pumps, basic robotics.",
+            "&bull; <strong>Servo Motors:</strong> Precise angular position control. Typically include a DC motor, gearbox, position sensor, and control circuit. Used in robotics, RC planes, camera gimbals.",
+            "&bull; <strong>Stepper Motors:</strong> Rotate in discrete steps, offering precise open-loop position control (no feedback sensor needed for basic positioning). Used in 3D printers, CNC machines, hard drives.",
+            "&bull; Real-Life Example: The print head in an inkjet printer is moved precisely by a stepper motor. Each tiny step ensures the ink nozzle is exactly at the correct position to print a dot.",
+            "<strong>Solenoids:</strong> Convert electrical energy into linear (push/pull) or rotary motion.",
+            "&bull; An electromagnet creates a magnetic field that pulls or pushes a plunger. Used in door locks, automatic valves, car starter motors.",
+            "&bull; Real-Life Example: An automatic door lock uses a solenoid. When electricity flows through the coil, it creates a magnetic field that pulls a metal plunger, retracting the lock bolt.",
+            "<strong>Relays:</strong> Electromechanical switches that use an electromagnet to open or close contacts, allowing a low-power signal to control a high-power circuit.",
+            "&bull; Provide electrical isolation between control and power circuits. Used to switch lights, heaters, motors, etc., that draw high currents.",
+            "&bull; Real-Life Example: A smart home hub uses low-voltage digital signals from its microcontroller to activate relays, which then safely switch the 120V AC power to turn lights or appliances ON/OFF."
+        ],
+        example: {
+            problem: "A robot needs to lift and place small objects with high precision, and also move across a floor with continuous motion. Suggest suitable electric motors for each task.",
+            circuitHTML: `<div class="diagram-container">
+                            <div class="component-box">Lifting/Placing Small Objects (Precision)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">SUGGEST ACTUATOR 1</div>
+                            <div class="my-4"></div>
+                            <div class="component-box">Moving Across Floor (Continuous Motion)</div>
+                            <span class="diagram-arrow">↓</span>
+                            <div class="component-box">SUGGEST ACTUATOR 2</div>
+                        </div>`,
+            solutionSteps: [
+                {
+                    title: "Lifting/Placing Small Objects (High Precision)",
+                    content: `For lifting and placing small objects with high precision, a **Servo Motor** is ideal. Servo motors are designed for precise angular positioning and often come with built-in feedback (encoder) to ensure they reach and hold a desired position accurately. Stepper motors could also be considered if cost and open-loop control are sufficient.`
+                },
+                {
+                    title: "Moving Across Floor (Continuous Motion)",
+                    content: `For continuous motion across a floor, a **DC Motor (Brushed or Brushless DC motor - BLDC)** is most suitable. DC motors provide continuous rotation and are excellent for driving wheels or tracks. BLDC motors offer higher efficiency and longer lifespan for continuous operation.`
+                },
+                {
+                    title: "Summary",
+                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">Precision task: Servo Motor or Stepper Motor.<br>Continuous motion task: DC Motor (Brushed or BLDC).</div>`
+                }
+            ]
+        }
+    },
+    interfacing: {
+        title: "Interfacing Sensors & Actuators with Microcontrollers",
+        description: "Connecting sensors (inputs) and actuators (outputs) to microcontrollers requires understanding their signal types and the appropriate microcontroller peripherals.",
+        steps: [
+            "<strong>Digital Input (from Sensors):</strong> Directly connect digital sensors (e.g., push buttons, limit switches, PIR sensors) to Digital I/O pins of the microcontroller. The MCU reads the pin's state (HIGH/LOW).",
+            "<strong>Analog Input (from Sensors):</strong> Connect analog sensors (e.g., potentiometers, thermistors, LDRs) to Analog Input pins (ADC pins) of the microcontroller. The MCU's built-in Analog-to-Digital Converter (ADC) converts the analog voltage into a digital number.",
+            "<strong>Digital Output (to Actuators/Indicators):</strong> Use Digital I/O pins to control ON/OFF devices (e.g., LEDs, relays, simple solenoids). Write HIGH or LOW to the pin.",
+            "<strong>Analog Output / Motor Control (to Actuators):</strong> For variable control of devices like LED brightness or DC motor speed, use Pulse Width Modulation (PWM) pins. The MCU generates a digital square wave with varying duty cycle, which effectively controls the average power.",
+            "<strong>Serial Communication (for complex sensors/actuators):</strong> Many advanced sensors and actuators communicate digitally using protocols like I2C, SPI, or UART. The microcontroller has dedicated hardware modules for these protocols, allowing efficient data exchange.",
+            "Real-Life Example: A smart fan. A thermistor (analog sensor) provides a voltage related to temperature, read by the MCU's ADC. If the temperature exceeds a set threshold, the MCU uses PWM to control the speed of a DC fan motor (actuator), increasing speed as temperature rises. A push button (digital sensor) might switch the fan to manual mode, controlling it with a simple digital ON/OFF signal."
+        ],
+        example: {
+            problem: "You are building an automated pet feeder. What types of sensors and actuators, and which microcontroller interfacing methods, would you use for the following features?",
+            circuitHTML: ``,
+            solutionSteps: [
+                {
+                    title: "Detecting Pet Presence (before dispensing food)",
+                    content: `<strong>Sensor:</strong> PIR (Passive Infrared) motion sensor or an Ultrasonic proximity sensor.<br>
+                    <strong>Interfacing:</strong> Digital Input pin (PIR provides HIGH/LOW); Digital Input or a simple communication protocol (ultrasonic provides distance, usually as a pulse width or via serial).`
+                },
+                {
+                    title: "Dispensing a specific amount of food",
+                    content: `<strong>Actuator:</strong> Small Servo motor (for rotating a dispensing mechanism) or a Stepper motor (for precise rotation to push food out).<br>
+                    <strong>Interfacing:</strong> PWM pin for Servo (to control angle); Digital I/O pins (often 4 pins) for Stepper motor control (to control steps).`
+                },
+                {
+                    title: "Knowing when the food bin is low",
+                    content: `<strong>Sensor:</strong> Force/Weight sensor (load cell) under the bin, or an IR/Ultrasonic distance sensor looking down into the bin.<br>
+                    <strong>Interfacing:</strong> ADC pin (for load cell, as it provides analog voltage proportional to weight); ADC or digital input depending on the distance sensor's output type.`
+                },
+                {
+                    title: "Notifying the owner (e.g., via LED)",
+                    content: `<strong>Actuator:</strong> LED (for visual indication).<br>
+                    <strong>Interfacing:</strong> Digital Output pin (ON/OFF).`
+                }
+            ]
+        }
+    }
+};
+
+const practiceProblems = [
+    {
+        id: 1,
+        title: "Sensor Identification & Interfacing",
+        problemHTML: `For a robotic arm, you need to know the precise angle of each joint and detect if an object is present in its gripper.
+        1. What type of sensor would you use for joint angle measurement, and how would you interface it with a microcontroller?
+        2. What type of sensor would you use for object detection in the gripper, and how would you interface it?`,
+        answerHTML: `<b>Solution:</b><br>
+        1.  <strong>Joint Angle Measurement:</strong> An **encoder** (rotary encoder) is ideal for precise angular position. It would interface with the microcontroller via **digital input pins** (for quadrature encoders) or potentially a serial communication protocol (for absolute encoders).<br>
+        2.  <strong>Object Detection in Gripper:</strong> A **force/pressure sensor** (e.g., a FSR - Force Sensitive Resistor) or a small **optical proximity sensor** (e.g., IR emitter/detector pair) could be used. A force sensor would connect to an **ADC pin** (analog input), while an optical proximity sensor would connect to a **digital input pin** (ON/OFF signal).<br>
+        <div class="solution-box">Encoder (Digital/Serial), Force/Proximity Sensor (ADC/Digital)</div>`
+    },
+    {
+        id: 2,
+        title: "Actuator Selection & Control",
+        problemHTML: `You are building a miniature self-driving car.
+        1. What type of motor would you use for precise steering control (e.g., turning the front wheels to a specific angle)?
+        2. What type of motor would you use for driving the main propulsion (continuous rotation)?
+        3. How would you control the speed of the propulsion motor using a microcontroller?`,
+        answerHTML: `<b>Solution:</b><br>
+        1.  <strong>Steering Control:</strong> A **Servo Motor** is most suitable due to its ability to accurately control angular position.<br>
+        2.  <strong>Main Propulsion:</strong> A **DC Motor** (Brushed or Brushless DC - BLDC) would be used for continuous rotation to drive the wheels.<br>
+        3.  <strong>Controlling Propulsion Motor Speed:</strong> You would control the DC motor's speed using a **Pulse Width Modulation (PWM) pin** from the microcontroller. By varying the duty cycle of the PWM signal, you effectively change the average voltage supplied to the motor, thus controlling its speed.<br>
+        <div class="solution-box">Servo (steering), DC Motor (propulsion), PWM (speed control)</div>`
+    },
+    {
+        id: 3,
+        title: "Interfacing Scenario",
+        problemHTML: `A smart room air freshener needs to dispense spray only when motion is detected and the room's light level is low.
+        1. Identify the sensors needed.
+        2. Identify the actuator needed.
+        3. Describe the basic microcontroller interfacing for each.`,
+        answerHTML: `<b>Solution:</b><br>
+        1.  <strong>Sensors:</strong> A **PIR (Passive Infrared) motion sensor** for motion detection and a **Photoresistor (LDR) or similar light sensor** for light level detection.<br>
+        2.  <strong>Actuator:</strong> A **Solenoid** (to activate a spray mechanism) or a small **DC motor** (to operate a fan or pump for dispensing).<br>
+        3.  <strong>Interfacing:</strong><br>
+            &bull;   **PIR Sensor:** Connects to a **digital input pin**. It outputs HIGH when motion is detected, LOW otherwise.<br>
+            &bull;   **Light Sensor (LDR):** Connects to an **Analog-to-Digital Converter (ADC) pin**. The LDR would typically be part of a voltage divider circuit, providing a variable analog voltage based on light intensity, which the ADC converts to a digital value.<br>
+            &bull;   **Solenoid/DC Motor:** Connects to a **digital output pin** (often through a transistor or motor driver for power amplification). The microcontroller would set the pin HIGH to activate and LOW to deactivate.<br>
+        <div class="solution-box">Sensors: PIR, LDR. Actuator: Solenoid/DC Motor. Interfacing: PIR->Digital In, LDR->ADC, Solenoid/Motor->Digital Out (via driver).</div>`
+    }
+];
+
+const quizQuestions = [
+    {
+        id: 1,
+        question: "Which of the following describes an 'active sensor'?",
+        options: [
+            "Generates an electrical signal without external power.",
+            "Requires an external power source to operate.",
+            "Always outputs a digital signal.",
+            "Converts electrical signals to physical motion."
+        ],
+        answer: "Requires an external power source to operate.",
+        explanation: "Active sensors, like ultrasonic sensors, emit energy (e.g., sound waves) and measure the response, thus requiring an external power source."
+    },
+    {
+        id: 2,
+        question: "A thermistor outputs a continuous range of resistance values based on temperature. What type of sensor is it, and what microcontroller peripheral is typically needed to read it?",
+        options: [
+            "Digital sensor, Digital I/O pin.",
+            "Analog sensor, Digital I/O pin.",
+            "Digital sensor, ADC pin.",
+            "Analog sensor, ADC pin."
+        ],
+        answer: "Analog sensor, ADC pin.",
+        explanation: "Thermistors change resistance continuously, making them analog. An ADC (Analog-to-Digital Converter) is necessary to convert this analog information into a digital value that a microcontroller can process."
+    },
+    {
+        id: 3,
+        question: "Which type of electric motor is best suited for applications requiring precise angular position control, like moving a robot arm joint to a specific angle?",
+        options: [
+            "DC Motor",
+            "Stepper Motor",
+            "Servo Motor",
+            "Solenoid"
+        ],
+        answer: "Servo Motor",
+        explanation: "Servo motors are specifically designed for precise angular positioning and typically include built-in feedback and control circuitry to achieve this."
+    },
+    {
+        id: 4,
+        question: "What is the primary function of an actuator in a mechatronic system?",
+        options: [
+            "To gather information about the environment.",
+            "To process data and make decisions.",
+            "To convert an electrical signal into a physical action.",
+            "To store program instructions."
+        ],
+        answer: "To convert an electrical signal into a physical action.",
+        explanation: "Actuators are the 'muscles' of a system, taking commands (electrical signals) from the controller and performing physical work or motion."
+    },
+    {
+        id: 5,
+        question: "You want to control the speed of a small DC motor using a microcontroller. Which interfacing method would be most appropriate?",
+        options: [
+            "Direct digital ON/OFF control.",
+            "Analog-to-Digital Converter (ADC).",
+            "Pulse Width Modulation (PWM).",
+            "Reading a serial data stream."
+        ],
+        answer: "Pulse Width Modulation (PWM).",
+        explanation: "PWM effectively controls the average voltage supplied to the motor by varying the 'on' time of a digital signal, allowing for variable speed control."
+    }
+];
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const appSections = document.querySelectorAll('.app-section');
+    const conceptTabs = document.querySelectorAll('.concept-tab');
+    const conceptContentContainer = document.getElementById('concept-content');
+    
+    // Main navigation
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const targetId = link.dataset.target;
+            appSections.forEach(section => {
+                section.classList.toggle('hidden', section.id !== targetId);
+            });
+            navLinks.forEach(l => l.classList.remove('font-bold', 'text-blue-600'));
+            link.classList.add('font-bold', 'text-blue-600');
+        });
+    });
+
+    // Concept tabs
+    conceptTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const conceptId = tab.dataset.concept;
+            conceptTabs.forEach(t => t.classList.remove('tab-active', 'border-blue-500', 'text-blue-600'));
+            tab.classList.add('tab-active', 'border-blue-500', 'text-blue-600');
+            renderConcept(conceptId);
+        });
+    });
+
+    function renderConcept(conceptId) {
+        const data = appData[conceptId];
+        if (!data) return;
+
+        let stepsHTML = data.steps.map(step => `<li class="mb-2">${step}</li>`).join('');
+        let exampleStepsHTML = data.example.solutionSteps.map((step, index) => `
+            <div id="step-${index}" class="step-content border-t pt-4 mt-4">
+                <h4 class="font-semibold text-lg text-blue-700">${step.title}</h4>
+                <div class="text-gray-700 mt-2">${step.content}</div>
+            </div>
+        `).join('');
+
+        conceptContentContainer.innerHTML = `
+            <h3 class="text-2xl font-bold text-gray-800">${data.title}</h3>
+            <p class="mt-2 mb-4 text-gray-600">${data.description}</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="text-xl font-semibold mb-2">Key Concepts & Real-Life Application</h4>
+                    <ul class="list-decimal list-inside text-gray-700 space-y-1">${stepsHTML}</ul>
+                </div>
+                <div>
+                    <h4 class="text-xl font-semibold mb-2">Interactive Example: ${data.example.problem}</h4>
+                    ${data.example.circuitHTML || ''}
+                    <div id="example-steps-container">${exampleStepsHTML}</div>
+                    <div class="mt-4 flex space-x-2">
+                         <button id="next-step-btn" class="btn">Start</button>
+                         <button id="reset-steps-btn" class="btn btn-secondary">Reset</button>
+                    </div>
+                </div>
+            </div>`;
+        
+        setupInteractiveExample();
+    }
+    
+    let currentStep = -1;
+    function setupInteractiveExample() {
+        const nextBtn = document.getElementById('next-step-btn');
+        const resetBtn = document.getElementById('reset-steps-btn');
+        const steps = document.querySelectorAll('.step-content');
+        currentStep = -1;
+
+        const showNextStep = () => {
+            if (currentStep >= 0) {
+                steps[currentStep].classList.remove('visible');
+            }
+            currentStep++;
+            if (currentStep < steps.length) {
+                steps[currentStep].classList.add('visible');
+                nextBtn.textContent = 'Next Step';
+            }
+            if (currentStep >= steps.length - 1) {
+                nextBtn.disabled = true;
+                nextBtn.textContent = 'Finished';
+            }
+        };
+
+        const resetSteps = () => {
+            steps.forEach(step => step.classList.remove('visible'));
+            currentStep = -1;
+            nextBtn.disabled = false;
+            nextBtn.textContent = 'Start';
+        };
+
+        nextBtn.addEventListener('click', showNextStep);
+        resetBtn.addEventListener('click', resetSteps);
+    }
+    
+    function renderPracticeProblems() {
+        const container = document.getElementById('practice-problems-container');
+        container.innerHTML = practiceProblems.map(p => `
+            <div class="border rounded-lg p-4">
+                <h4 class="text-lg font-semibold">${p.title}</h4>
+                <p class="mt-2 text-gray-700">${p.problemHTML}</p>
+                <div id="answer-${p.id}" class="mt-4 p-4 bg-blue-50 rounded hidden">
+                   ${p.answerHTML}
+                </div>
+                <button data-answer-id="${p.id}" class="toggle-answer-btn btn mt-4 text-sm">Show Answer</button>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const answerId = btn.dataset.answerId;
+                const answerEl = document.getElementById(`answer-${answerId}`);
+                answerEl.classList.toggle('hidden');
+                btn.textContent = answerEl.classList.contains('hidden') ? 'Show Answer' : 'Hide Answer';
+            });
+        });
+    }
+
+    function renderQuiz() {
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = quizQuestions.map((q, index) => `
+            <div class="border rounded-lg p-4">
+                <h4 class="text-lg font-semibold mb-3">Q${index + 1}: ${q.question}</h4>
+                <div class="space-y-2">
+                    ${q.options.map((option, optIndex) => `
+                        <label class="block">
+                            <input type="radio" name="quiz-q${q.id}" value="${option}" class="mr-2">
+                            ${option}
+                        </label>
+                    `).join('')}
+                </div>
+                <button data-question-id="${q.id}" class="check-quiz-btn btn mt-4 text-sm">Check Answer</button>
+                <div id="quiz-feedback-${q.id}" class="mt-3 text-sm font-semibold"></div>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.check-quiz-btn').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                const questionId = btn.dataset.questionId;
+                const selectedOption = document.querySelector(`input[name="quiz-q${questionId}"]:checked`);
+                const feedbackEl = document.getElementById(`quiz-feedback-${questionId}`);
+                const question = quizQuestions.find(q => q.id == questionId);
+
+                if (!selectedOption) {
+                    feedbackEl.innerHTML = `<span class="text-yellow-600">Please select an option.</span>`;
+                    return;
+                }
+
+                if (selectedOption.value === question.answer) {
+                    feedbackEl.innerHTML = `<span class="text-green-600">Correct!</span> ${question.explanation}`;
+                } else {
+                    feedbackEl.innerHTML = `<span class="text-red-600">Incorrect.</span> The correct answer is: <strong>${question.answer}</strong>. ${question.explanation}`;
+                }
+            });
+        });
+    }
+
+    // --- Sandbox Logic for Smart Lighting System Simulation ---
+    const lightSensorSlider = document.getElementById('light-sensor-slider');
+    const lightSensorValueDisplay = document.getElementById('light-sensor-value');
+    const simOutputLed = document.getElementById('sim-output-led');
+    const ledBrightnessStatus = document.getElementById('led-brightness-status');
+    const motorStatus = document.getElementById('motor-status');
+    const motorDirection = document.getElementById('motor-direction');
+    const pseudoCodeDisplay = document.getElementById('pseudo-code-display');
+
+    const pseudoCode = `// Smart Lighting System Pseudo-Code
+// Reads analog light sensor and controls LED brightness via PWM.
+// Also controls a simulated DC motor (for blinds) based on light level.
+
+function setup() {
+  pinMode(LIGHT_SENSOR_PIN, INPUT_ANALOG); // Configure analog input
+  pinMode(LED_PWM_PIN, OUTPUT_PWM);       // Configure PWM output for LED
+  pinMode(MOTOR_ENABLE_PIN, OUTPUT);      // Digital output for motor enable
+  pinMode(MOTOR_DIR_PIN_1, OUTPUT);       // Digital output for motor direction
+  pinMode(MOTOR_DIR_PIN_2, OUTPUT);       // Digital output for motor direction
+}
+
+function loop() {
+  lightValue = analogRead(LIGHT_SENSOR_PIN); // Read sensor (0-1023)
+
+  // Control LED brightness based on light value (inverted logic for 'darker = brighter LED')
+  // Map 0-1023 light to 255-0 LED brightness (inverted, and scaled for PWM)
+  ledBrightness = map(lightValue, 0, 1023, 255, 0); 
+  analogWrite(LED_PWM_PIN, ledBrightness);
+
+  // Control blinds motor based on light level
+  if (lightValue < 200) { // Very Dark
+    // Open blinds (motor moves one way)
+    digitalWrite(MOTOR_ENABLE_PIN, HIGH);
+    digitalWrite(MOTOR_DIR_PIN_1, HIGH);
+    digitalWrite(MOTOR_DIR_PIN_2, LOW);
+    // motor moves for a short duration
+  } else if (lightValue > 800) { // Very Bright
+    // Close blinds (motor moves other way)
+    digitalWrite(MOTOR_ENABLE_PIN, HIGH);
+    digitalWrite(MOTOR_DIR_PIN_1, LOW);
+    digitalWrite(MOTOR_DIR_PIN_2, HIGH);
+    // motor moves for a short duration
+  } else { // Medium Light
+    // Stop blinds motor
+    digitalWrite(MOTOR_ENABLE_PIN, LOW); // Disable motor
+  }
+
+  // Small delay to prevent rapid updates
+  delay(50); 
+}`;
+
+    // Function to update LED brightness and motor status
+    function updateSimulationOutputs() {
+        const lightValue = parseInt(lightSensorSlider.value);
+        lightSensorValueDisplay.textContent = `Value: ${lightValue} (${getLightLevelDescription(lightValue)})`;
+
+        // Calculate LED brightness (inverted: darker room = brighter LED)
+        // Map 0-1023 (light value) to 255-0 (PWM value). 255 is max brightness.
+        const ledBrightness = Math.round(255 - (lightValue / 1023) * 255); 
+        simOutputLed.style.opacity = (ledBrightness / 255).toFixed(2); // Set opacity based on PWM value
+        ledBrightnessStatus.textContent = `Brightness: ${Math.round((ledBrightness / 255) * 100)}%`;
+
+        // Update LED color based on brightness for better visual
+        const intensity = (ledBrightness / 255); // 0 to 1
+        const r = Math.round(255 * intensity);
+        const g = Math.round(200 * intensity); // Slightly yellowish
+        const b = Math.round(50 * intensity);
+        simOutputLed.style.backgroundColor = `rgb(${r},${g},${b})`;
+
+
+        // Control motor for blinds
+        if (lightValue < 200) { // Very Dark
+            motorStatus.textContent = 'Moving';
+            motorDirection.textContent = 'Blinds: Opening';
+            motorStatus.classList.add('text-blue-700');
+            motorStatus.classList.remove('text-red-700');
+        } else if (lightValue > 800) { // Very Bright
+            motorStatus.textContent = 'Moving';
+            motorDirection.textContent = 'Blinds: Closing';
+            motorStatus.classList.add('text-red-700');
+            motorStatus.classList.remove('text-blue-700');
+        } else { // Medium Light
+            motorStatus.textContent = 'Stopped';
+            motorDirection.textContent = '';
+            motorStatus.classList.remove('text-blue-700', 'text-red-700');
+        }
+    }
+
+    function getLightLevelDescription(value) {
+        if (value < 100) return 'Very Dark';
+        if (value < 400) return 'Dark';
+        if (value < 700) return 'Medium';
+        if (value < 950) return 'Bright';
+        return 'Very Bright';
+    }
+
+    // Event listeners
+    lightSensorSlider.addEventListener('input', updateSimulationOutputs); // Update on slider move
+
+    // Initial setup
+    document.querySelector('.nav-link[data-target="concepts"]').click(); // Activate 'Concepts' tab by default
+    document.querySelector('.concept-tab[data-concept="intro_sensors"]').click(); // Activate first concept tab by default
+    renderPracticeProblems(); // Render practice problems
+    renderQuiz(); // Render quiz questions
+    pseudoCodeDisplay.textContent = pseudoCode; // Display pseudo-code initially
+    updateSimulationOutputs(); // Initial simulation output update
+});
+</script>
+</body>
+</html>
