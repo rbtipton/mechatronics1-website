@@ -140,6 +140,7 @@
             padding: 0.5rem;
             border: 1px solid #e5e7eb;
             text-align: center;
+            min-width: 40px; /* Ensure a minimum width for table cells */
         }
         .truth-table-container th {
             background-color: #e0f2fe; /* blue-50 */
@@ -615,6 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Main Navigation Logic ---
     function showSection(sectionId) {
+        console.log(`Showing section: ${sectionId}`);
         appSections.forEach(section => {
             section.classList.add('hidden');
         });
@@ -632,6 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initialize sandbox on first visit to ensure truth table is populated
         if (sectionId === 'sandbox') {
+            console.log('Initializing sandbox simulator.');
             updateGateSimulator();
         }
     }
@@ -644,6 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Concept Tabs Logic ---
     function loadConceptContent(conceptKey) {
+        console.log(`Loading concept content: ${conceptKey}`);
         const data = appData[conceptKey];
         if (!data) return;
 
@@ -728,6 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Practice Problems Logic ---
     function loadPracticeProblems() {
+        console.log('Loading practice problems.');
         let html = '';
         practiceProblems.forEach(problem => {
             html += `
@@ -761,6 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Quiz Logic ---
     function loadQuiz() {
+        console.log('Loading quiz questions.');
         let html = '';
         quizQuestions.forEach((q, index) => {
             html += `
@@ -803,8 +809,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const explanationBox = parentQuestion.querySelector('.quiz-explanation');
                 
                 if (!selectedOption) {
-                    // In a real app, use a custom modal for user feedback instead of alert()
-                    // console.log('Please select an option first!');
+                    // console.log('Please select an option first!'); // Use console for debugging
                     return;
                 }
 
@@ -914,6 +919,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to update the gate simulator's output and truth table
     function updateGateSimulator() {
+        console.log('updateGateSimulator called.');
         const selectedGate = gateSelect.value;
         // Parse current input values from data-value attributes
         let inputAValue = parseInt(inputA.dataset.value);
@@ -928,10 +934,12 @@ document.addEventListener('DOMContentLoaded', () => {
             inputBValue = undefined; // Set B to undefined for NOT gate logic
             currentOutput = gateLogic[selectedGate](inputAValue); // Calculate output for NOT gate
             tt = truthTableData[selectedGate]; // Get truth table for NOT gate
+            console.log(`Gate: NOT, Input A: ${inputAValue}, Output Q: ${currentOutput ? '1' : '0'}`);
         } else {
             inputBContainer.classList.remove('hidden'); // Show Input B for other gates
             currentOutput = gateLogic[selectedGate](inputAValue, inputBValue); // Calculate output for two-input gates
             tt = truthTableData[selectedGate]; // Get truth table for two-input gates
+            console.log(`Gate: ${selectedGate}, Input A: ${inputAValue}, Input B: ${inputBValue}, Output Q: ${currentOutput ? '1' : '0'}`);
         }
 
         // Display the calculated output (convert boolean result to '1' or '0')
@@ -953,10 +961,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         tableHTML += `</tbody></table>`;
         truthTableDisplay.innerHTML = tableHTML;
+        console.log('Truth table updated.');
     }
 
     // Function to toggle input button values (0 <-> 1)
     function toggleInput(button, statusSpan) {
+        console.log(`Toggling input for ${button.id}`);
         let currentValue = parseInt(button.dataset.value);
         let newValue = 1 - currentValue; // Toggle 0 to 1, 1 to 0
         button.dataset.value = newValue; // Update data-value attribute
@@ -966,9 +976,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event Listeners for Sandbox interactions
-    inputA.addEventListener('click', () => toggleInput(inputA, inputAStatus));
-    inputB.addEventListener('click', () => toggleInput(inputB, inputBStatus));
-    gateSelect.addEventListener('change', updateGateSimulator); // Update simulator when gate selection changes
+    if (inputA) inputA.addEventListener('click', () => toggleInput(inputA, inputAStatus));
+    else console.error("Input A button not found.");
+
+    if (inputB) inputB.addEventListener('click', () => toggleInput(inputB, inputBStatus));
+    else console.error("Input B button not found.");
+
+    if (gateSelect) gateSelect.addEventListener('change', updateGateSimulator);
+    else console.error("Gate Select dropdown not found.");
 
 
     // Initial setup: show 'Digital Logic Concepts' section and its 'Intro & Binary' tab
