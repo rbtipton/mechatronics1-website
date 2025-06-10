@@ -210,6 +210,11 @@
                         </div>
                         <p class="text-sm text-gray-600">Capacitor: 100nF ($100 \\times 10^{-9}$ F)</p>
                         <p class="text-sm text-gray-600">Inductor: 10mH ($10 \\times 10^{-3}$ H)</p>
+                        <div class="mt-4 text-center">
+                            <p class="text-lg font-semibold">Calculated Reactances at Current Frequency:</p>
+                            <p>Inductive Reactance ($X_L$): <span id="currentInductiveReactance" class="font-bold text-blue-700">0.00 Ω</span></p>
+                            <p>Capacitive Reactance ($X_C$): <span id="currentCapacitiveReactance" class="font-bold text-red-700">0.00 Ω</span></p>
+                        </div>
                     </div>
                     <div>
                         <h3 class="text-xl font-semibold mb-4">Reactance Graph</h3>
@@ -535,6 +540,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const frequencyInput = document.getElementById('frequencyInput');
     const frequencyValueSpan = document.getElementById('frequencyValue');
     const reactanceChartCanvas = document.getElementById('reactanceChart');
+    const currentInductiveReactanceSpan = document.getElementById('currentInductiveReactance');
+    const currentCapacitiveReactanceSpan = document.getElementById('currentCapacitiveReactance');
+
 
     let reactanceChart; // Declare chart variable globally within this scope
 
@@ -546,6 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // This is crucial when content is dynamically replaced via innerHTML to prevent reference issues.
             window.MathJax.typesetClear([element]);
             // Typeset the content within the specified element
+            // MathJax.typesetPromise expects an array of elements or no argument to typeset the whole document
             window.MathJax.typesetPromise([element]).then(() => {
                 // console.log('MathJax typeset complete for:', element.id || element.className || element.tagName);
             }).catch(err => console.error('MathJax typesetting failed:', err));
@@ -573,6 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (sectionId === 'sandbox' && !reactanceChart) {
             initializeReactanceChart(); // Initialize chart when sandbox is first shown
+            updateCurrentReactances(); // Initialize display of current reactances
         }
     }
 
@@ -841,14 +851,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Update chart based on frequency slider (still refers to the static chart, not dynamic data points)
-        frequencyInput.addEventListener('input', () => {
-            const freq = parseFloat(frequencyInput.value);
-            frequencyValueSpan.textContent = `${freq} Hz`;
-            // No MathJax call needed here as the chart itself doesn't contain LaTeX,
-            // and the text update is simple DOM manipulation.
-        });
+        // Initial update of calculated reactances when chart is initialized
+        updateCurrentReactances();
     }
+
+    // Function to update the displayed current reactances
+    function updateCurrentReactances() {
+        const freq = parseFloat(frequencyInput.value);
+        const inductance = 10e-3; // 10mH
+        const capacitance = 100e-9; // 100nF
+
+        const angularFrequency = 2 * Math.PI * freq;
+        const inductiveReactance = angularFrequency * inductance;
+        const capacitiveReactance = 1 / (angularFrequency * capacitance);
+
+        currentInductiveReactanceSpan.textContent = `${inductiveReactance.toFixed(2)} Ω`;
+        currentCapacitiveReactanceSpan.textContent = `${capacitiveReactance.toFixed(2)} Ω`;
+
+        // No need to re-typeset MathJax for these specific spans, as they only contain numbers and 'Ω'.
+        // If they contained complex LaTeX, typesetMath would be called here.
+    }
+
+    // Update current reactances display when frequency slider changes
+    frequencyInput.addEventListener('input', () => {
+        frequencyValueSpan.textContent = `${parseFloat(frequencyInput.value)} Hz`;
+        updateCurrentReactances(); // Call the new function
+    });
 
 
     // Initial setup: show AC Concepts section and its first tab
