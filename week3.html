@@ -4,18 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mechatronics 1: Week 3 - AC Circuit Fundamentals</title>
+    <!-- Tailwind CSS CDN for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN for interactive graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Academic Blue -->
-    <!-- Application Structure Plan: The SPA is structured using a main navigation bar to switch between three core sections: 'AC Concepts', 'Interactive Sandbox', and 'Practice Problems'. The 'AC Concepts' section uses a sub-navigation (tabs) for 'AC Basics', 'Phasors', 'Reactance', 'Impedance', and 'AC Power'. This architecture organizes the content thematically, allowing students to focus on one concept at a time. The 'Interactive Sandbox' visually compares how impedance changes with frequency for capacitors and inductors. The user flow is designed for progressive learning: grasp a concept, see it applied interactively, explore its behavior visually, and finally, test knowledge with practice problems. This is more engaging and effective than a static document. -->
-    <!-- Visualization & Content Choices: Concepts/Steps -> Styled text blocks (HTML/Tailwind). Math Examples -> Interactive step-by-step reveal with a button (JS). Circuit diagrams -> HTML/CSS divs for generic components. Sandbox Comparison -> Line chart (Chart.js/Canvas) to show frequency dependence of reactance/impedance. Practice Problems -> Cards with a 'show answer' toggle (JS). This mix of static and interactive content enhances engagement and comprehension. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- MathJax CDN for rendering LaTeX formulas -->
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <script>
+        // MathJax configuration to handle common delimiters
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true,
+                tags: 'ams' // Enable automatic equation numbering with AMS packages
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    <!-- Custom CSS -->
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .tab-active { 
+        .tab-active {
             border-color: #3b82f6; /* blue-500 */
             color: #1d4ed8; /* blue-700 */
             background-color: #eff6ff; /* blue-50 */
@@ -51,7 +69,9 @@
         }
         .btn-secondary:hover { background-color: #4b5563; }
         .hidden { display: none; }
-        .katex-display { display: block; overflow-x: auto; white-space: nowrap; }
+        /* Ensure MathJax rendered elements also respect overflow for long formulas */
+        .katex-display > .katex { white-space: normal; } /* Allow breaking for long formulas */
+        .katex-html { white-space: normal; } /* Ensure the HTML output wraps */
 
         /* Generic Component Styling for AC Diagrams (simplified) */
         .component-box {
@@ -70,7 +90,7 @@
             display: inline-block;
             transform: scaleX(1.5); /* Make it look like a coil */
         }
-         .capacitor-symbol {
+        .capacitor-symbol {
             width: 30px;
             height: 20px;
             border-left: 2px solid #374151;
@@ -89,6 +109,48 @@
         .capacitor-symbol::before { left: 0; }
         .capacitor-symbol::after { right: 0; }
         
+        /* Styles for real-life examples and answers */
+        .real-world-example {
+            background-color: #fffbeb; /* Light yellow for real-world examples */
+            border-left: 4px solid #fbbf24; /* Yellow left border */
+            padding: 1rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.375rem;
+            font-style: italic;
+        }
+        .quiz-option {
+            background-color: #f0fdf4;
+            border: 1px solid #d1fae5;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .quiz-option:hover {
+            background-color: #e0fdf0;
+        }
+        .quiz-option.selected {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+        .quiz-option.correct {
+            background-color: #a7f3d0; /* green-200 */
+            border-color: #059669; /* green-600 */
+        }
+        .quiz-option.incorrect {
+            background-color: #fecaca; /* red-200 */
+            border-color: #ef4444; /* red-500 */
+        }
+        .quiz-explanation {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -134,7 +196,7 @@
 
         <!-- Section: Interactive Sandbox -->
         <section id="sandbox" class="app-section hidden">
-             <div class="bg-white p-6 rounded-lg shadow">
+            <div class="bg-white p-6 rounded-lg shadow">
                 <h2 class="text-3xl font-bold mb-2 text-gray-900">Interactive Sandbox: Reactance vs. Frequency</h2>
                 <p class="text-gray-600 mb-6">This sandbox illustrates how the opposition to current flow (reactance) for capacitors and inductors changes dramatically with frequency. Observe the inverse relationship for capacitors and the direct relationship for inductors. Try different frequencies to see the effect.</p>
                 <div class="grid md:grid-cols-2 gap-8">
@@ -146,8 +208,8 @@
                             <input type="range" id="frequencyInput" min="100" max="10000" value="1000" class="flex-grow">
                             <span id="frequencyValue" class="font-bold w-16 text-right">1000 Hz</span>
                         </div>
-                        <p class="text-sm text-gray-600">Capacitor: 100nF ($100 \times 10^{-9}$ F)</p>
-                        <p class="text-sm text-gray-600">Inductor: 10mH ($10 \times 10^{-3}$ H)</p>
+                        <p class="text-sm text-gray-600">Capacitor: 100nF ($100 \\times 10^{-9}$ F)</p>
+                        <p class="text-sm text-gray-600">Inductor: 10mH ($10 \\times 10^{-3}$ H)</p>
                     </div>
                     <div>
                         <h3 class="text-xl font-semibold mb-4">Reactance Graph</h3>
@@ -162,22 +224,23 @@
         <!-- Section: Practice Problems -->
         <section id="practice" class="app-section hidden">
             <div class="bg-white p-6 rounded-lg shadow">
-                 <h2 class="text-3xl font-bold mb-4 text-gray-900">Practice Problems</h2>
-                 <p class="text-gray-600 mb-6">Test your understanding with these problems from the course notes. Click "Show Answer" to reveal the detailed solution.</p>
-                 <div id="practice-problems-container" class="space-y-6">
+                <h2 class="text-3xl font-bold mb-4 text-gray-900">Practice Problems</h2>
+                <p class="text-gray-600 mb-6">Test your understanding with these problems from the course notes. Click "Show Answer" to reveal the detailed solution.</p>
+                <div id="practice-problems-container" class="space-y-6">
                     <!-- Practice problems will be injected here -->
-                 </div>
-                 <h2 class="text-3xl font-bold mt-8 mb-4 text-gray-900">Quiz</h2>
-                 <p class="text-gray-600 mb-6">Challenge your knowledge with these multiple-choice questions. Select your answer and click 'Check Answer'.</p>
-                 <div id="quiz-container" class="space-y-6">
+                </div>
+                <h2 class="text-3xl font-bold mt-8 mb-4 text-gray-900">Quiz</h2>
+                <p class="text-gray-600 mb-6">Challenge your knowledge with these multiple-choice questions. Select your answer and click 'Check Answer'.</p>
+                <div id="quiz-container" class="space-y-6">
                     <!-- Quiz questions will be injected here -->
-                 </div>
+                </div>
             </div>
         </section>
 
     </main>
     
 <script>
+// Data for the application sections
 const appData = {
     ac_basics: {
         title: "AC Basics: Sinusoidal Waveforms",
@@ -187,7 +250,7 @@ const appData = {
             "<strong>Amplitude ($V_m$ or $I_m$):</strong> The peak value of the voltage or current from zero. Measured in Volts (V) or Amperes (A).",
             "<strong>Period (T):</strong> The time it takes for one complete cycle of the waveform. Measured in seconds (s).",
             "<strong>Frequency (f):</strong> The number of cycles per second. Measured in Hertz (Hz). $f = 1/T$. Real-Life: In North America, household AC is typically 60Hz. In Europe, it's 50Hz.",
-            "<strong>Angular Frequency ($\omega$):</strong> Related to frequency by $\\omega = 2\\pi f$. Measured in radians per second (rad/s).",
+            "<strong>Angular Frequency ($\\omega$):</strong> Related to frequency by $\\omega = 2\\pi f$. Measured in radians per second (rad/s).",
             "<strong>Phase Angle ($\\phi$):</strong> Describes the shift of the waveform relative to a reference. Measured in degrees or radians. A positive $\\phi$ means the waveform is shifted left (leads the reference), a negative $\\phi$ means it's shifted right (lags)."
         ],
         example: {
@@ -447,17 +510,17 @@ const quizQuestions = [
     },
     {
         id: 4,
-        question: "What does a power factor of 1 (unity) signify in an AC circuit?",
-        options: ["High reactive power", "Purely resistive load", "High apparent power", "Purely inductive load"],
+        question: "What does a power factor of 1 (unity) signify?",
+        options: ["Purely inductive load", "Purely capacitive load", "Purely resistive load", "Maximum reactive power"],
         answer: "Purely resistive load",
-        explanation: "A power factor of 1 means all apparent power is real power, indicating no reactive components or perfect cancellation of reactive power."
+        explanation: "A power factor of 1 means all apparent power is real power, indicating a purely resistive circuit with no reactive components."
     },
     {
         id: 5,
-        question: "How do you calculate the RMS value of a sinusoidal voltage if its peak voltage ($V_m$) is known?",
-        options: ["$V_{RMS} = V_m \\cdot \\sqrt{2}$", "$V_{RMS} = V_m / 2$", "$V_{RMS} = V_m / \\sqrt{2}$", "$V_{RMS} = V_m$"],
-        answer: "$V_{RMS} = V_m / \\sqrt{2}$",
-        explanation: "For a sine wave, the RMS value is the peak value divided by the square root of 2."
+        question: "In complex impedance, what does the imaginary part represent?",
+        options: ["Resistance", "Conductance", "Reactance", "Admittance"],
+        answer: "Reactance",
+        explanation: "Complex impedance $Z = R + jX$, where $R$ is resistance (real part) and $X$ is reactance (imaginary part)."
     }
 ];
 
@@ -466,258 +529,339 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelectorAll('.nav-link');
     const appSections = document.querySelectorAll('.app-section');
     const conceptTabs = document.querySelectorAll('.concept-tab');
-    const conceptContentContainer = document.getElementById('concept-content');
-    
-    // Main navigation
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            const targetId = link.dataset.target;
-            appSections.forEach(section => {
-                section.classList.toggle('hidden', section.id !== targetId);
-            });
-            navLinks.forEach(l => l.classList.remove('font-bold', 'text-blue-600'));
-            link.classList.add('font-bold', 'text-blue-600');
-        });
-    });
-
-    // Concept tabs
-    conceptTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const conceptId = tab.dataset.concept;
-            conceptTabs.forEach(t => t.classList.remove('tab-active', 'border-blue-500', 'text-blue-600'));
-            tab.classList.add('tab-active', 'border-blue-500', 'text-blue-600');
-            renderConcept(conceptId);
-        });
-    });
-
-    function renderConcept(conceptId) {
-        const data = appData[conceptId];
-        if (!data) return;
-
-        let stepsHTML = data.steps.map(step => `<li class="mb-2">${step}</li>`).join('');
-        let exampleStepsHTML = data.example.solutionSteps.map((step, index) => `
-            <div id="step-${index}" class="step-content border-t pt-4 mt-4">
-                <h4 class="font-semibold text-lg text-blue-700">${step.title}</h4>
-                <div class="text-gray-700 mt-2">${step.content}</div>
-            </div>
-        `).join('');
-
-        conceptContentContainer.innerHTML = `
-            <h3 class="text-2xl font-bold text-gray-800">${data.title}</h3>
-            <p class="mt-2 mb-4 text-gray-600">${data.description}</p>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div>
-                    <h4 class="text-xl font-semibold mb-2">General Steps & Real-Life Application</h4>
-                    <ul class="list-decimal list-inside text-gray-700 space-y-1">${stepsHTML}</ul>
-                </div>
-                <div>
-                    <h4 class="text-xl font-semibold mb-2">Interactive Example: ${data.example.problem}</h4>
-                    ${data.example.circuitHTML || ''}
-                    <div id="example-steps-container">${exampleStepsHTML}</div>
-                    <div class="mt-4 flex space-x-2">
-                         <button id="next-step-btn" class="btn">Start</button>
-                         <button id="reset-steps-btn" class="btn btn-secondary">Reset</button>
-                    </div>
-                </div>
-            </div>`;
-        
-        setupInteractiveExample();
-    }
-    
-    let currentStep = -1;
-    function setupInteractiveExample() {
-        const nextBtn = document.getElementById('next-step-btn');
-        const resetBtn = document.getElementById('reset-steps-btn');
-        const steps = document.querySelectorAll('.step-content');
-        currentStep = -1;
-
-        const showNextStep = () => {
-            if (currentStep >= 0) {
-                steps[currentStep].classList.remove('visible');
-            }
-            currentStep++;
-            if (currentStep < steps.length) {
-                steps[currentStep].classList.add('visible');
-                nextBtn.textContent = 'Next Step';
-            }
-            if (currentStep >= steps.length - 1) {
-                nextBtn.disabled = true;
-                nextBtn.textContent = 'Finished';
-            }
-        };
-
-        const resetSteps = () => {
-            steps.forEach(step => step.classList.remove('visible'));
-            currentStep = -1;
-            nextBtn.disabled = false;
-            nextBtn.textContent = 'Start';
-        };
-
-        nextBtn.addEventListener('click', showNextStep);
-        resetBtn.addEventListener('click', resetSteps);
-    }
-    
-    function renderPracticeProblems() {
-        const container = document.getElementById('practice-problems-container');
-        container.innerHTML = practiceProblems.map(p => `
-            <div class="border rounded-lg p-4">
-                <h4 class="text-lg font-semibold">${p.title}</h4>
-                <p class="mt-2 text-gray-700">${p.problemHTML}</p>
-                <div id="answer-${p.id}" class="mt-4 p-4 bg-blue-50 rounded hidden">
-                   ${p.answerHTML}
-                </div>
-                <button data-answer-id="${p.id}" class="toggle-answer-btn btn mt-4 text-sm">Show Answer</button>
-            </div>
-        `).join('');
-
-        document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const answerId = btn.dataset.answerId;
-                const answerEl = document.getElementById(`answer-${answerId}`);
-                answerEl.classList.toggle('hidden');
-                btn.textContent = answerEl.classList.contains('hidden') ? 'Show Answer' : 'Hide Answer';
-            });
-        });
-    }
-
-    function renderQuiz() {
-        const container = document.getElementById('quiz-container');
-        container.innerHTML = quizQuestions.map((q, index) => `
-            <div class="border rounded-lg p-4">
-                <h4 class="text-lg font-semibold mb-3">Q${index + 1}: ${q.question}</h4>
-                <div class="space-y-2">
-                    ${q.options.map((option, optIndex) => `
-                        <label class="block">
-                            <input type="radio" name="quiz-q${q.id}" value="${option}" class="mr-2">
-                            ${option}
-                        </label>
-                    `).join('')}
-                </div>
-                <button data-question-id="${q.id}" class="check-quiz-btn btn mt-4 text-sm">Check Answer</button>
-                <div id="quiz-feedback-${q.id}" class="mt-3 text-sm font-semibold"></div>
-            </div>
-        `).join('');
-
-        document.querySelectorAll('.check-quiz-btn').forEach(btn => {
-            btn.addEventListener('click', (event) => {
-                const questionId = btn.dataset.questionId;
-                const selectedOption = document.querySelector(`input[name="quiz-q${questionId}"]:checked`);
-                const feedbackEl = document.getElementById(`quiz-feedback-${questionId}`);
-                const question = quizQuestions.find(q => q.id == questionId);
-
-                if (!selectedOption) {
-                    feedbackEl.innerHTML = `<span class="text-yellow-600">Please select an option.</span>`;
-                    return;
-                }
-
-                if (selectedOption.value === question.answer) {
-                    feedbackEl.innerHTML = `<span class="text-green-600">Correct!</span> ${question.explanation}`;
-                } else {
-                    feedbackEl.innerHTML = `<span class="text-red-600">Incorrect.</span> The correct answer is: <strong>${question.answer}</strong>. ${question.explanation}`;
-                }
-            });
-        });
-    }
-
-    // Sandbox logic for Reactance Chart
+    const conceptContent = document.getElementById('concept-content');
+    const practiceProblemsContainer = document.getElementById('practice-problems-container');
+    const quizContainer = document.getElementById('quiz-container');
     const frequencyInput = document.getElementById('frequencyInput');
     const frequencyValueSpan = document.getElementById('frequencyValue');
-    const reactanceChartCtx = document.getElementById('reactanceChart').getContext('2d');
-    let reactanceChart;
+    const reactanceChartCanvas = document.getElementById('reactanceChart');
 
-    const CAPACITANCE = 100 * 1e-9; // 100 nF
-    const INDUCTANCE = 10 * 1e-3; // 10 mH
+    let reactanceChart; // Declare chart variable globally within this scope
 
-    function updateReactanceChart() {
-        const frequency = parseFloat(frequencyInput.value);
-        frequencyValueSpan.textContent = `${frequency} Hz`;
-        const omega = 2 * Math.PI * frequency;
-
-        const xl = omega * INDUCTANCE;
-        const xc = 1 / (omega * CAPACITANCE);
-
-        if (!reactanceChart) {
-            reactanceChart = new Chart(reactanceChartCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Inductive Reactance ($X_L$)', 'Capacitive Reactance ($X_C$)'],
-                    datasets: [{
-                        label: 'Reactance (Ω)',
-                        data: [xl, xc],
-                        backgroundColor: [
-                            'rgba(59, 130, 246, 0.6)', // Blue for XL
-                            'rgba(234, 179, 8, 0.6)'    // Yellow for XC
-                        ],
-                        borderColor: [
-                            'rgba(59, 130, 246, 1)',
-                            'rgba(234, 179, 8, 1)'
-                        ],
-                        borderWidth: 2,
-                        tension: 0.2,
-                        pointRadius: 5,
-                        pointBackgroundColor: [
-                            'rgba(59, 130, 246, 1)',
-                            'rgba(234, 179, 8, 1)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            grid: { display: false }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Reactance (Ω)'
-                            },
-                            type: 'logarithmic', // Log scale for better visualization of wide range
-                            ticks: {
-                                callback: function (value, index, values) {
-                                    if (value === 0) return '0';
-                                    if (value >= 1000) return value / 1000 + 'k';
-                                    return value;
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        title: {
-                            display: true,
-                            text: 'Reactance vs. Frequency'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed.y.toFixed(2) + ' Ω';
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        duration: 0 // Disable animation for real-time slider updates
-                    }
-                }
-            });
-        } else {
-            reactanceChart.data.datasets[0].data = [xl, xc];
-            reactanceChart.update();
+    // --- MathJax Helper Function ---
+    // Function to safely typeset MathJax within an element
+    function typesetMath(element) {
+        if (window.MathJax && element) { // Check if MathJax is loaded and element exists
+            // Clear previous MathJax rendering within the element before re-typesetting
+            // This is crucial when content is dynamically replaced via innerHTML to prevent reference issues.
+            window.MathJax.typesetClear([element]);
+            // Typeset the content within the specified element
+            window.MathJax.typesetPromise([element]).then(() => {
+                // console.log('MathJax typeset complete for:', element.id || element.className || element.tagName);
+            }).catch(err => console.error('MathJax typesetting failed:', err));
         }
     }
 
-    frequencyInput.addEventListener('input', updateReactanceChart);
 
-    // Initial setup
-    document.querySelector('.nav-link[data-target="concepts"]').click();
-    document.querySelector('.concept-tab[data-concept="ac_basics"]').click();
-    renderPracticeProblems();
-    renderQuiz();
-    updateReactanceChart(); // Initial chart render
+    // --- Main Navigation Logic ---
+    function showSection(sectionId) {
+        appSections.forEach(section => {
+            section.classList.add('hidden');
+        });
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.remove('hidden');
+            // When switching main sections, typeset the new section's content.
+            // This targets only the visible section, reducing potential conflicts.
+            typesetMath(targetSection);
+        }
+
+        navLinks.forEach(link => {
+            link.classList.remove('tab-active', 'font-bold', 'text-blue-700');
+        });
+        document.querySelector(`.nav-link[data-target="${sectionId}"]`).classList.add('tab-active', 'font-bold', 'text-blue-700');
+
+        if (sectionId === 'sandbox' && !reactanceChart) {
+            initializeReactanceChart(); // Initialize chart when sandbox is first shown
+        }
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            showSection(link.dataset.target);
+        });
+    });
+
+    // --- Concept Tabs Logic ---
+    function loadConceptContent(conceptKey) {
+        const data = appData[conceptKey];
+        if (!data) return;
+
+        let html = `
+            <h3 class="text-2xl font-semibold mb-4 text-blue-800">${data.title}</h3>
+            <p class="mb-4">${data.description}</p>
+            <h4 class="text-xl font-semibold mb-3">Key Concepts:</h4>
+            <ul class="list-disc list-inside ml-4 mb-6 space-y-2">
+        `;
+        data.steps.forEach(step => {
+            html += `<li class="mb-1">${step}</li>`;
+        });
+        html += `</ul>`;
+
+        if (data.example) {
+            html += `
+                <h4 class="text-xl font-semibold mb-3">Worked Example:</h4>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p class="font-medium mb-2">${data.example.problem}</p>
+                    ${data.example.circuitHTML ? `<div class="mb-4">${data.example.circuitHTML}</div>` : ''}
+                    <button class="btn show-solution-btn">Show Solution Steps</button>
+                    <div class="solution-steps mt-4 hidden">
+            `;
+            data.example.solutionSteps.forEach((step, index) => {
+                html += `
+                    <div class="step-card bg-white p-3 rounded-md shadow-sm mb-3 border border-gray-200">
+                        <h5 class="font-semibold text-gray-800">Step ${index + 1}: ${step.title}</h5>
+                        <div class="step-content mt-1 text-gray-700">
+                            ${step.content}
+                        </div>
+                        <button class="btn btn-secondary show-step-btn mt-2">Show Step</button>
+                    </div>
+                `;
+            });
+            html += `</div></div>`;
+        }
+        
+        conceptContent.innerHTML = html;
+
+        // Add event listeners for solution steps
+        conceptContent.querySelectorAll('.show-solution-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const solutionStepsDiv = e.target.nextElementSibling;
+                // Only typeset if the div is about to be revealed (not hidden)
+                // or if it was hidden and is now being re-hidden (to clear MathJax).
+                solutionStepsDiv.classList.toggle('hidden');
+                e.target.textContent = solutionStepsDiv.classList.contains('hidden') ? 'Show Solution Steps' : 'Hide Solution Steps';
+                if (!solutionStepsDiv.classList.contains('hidden')) { // Only typeset when showing
+                    typesetMath(solutionStepsDiv);
+                } else {
+                    // Optionally clear math when hiding, but MathJax usually handles hidden elements gracefully
+                    if (window.MathJax) window.MathJax.typesetClear([solutionStepsDiv]);
+                }
+            });
+        });
+
+        conceptContent.querySelectorAll('.show-step-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const stepContentDiv = e.target.previousElementSibling;
+                stepContentDiv.classList.toggle('visible');
+                e.target.textContent = stepContentDiv.classList.contains('visible') ? 'Hide Step' : 'Show Step';
+                if (stepContentDiv.classList.contains('visible')) { // Only typeset when showing
+                    typesetMath(stepContentDiv);
+                } else {
+                    if (window.MathJax) window.MathJax.typesetClear([stepContentDiv]);
+                }
+            });
+        });
+
+        // Initial typeset for the newly loaded concept content
+        typesetMath(conceptContent);
+    }
+
+    conceptTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            conceptTabs.forEach(t => {
+                t.classList.remove('tab-active', 'font-bold', 'text-blue-700');
+                t.classList.add('text-gray-700', 'hover:bg-gray-100');
+            });
+            tab.classList.add('tab-active', 'font-bold', 'text-blue-700');
+            tab.classList.remove('text-gray-700', 'hover:bg-gray-100');
+            loadConceptContent(tab.dataset.concept);
+        });
+    });
+
+    // --- Practice Problems Logic ---
+    function loadPracticeProblems() {
+        let html = '';
+        practiceProblems.forEach(problem => {
+            html += `
+                <div class="bg-gray-100 p-4 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold mb-2">Problem ${problem.id}: ${problem.title}</h3>
+                    <p class="mb-4">${problem.problemHTML}</p>
+                    <button class="btn show-answer-btn">Show Answer</button>
+                    <div class="answer-box mt-4 hidden">
+                        ${problem.answerHTML}
+                    </div>
+                </div>
+            `;
+        });
+        practiceProblemsContainer.innerHTML = html;
+
+        practiceProblemsContainer.querySelectorAll('.show-answer-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const answerBox = e.target.nextElementSibling;
+                answerBox.classList.toggle('hidden');
+                e.target.textContent = answerBox.classList.contains('hidden') ? 'Show Answer' : 'Hide Answer';
+                if (!answerBox.classList.contains('hidden')) { // Only typeset when showing
+                    typesetMath(answerBox);
+                } else {
+                    if (window.MathJax) window.MathJax.typesetClear([answerBox]);
+                }
+            });
+        });
+        // Initial typeset for the entire loaded practice problems
+        typesetMath(practiceProblemsContainer);
+    }
+
+    // --- Quiz Logic ---
+    function loadQuiz() {
+        let html = '';
+        quizQuestions.forEach((q, index) => {
+            html += `
+                <div class="bg-gray-100 p-4 rounded-lg shadow-sm border border-gray-200" data-question-id="${q.id}">
+                    <h3 class="text-xl font-semibold mb-3">Question ${index + 1}: ${q.question}</h3>
+                    <div class="options-container space-y-2">
+            `;
+            q.options.forEach((option, optIndex) => {
+                html += `
+                        <div class="quiz-option" data-option="${option}">
+                            ${String.fromCharCode(97 + optIndex)}. ${option}
+                        </div>
+                `;
+            });
+            html += `
+                    </div>
+                    <button class="btn check-answer-btn mt-4">Check Answer</button>
+                    <div class="quiz-explanation mt-4 hidden">
+                        <strong>Explanation:</strong> ${q.explanation}
+                    </div>
+                </div>
+            `;
+        });
+        quizContainer.innerHTML = html;
+
+        quizContainer.querySelectorAll('.quiz-option').forEach(optionDiv => {
+            optionDiv.addEventListener('click', (e) => {
+                const parentQuestion = e.target.closest('.bg-gray-100');
+                parentQuestion.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'incorrect');
+                });
+                e.target.classList.add('selected');
+            });
+        });
+
+        quizContainer.querySelectorAll('.check-answer-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const parentQuestion = e.target.closest('.bg-gray-100');
+                const selectedOption = parentQuestion.querySelector('.quiz-option.selected');
+                const explanationBox = parentQuestion.querySelector('.quiz-explanation');
+                
+                if (!selectedOption) {
+                    // In a real app, use a custom modal for user feedback instead of alert()
+                    // alert('Please select an option first!');
+                    return;
+                }
+
+                const questionId = parseInt(parentQuestion.dataset.questionId);
+                const quizQ = quizQuestions.find(q => q.id === questionId);
+
+                if (selectedOption.dataset.option === quizQ.answer) {
+                    selectedOption.classList.remove('selected');
+                    selectedOption.classList.add('correct');
+                    // alert('Correct!');
+                } else {
+                    selectedOption.classList.remove('selected');
+                    selectedOption.classList.add('incorrect');
+                    // Find and highlight the correct answer
+                    parentQuestion.querySelectorAll('.quiz-option').forEach(opt => {
+                        if (opt.dataset.option === quizQ.answer) {
+                            opt.classList.add('correct');
+                        }
+                    });
+                    // alert('Incorrect. Try again!');
+                }
+                explanationBox.classList.remove('hidden');
+                typesetMath(explanationBox); // Typeset explanation content
+            });
+        });
+        // Initial typeset for quiz problems
+        typesetMath(quizContainer);
+    }
+
+    // --- Interactive Reactance Chart Logic ---
+    function initializeReactanceChart() {
+        const ctx = reactanceChartCanvas.getContext('2d');
+        const labels = Array.from({ length: 100 }, (_, i) => 100 + i * 99); // Frequencies from 100 to 10000 Hz
+
+        if (reactanceChart) { // Destroy existing chart instance if it exists
+            reactanceChart.destroy();
+        }
+
+        reactanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Inductive Reactance (XL) - 10mH',
+                        data: labels.map(f => (2 * Math.PI * f * 10e-3)),
+                        borderColor: 'rgb(59, 130, 246)', // Tailwind blue-500
+                        tension: 0.1,
+                        fill: false
+                    },
+                    {
+                        label: 'Capacitive Reactance (XC) - 100nF',
+                        data: labels.map(f => (1 / (2 * Math.PI * f * 100e-9))),
+                        borderColor: 'rgb(239, 68, 68)', // Tailwind red-500
+                        tension: 0.1,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Allows the chart to fill its container
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Reactance vs. Frequency'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Frequency (Hz)'
+                        }
+                    },
+                    y: {
+                        type: 'logarithmic', // Logarithmic scale for better visualization of wide range
+                        title: {
+                            display: true,
+                            text: 'Reactance (Ohms)'
+                        },
+                        ticks: {
+                            callback: function(value, index, values) {
+                                // Only show integer ticks on a logarithmic scale for better readability
+                                if (Number.isInteger(value)) return value.toString();
+                                return '';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Update chart based on frequency slider (still refers to the static chart, not dynamic data points)
+        frequencyInput.addEventListener('input', () => {
+            const freq = parseFloat(frequencyInput.value);
+            frequencyValueSpan.textContent = `${freq} Hz`;
+            // No MathJax call needed here as the chart itself doesn't contain LaTeX,
+            // and the text update is simple DOM manipulation.
+        });
+    }
+
+
+    // Initial setup: show AC Concepts section and its first tab
+    showSection('concepts'); // This now uses typesetMath internally for the concepts section
+    loadConceptContent('ac_basics'); // This now uses typesetMath internally for conceptContent
+    conceptTabs[0].classList.add('tab-active', 'font-bold', 'text-blue-700');
+
+    // Load practice problems and quiz when the document is ready
+    loadPracticeProblems(); // This now uses typesetMath internally for practiceProblemsContainer
+    loadQuiz(); // This now uses typesetMath internally for quizContainer
+
 });
 </script>
+
 </body>
 </html>
