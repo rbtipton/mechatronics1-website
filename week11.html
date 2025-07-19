@@ -3,307 +3,587 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 11 - Filters & Frequency Response</title>
+    <title>Mechatronics 1: Week 11 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-    <!-- Chosen Palette: Calm Harmony -->
-    <!-- Application Structure Plan: The SPA is a tab-based interactive dashboard with five sections: 'Introduction', 'Filter Simulator', 'Key Concepts', 'Applications', and 'Knowledge Check'. This structure replaces the linear document with a hands-on, exploratory learning environment. The core is the 'Filter Simulator,' which allows users to actively engage with the material rather than passively read. By manipulating R and C values and seeing the Bode plot change in real-time, students can build a much deeper, intuitive understanding of filter theory. The other sections provide context and reinforcement, creating a holistic and effective learning tool. -->
-    <!-- Visualization & Content Choices: 
-        - Filter Behavior -> Goal: Understand how R and C values define a filter -> Viz: Interactive Bode Plot (Chart.js Line Chart with logarithmic x-axis) -> Interaction: Sliders for Resistor (R) and Capacitor (C) values dynamically update the calculated cutoff frequency and redraw the frequency response curve. Justification: This is the most effective way to teach frequency response. It visually connects abstract formulas to concrete filter behavior, which is a core learning objective.
-        - Filter Types (LPF/HPF) -> Goal: Compare low-pass and high-pass filters -> Viz: The same interactive Bode Plot -> Interaction: A toggle/button to switch between LPF and HPF modes, which changes the transfer function calculation and redraws the corresponding curve. Justification: Allows for direct comparison and highlights the operational differences in a single, powerful tool.
-        - Key Concepts & Quiz -> Goal: Reinforce knowledge -> Viz: Interactive "flashcards" with reveal buttons -> Interaction: Clicking a button reveals the answer. Justification: Encourages active recall and self-assessment, which is more effective for learning than static text.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
-        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
-        .nav-button.active, .nav-button:hover { color: #059669; border-bottom-color: #059669; }
-        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .content-section { display: none; }
-        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-        .question-card .answer { display: none; }
-        .slider-label { font-size: 0.875rem; font-weight: 500; color: #57534e; }
-        .slider-value { font-family: 'Roboto Mono', monospace; font-size: 0.9rem; background-color: #e7e5e4; padding: 0.1rem 0.5rem; border-radius: 0.25rem; }
-        .chart-container { position: relative; width: 100%; max-width: 700px; margin-left: auto; margin-right: auto; height: 350px; max-height: 45vh; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
+        }
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
+        }
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
+        }
+        .nav-button svg {
+          margin-bottom: 0.25rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
+        }
+        .formula-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border-left: 4px solid #38bdf8; /* Blue border on left */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 1rem;
+            color: #0c4a6e; /* Darker blue text */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="antialiased">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 1: Filters</h1>
-                <nav class="hidden md:flex space-x-4 lg:space-x-6">
-                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
-                    <button class="nav-button" onclick="showSection('simulator')">Filter Simulator</button>
-                    <button class="nav-button" onclick="showSection('concepts')">Key Concepts</button>
-                    <button class="nav-button" onclick="showSection('knowledge')">Knowledge Check</button>
-                </nav>
-                <button id="menu-btn" class="md:hidden">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </div>
-             <div id="mobile-menu" class="hidden md:hidden py-2">
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('simulator'); closeMenu();">Filter Simulator</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('concepts'); closeMenu();">Key Concepts</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('knowledge'); closeMenu();">Knowledge Check</button>
-            </div>
-        </div>
-    </header>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
-        
-        <section id="intro" class="content-section active">
-            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
-                <h2 class="text-3xl font-bold text-stone-800 mb-4">Filtering Signals in Mechatronics</h2>
-                <p class="text-lg text-stone-600 mb-6">Filters are fundamental circuits that selectively pass or block signals based on their frequency. In mechatronics, they are essential for cleaning up noisy sensor data, conditioning signals before they reach a microcontroller, and ensuring actuators receive the correct type of control signal. This interactive module will help you build an intuition for how filters work by allowing you to design and visualize their behavior in real-time.</p>
-                <h3 class="text-2xl font-bold text-stone-800 mb-3">Learning Objectives</h3>
-                <ul class="list-disc list-inside space-y-2 text-stone-700">
-                    <li>Classify and describe the four main types of filters.</li>
-                    <li>Understand frequency response and calculate cutoff frequency for RC filters.</li>
-                    <li>Analyze how component values affect filter performance.</li>
-                    <li>Identify real-world applications for different filters.</li>
+        // Lucide React icons (inline SVGs for direct use in HTML)
+        const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+        const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+        const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+
+        // Icons for Week 11
+        const Thermometer = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></svg>;
+        const Lightbulb = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2C7.8 2 4.1 4.3 2.4 8.7A4.4 4.4 0 0 0 4 15h.3c.7 0 1.4.3 1.8.9l.4.9c1.4 2.3 3.4 3.4 5.4 3.4 2 0 4-.9 5.4-3.4l.4-.9c.4-.6 1.1-.9 1.8-.9H20a4.4 4.4 0 0 0 1.6-6.3C19.9 4.3 16.2 2 12 2z"/></svg>;
+        const Gps = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2L12 22"/><path d="M17 17L7 7"/><path d="M2 12L22 12"/><path d="M7 17L17 7"/></svg>;
+
+
+        // Concept Review Component
+        const ConceptReview = () => {
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 11: Temperature, Light & Inertial Sensors</h2>
+
+              {/* Temperature Sensors */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Thermometer className="w-7 h-7 mr-3 text-blue-600"/>
+                    1. Temperature Sensors
+                </h3>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Thermocouples:</h4>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A temperature sensor consisting of two dissimilar metal wires joined at one end.
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Principle (Seebeck Effect):</span> When the two junctions of dissimilar metals are at different temperatures, a small voltage (thermoelectric voltage) is generated proportional to the temperature difference.</li>
+                  <li><span className="font-medium">Cold-Junction Compensation (CJC):</span> Required because the thermocouple measures a temperature *difference*. CJC measures the temperature of the "cold junction" (where the thermocouple wires connect to the measurement system) and adds this to the measured voltage to get the absolute temperature at the "hot junction."</li>
+                  <li><span className="font-medium">Characteristics:</span> Wide temperature range, robust, relatively inexpensive, but low voltage output (requires amplification) and needs CJC.</li>
                 </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Thermistors:</h4>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A resistor whose electrical resistance changes significantly with temperature.
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Types:</span> NTC (Negative Temperature Coefficient - resistance decreases as temperature increases, most common) and PTC (Positive Temperature Coefficient - resistance increases as temperature increases).</li>
+                  <li><span className="font-medium">Characteristics:</span> High sensitivity (large change in resistance for small temperature change), fast response, inexpensive, but non-linear output.</li>
+                  <li><span className="font-medium">Signal Conditioning:</span> Often used in a voltage divider. Requires linearization (e.g., Steinhart-Hart equation or lookup tables) to convert non-linear resistance to accurate temperature.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">C. Resistance Temperature Detectors (RTDs):</h4>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A temperature sensor that changes resistance with temperature, typically made from a pure metal (e.g., Platinum, Pt100, Pt1000).
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Principle:</span> Resistance of metals increases predictably with temperature.</li>
+                  <li><span className="font-medium">Characteristics:</span> High accuracy, good linearity, stable over time, wide temperature range. More expensive and less sensitive than thermistors.</li>
+                  <li><span className="font-medium">Signal Conditioning:</span> Requires a current source and often a Wheatstone bridge for precise resistance measurement.</li>
+                </ul>
+              </section>
+
+              {/* Light Sensors */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Lightbulb className="w-7 h-7 mr-3 text-yellow-600"/>
+                    2. Light Sensors
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Devices that detect light (electromagnetic radiation) and convert it into an electrical signal.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Photoresistors (LDRs - Light-Dependent Resistors):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Definition:</span> A resistor whose electrical resistance decreases with increasing light intensity.</li>
+                  <li><span className="font-medium">Principle:</span> Made from semiconductor materials (e.g., Cadmium Sulfide). Light provides energy to electrons, increasing conductivity.</li>
+                  <li><span className="font-medium">Characteristics:</span> Inexpensive, simple to use (often in a voltage divider), but slow response time, not very precise, and sensitive to temperature.</li>
+                  <li><span className="font-medium">Applications:</span> Ambient light detection, automatic street lights, simple light alarms.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Photodiodes:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Definition:</span> A semiconductor device that converts light into an electrical current.</li>
+                  <li><span className="font-medium">Principle:</span> Operates like a normal diode, but when light strikes its P-N junction, it generates electron-hole pairs, leading to a photocurrent proportional to light intensity.</li>
+                  <li><span className="font-medium">Characteristics:</span> Much faster response time than LDRs, more linear, more precise, but more expensive and requires more complex circuitry (e.g., transimpedance amplifier) to convert current to voltage.</li>
+                  <li><span className="font-medium">Applications:</span> Optical communication, light meters, bar code scanners, remote controls.</li>
+                </ul>
+              </section>
+
+              {/* Inertial Sensors: Accelerometers & Gyroscopes */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Gps className="w-7 h-7 mr-3 text-purple-600"/>
+                    3. Inertial Sensors: Accelerometers & Gyroscopes
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Sensors that measure motion and orientation in space.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Accelerometers:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Definition:</span> A sensor that measures linear acceleration.</li>
+                  <li><span className="font-medium">Principle (MEMS):</span> Often micro-electromechanical systems (MEMS) devices. A tiny mass is suspended by springs. When accelerated, the mass deflects, and this displacement is measured (e.g., by changes in capacitance).</li>
+                  <li><span className="font-medium">Applications:</span> Tilt sensing (detects gravity's acceleration), vibration detection, impact sensing, step counting (in phones).</li>
+                  <li><span className="font-medium">Limitations:</span> Measures total acceleration (including gravity), so motion can be confused with tilt. Integrating acceleration to get velocity/position accumulates errors (drift).</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Gyroscopes:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Definition:</span> A sensor that measures angular velocity (rate of rotation).</li>
+                  <li><span className="font-medium">Principle (MEMS):</span> Uses the Coriolis effect on a vibrating mass. When the sensor rotates, the vibrating mass experiences a force perpendicular to its motion and the rotation, which is then measured.</li>
+                  <li><span className="font-medium">Applications:</span> Measuring rotation speed, maintaining orientation (e.g., in drones, robotics), virtual reality.</li>
+                  <li><span className="font-medium">Limitations:</span> Measures angular *rate*, not absolute angle. Integrating rate to get angle also accumulates errors (drift).</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">C. Inertial Measurement Units (IMUs):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Definition:</span> A combination of multiple inertial sensors, typically accelerometers and gyroscopes (and sometimes magnetometers).</li>
+                  <li><span className="font-medium">Sensor Fusion:</span> Microcontrollers use algorithms (e.g., Kalman filters) to combine data from different sensors to get a more accurate and stable estimate of orientation and motion. Gyroscopes provide fast, short-term rotation data, while accelerometers provide a stable long-term reference for tilt (due to gravity). This helps compensate for the drift inherent in gyroscopes.</li>
+                  <li><span className="font-medium">Applications:</span> Drone stabilization, robotics, virtual reality, navigation systems.</li>
+                </ul>
+              </section>
             </div>
-        </section>
-
-        <section id="simulator" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-2 text-center">Interactive RC Filter Simulator</h2>
-            <p class="text-stone-600 mb-6 text-center">Adjust R and C values to design your own filter and see its frequency response.</p>
-            <div class="card p-6">
-                <div class="grid lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 space-y-4">
-                        <h3 class="text-lg font-semibold text-stone-700">1. Select Filter Type</h3>
-                        <div class="flex space-x-2">
-                           <button id="lpf-btn" class="w-full py-2 text-sm font-semibold rounded-md transition-colors bg-emerald-600 text-white">Low-Pass (LPF)</button>
-                           <button id="hpf-btn" class="w-full py-2 text-sm font-semibold rounded-md transition-colors bg-stone-200 text-stone-700 hover:bg-stone-300">High-Pass (HPF)</button>
-                        </div>
-
-                        <h3 class="text-lg font-semibold text-stone-700 pt-4">2. Adjust Components</h3>
-                        <div>
-                            <label for="resistance-slider" class="slider-label">Resistance (R): <span id="resistance-value" class="slider-value">10 kΩ</span></label>
-                            <input id="resistance-slider" type="range" min="1000" max="20000" value="10000" step="100" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                        <div>
-                            <label for="capacitance-slider" class="slider-label">Capacitance (C): <span id="capacitance-value" class="slider-value">15.9 nF</span></label>
-                            <input id="capacitance-slider" type="range" min="1" max="100" value="15.9" step="0.1" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
-
-                        <h3 class="text-lg font-semibold text-stone-700 pt-4">3. See Result</h3>
-                        <div class="bg-stone-100 p-4 rounded-lg text-center">
-                            <p class="text-sm text-stone-600">Cutoff Frequency (f<sub>c</sub>)</p>
-                            <p id="cutoff-freq-display" class="text-2xl font-bold text-emerald-700 font-mono">1.00 kHz</p>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2">
-                         <div class="chart-container"><canvas id="bode-plot-chart"></canvas></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="concepts" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Key Filter Concepts</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                 <div class="card p-6">
-                    <h3 class="font-bold text-lg text-stone-800 mb-2">Cutoff Frequency (f<sub>c</sub>)</h3>
-                    <p class="text-stone-600 text-sm">Also called the -3dB point, this is the frequency where the filter starts to work. The output signal's power is reduced to half of the input signal's power. For first-order RC filters, $f_c = 1 / (2\pi RC)$.</p>
-                </div>
-                <div class="card p-6">
-                    <h3 class="font-bold text-lg text-stone-800 mb-2">Roll-off Rate</h3>
-                    <p class="text-stone-600 text-sm">Describes how quickly the filter attenuates signals past the cutoff frequency. For simple first-order filters like the ones in our simulator, the rate is -20 dB per decade. This means the signal strength drops by a factor of 10 for every 10x increase in frequency.</p>
-                </div>
-                <div class="card p-6">
-                    <h3 class="font-bold text-lg text-stone-800 mb-2">Resonance (RLC Circuits)</h3>
-                    <p class="text-stone-600 text-sm">When a circuit contains both inductors (L) and capacitors (C), resonance occurs at a specific frequency where reactances cancel out. This principle is key for creating sharp Band-Pass and Band-Stop filters, crucial for applications like radio tuning.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="knowledge" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
-            <div id="knowledge-grid" class="space-y-4"></div>
-        </section>
-    </main>
-
-<script>
-let bodePlotChart;
-let currentFilterType = 'lpf';
-
-const knowledgeData = [
-    { question: "You need a filter with a cutoff frequency of 1 kHz. If you have a 10 kΩ resistor, what capacitor value do you need?", answer: "Using the formula C = 1 / (2π * R * f_c), the required capacitance is C = 1 / (2π * 10,000 Ω * 1,000 Hz) ≈ 15.9 nF." },
-    { question: "A temperature sensor signal has high-frequency noise. Which filter type should you use to clean it up and why?", answer: "A Low-Pass Filter (LPF). The temperature reading is a low-frequency signal, while the noise is high-frequency. An LPF will pass the temperature data and attenuate the noise." },
-    { question: "What is the primary role of the capacitor in an RC High-Pass Filter?", answer: "The capacitor blocks low-frequency signals (including DC) because its impedance is high at low frequencies. It passes high-frequency signals because its impedance becomes very low." },
-    { question: "What does a filter's 'roll-off rate' of -20 dB/decade signify?", answer: "It means that for every ten-fold increase in frequency beyond the cutoff frequency, the amplitude of the output signal is reduced by a factor of 10." }
-];
-
-function initFilterSimulator() {
-    const ctx = document.getElementById('bode-plot-chart').getContext('2d');
-    bodePlotChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Gain (dB)',
-                data: [],
-                borderColor: '#059669',
-                borderWidth: 3,
-                tension: 0.1,
-                pointRadius: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { 
-                    type: 'logarithmic',
-                    title: { display: true, text: 'Frequency (Hz)' },
-                    min: 10
-                },
-                y: { 
-                    title: { display: true, text: 'Gain (dB)' },
-                    max: 5,
-                    min: -40
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        title: (tooltipItems) => `Freq: ${parseFloat(tooltipItems[0].label).toFixed(2)} Hz`,
-                        label: (tooltipItem) => `Gain: ${tooltipItem.raw.toFixed(2)} dB`
-                    }
-                }
-            }
-        }
-    });
-
-    document.getElementById('resistance-slider').addEventListener('input', updateFilterSimulator);
-    document.getElementById('capacitance-slider').addEventListener('input', updateFilterSimulator);
-    
-    const lpfBtn = document.getElementById('lpf-btn');
-    const hpfBtn = document.getElementById('hpf-btn');
-
-    lpfBtn.addEventListener('click', () => {
-        currentFilterType = 'lpf';
-        lpfBtn.classList.add('bg-emerald-600', 'text-white');
-        lpfBtn.classList.remove('bg-stone-200', 'text-stone-700', 'hover:bg-stone-300');
-        hpfBtn.classList.remove('bg-emerald-600', 'text-white');
-        hpfBtn.classList.add('bg-stone-200', 'text-stone-700', 'hover:bg-stone-300');
-        updateFilterSimulator();
-    });
-
-    hpfBtn.addEventListener('click', () => {
-        currentFilterType = 'hpf';
-        hpfBtn.classList.add('bg-emerald-600', 'text-white');
-        hpfBtn.classList.remove('bg-stone-200', 'text-stone-700', 'hover:bg-stone-300');
-        lpfBtn.classList.remove('bg-emerald-600', 'text-white');
-        lpfBtn.classList.add('bg-stone-200', 'text-stone-700', 'hover:bg-stone-300');
-        updateFilterSimulator();
-    });
-
-    updateFilterSimulator();
-}
-
-function updateFilterSimulator() {
-    const R = parseFloat(document.getElementById('resistance-slider').value);
-    const C = parseFloat(document.getElementById('capacitance-slider').value) * 1e-9; // nF to F
-
-    document.getElementById('resistance-value').textContent = `${(R/1000).toFixed(1)} kΩ`;
-    document.getElementById('capacitance-value').textContent = `${(C*1e9).toFixed(1)} nF`;
-
-    const fc = 1 / (2 * Math.PI * R * C);
-    
-    if (fc < 1000) {
-      document.getElementById('cutoff-freq-display').textContent = `${fc.toFixed(2)} Hz`;
-    } else {
-      document.getElementById('cutoff-freq-display').textContent = `${(fc/1000).toFixed(2)} kHz`;
-    }
-
-    const labels = [];
-    const data = [];
-    
-    for(let i = 1; i < 500; i++) {
-        const f = Math.pow(10, 1 + i * 4 / 500); // Generate frequencies from 10Hz to 100kHz on a log scale
-        labels.push(f);
-        
-        const ratio = f / fc;
-        let gain;
-
-        if (currentFilterType === 'lpf') {
-             gain = 1 / Math.sqrt(1 + ratio * ratio);
-        } else { // hpf
-             gain = ratio / Math.sqrt(1 + ratio * ratio);
-        }
-        
-        const gainDb = 20 * Math.log10(gain);
-        data.push(gainDb);
-    }
-
-    bodePlotChart.data.labels = labels;
-    bodePlotChart.data.datasets[0].data = data;
-    bodePlotChart.options.scales.x.max = 100000;
-    bodePlotChart.update('none');
-}
-
-function initKnowledgeCheck() {
-    const container = document.getElementById('knowledge-grid');
-    container.innerHTML = ''; // Clear previous
-    knowledgeData.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'question-card bg-white p-6 rounded-lg shadow-md border border-stone-200';
-        card.innerHTML = `
-            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
-            <div class="answer mt-4 p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-800">
-                <p><strong>Answer:</strong> ${item.answer}</p>
-            </div>
-            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 transition-colors text-sm">Reveal Answer</button>
-        `;
-        const answerEl = card.querySelector('.answer');
-        const buttonEl = card.querySelector('button');
-        buttonEl.onclick = () => {
-            const isVisible = answerEl.style.display === 'block';
-            answerEl.style.display = isVisible ? 'none' : 'block';
-            buttonEl.textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
+          );
         };
-        container.appendChild(card);
-    });
-}
+
+        // Sensor Reading Simulator Sandbox
+        const SensorReadingSimulator = () => {
+          const [temperature, setTemperature] = useState(25); // in C
+          const [lightIntensity, setLightIntensity] = useState(500); // 0-1023
+          const [xAccel, setXAccel] = useState(0); // -10 to 10 m/s^2
+          const [yAccel, setYAccel] = useState(0);
+          const [zAccel, setZAccel] = useState(9.81); // Gravity
+          const [xGyro, setXGyro] = useState(0); // degrees/sec
+          const [yGyro, setYGyro] = useState(0);
+          const [zGyro, setZGyro] = useState(0);
+          const [sensorOutput, setSensorOutput] = useState('');
+
+          useEffect(() => {
+            updateSensorOutput();
+          }, [temperature, lightIntensity, xAccel, yAccel, zAccel, xGyro, yGyro, zGyro]);
+
+          const updateSensorOutput = () => {
+            let output = "Simulated Sensor Readings:\n";
+            output += `  - Temperature: ${temperature.toFixed(1)} °C (Thermistor/RTD)\n`;
+            output += `  - Light Intensity: ${lightIntensity} (LDR/Photodiode ADC Value)\n`;
+            output += `  - Accelerometer (m/s^2): X=${xAccel.toFixed(2)}, Y=${yAccel.toFixed(2)}, Z=${zAccel.toFixed(2)}\n`;
+            output += `  - Gyroscope (deg/s): X=${xGyro.toFixed(2)}, Y=${yGyro.toFixed(2)}, Z=${zGyro.toFixed(2)}\n`;
+            setSensorOutput(output);
+          };
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Temperature, Light & Inertial Sensor Simulator</h2>
+              <p className="text-gray-700 mb-4">
+                Adjust the sliders to simulate sensor readings for temperature, light, acceleration, and angular velocity.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {/* Temperature */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="tempInput" className="text-lg font-medium text-gray-700 mb-2">Temperature (°C): {temperature}</label>
+                  <input
+                    type="range"
+                    id="tempInput"
+                    min="0"
+                    max="50"
+                    step="0.1"
+                    value={temperature}
+                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+
+                {/* Light Intensity */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="lightInput" className="text-lg font-medium text-gray-700 mb-2">Light Intensity (0-1023 ADC): {lightIntensity}</label>
+                  <input
+                    type="range"
+                    id="lightInput"
+                    min="0"
+                    max="1023"
+                    value={lightIntensity}
+                    onChange={(e) => setLightIntensity(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+
+                {/* X Acceleration */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="xAccelInput" className="text-lg font-medium text-gray-700 mb-2">X Acceleration (m/s²): {xAccel}</label>
+                  <input
+                    type="range"
+                    id="xAccelInput"
+                    min="-10"
+                    max="10"
+                    step="0.1"
+                    value={xAccel}
+                    onChange={(e) => setXAccel(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+
+                {/* Y Acceleration */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="yAccelInput" className="text-lg font-medium text-gray-700 mb-2">Y Acceleration (m/s²): {yAccel}</label>
+                  <input
+                    type="range"
+                    id="yAccelInput"
+                    min="-10"
+                    max="10"
+                    step="0.1"
+                    value={yAccel}
+                    onChange={(e) => setYAccel(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+
+                {/* Z Acceleration (Gravity) */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="zAccelInput" className="text-lg font-medium text-gray-700 mb-2">Z Acceleration (m/s²): {zAccel}</label>
+                  <input
+                    type="range"
+                    id="zAccelInput"
+                    min="-10"
+                    max="10"
+                    step="0.1"
+                    value={zAccel}
+                    onChange={(e) => setZAccel(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+
+                {/* X Gyroscope */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="xGyroInput" className="text-lg font-medium text-gray-700 mb-2">X Gyro (deg/s): {xGyro}</label>
+                  <input
+                    type="range"
+                    id="xGyroInput"
+                    min="-360"
+                    max="360"
+                    step="1"
+                    value={xGyro}
+                    onChange={(e) => setXGyro(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+
+                {/* Y Gyroscope */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="yGyroInput" className="text-lg font-medium text-gray-700 mb-2">Y Gyro (deg/s): {yGyro}</label>
+                  <input
+                    type="range"
+                    id="yGyroInput"
+                    min="-360"
+                    max="360"
+                    step="1"
+                    value={yGyro}
+                    onChange={(e) => setYGyro(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+
+                {/* Z Gyroscope */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="zGyroInput" className="text-lg font-medium text-gray-700 mb-2">Z Gyro (deg/s): {zGyro}</label>
+                  <input
+                    type="range"
+                    id="zGyroInput"
+                    min="-360"
+                    max="360"
+                    step="1"
+                    value={zGyro}
+                    onChange={(e) => setZGyro(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-md font-semibold whitespace-pre-wrap">
+                {sensorOutput}
+              </div>
+            </div>
+          );
+        };
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    initFilterSimulator();
-    initKnowledgeCheck();
+        // Practice Problems Component
+        const PracticeProblems = () => {
+          const [activeTab, setActiveTab] = useState('homework');
 
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-});
+          const homeworkQuestions = [
+            {
+              id: 1,
+              type: 'text',
+              question: 'A Type K thermocouple outputs 1 mV for every 25°C difference. If the hot junction is at 100°C and the cold junction is at 25°C, what voltage will the thermocouple produce? What is Cold-Junction Compensation (CJC) and why is it necessary?',
+              answer: 'Temperature difference = Hot Junction Temp - Cold Junction Temp = 100°C - 25°C = 75°C.\nVoltage produced = (Temperature difference / 25°C) * 1 mV = (75°C / 25°C) * 1 mV = 3 mV.\n\nCold-Junction Compensation (CJC) is a technique used to correct for the voltage generated at the cold junction (where the thermocouple wires connect to the measurement system). Thermocouples measure a temperature *difference* between their hot and cold junctions. Without CJC, the measurement would be relative to the unknown cold junction temperature, leading to inaccurate absolute temperature readings. CJC measures the cold junction temperature (e.g., with a thermistor) and mathematically adds its equivalent voltage to the thermocouple\'s output, effectively referencing the measurement to 0°C.',
+              explanation: 'Thermocouples are differential sensors. CJC is crucial for obtaining an accurate absolute temperature reading by accounting for the temperature of the reference junction, which is usually at ambient temperature and fluctuates.'
+            },
+            {
+              id: 2,
+              type: 'text',
+              question: 'Compare Photoresistors (LDRs) and Photodiodes in terms of response speed and precision. For what type of application would each be more suitable?',
+              answer: 'Photoresistors (LDRs):\n  - Response Speed: Slow\n  - Precision: Low\n  - Suitable Application: Ambient light detection, simple light-activated switches (e.g., automatic street lights, basic light alarms) where speed and high precision are not critical.\n\nPhotodiodes:\n  - Response Speed: Much faster\n  - Precision: Higher, more linear response\n  - Suitable Application: High-speed light detection, precise light measurement, optical communication, bar code scanners, remote controls, where quick and accurate light sensing is required.',
+              explanation: 'LDRs are simple and cheap for basic light presence/absence. Photodiodes are more complex but offer superior performance for applications requiring speed and accuracy due to their semiconductor junction operation.'
+            },
+            {
+              id: 3,
+              type: 'multiple_choice',
+              question: 'Which sensor measures angular velocity (rate of rotation) but suffers from drift when integrating its output to determine absolute angle?',
+              options: ['A) Accelerometer', 'B) Thermistor', 'C) Gyroscope', 'D) Potentiometer'],
+              correctAnswer: 'C) Gyroscope',
+              explanation: 'Gyroscopes measure angular velocity. When their output is integrated over time to calculate an absolute angle, small errors in the rate measurement accumulate, leading to "drift." Accelerometers measure linear acceleration (and can infer tilt), thermistors measure temperature, and potentiometers measure absolute position.'
+            },
+            {
+              id: 4,
+              type: 'text',
+              question: 'You are using an NTC thermistor in a voltage divider circuit with a 10 kΩ fixed resistor and a 5V supply. At 25°C, the thermistor\'s resistance is 10 kΩ. At 50°C, its resistance drops to 2 kΩ. Calculate the voltage across the thermistor at both 25°C and 50°C.',
+              answer: 'Voltage Divider Formula: V_out = V_in * (R_thermistor / (R_fixed + R_thermistor))\nGiven: V_in = 5V, R_fixed = 10 kΩ\n\nAt 25°C:\n  R_thermistor = 10 kΩ\n  V_out = 5V * (10 kΩ / (10 kΩ + 10 kΩ)) = 5V * (10 kΩ / 20 kΩ) = 5V * 0.5 = 2.5V\n\nAt 50°C:\n  R_thermistor = 2 kΩ\n  V_out = 5V * (2 kΩ / (10 kΩ + 2 kΩ)) = 5V * (2 kΩ / 12 kΩ) = 5V * (1 / 6) approx 0.833V\n\nSo, the voltage across the thermistor is 2.5V at 25°C and approximately 0.833V at 50°C.',
+              explanation: 'This demonstrates the non-linear behavior of an NTC thermistor. As temperature increases, its resistance decreases, causing the voltage across it in a voltage divider to also decrease. This non-linearity is why linearization techniques are often needed for accurate temperature readings.'
+            },
+            {
+              id: 5,
+              type: 'text',
+              question: 'What is an Inertial Measurement Unit (IMU), and how does "sensor fusion" in an IMU improve the accuracy of orientation tracking compared to using just an accelerometer or just a gyroscope?',
+              answer: 'An Inertial Measurement Unit (IMU) is a combination of multiple inertial sensors, typically including accelerometers and gyroscopes (and sometimes magnetometers), integrated into a single package.\n\n"Sensor fusion" is the process of combining data from these different sensors using algorithms (e.g., Kalman filters, complementary filters) to achieve a more accurate and stable estimate of an object\'s orientation and motion. It improves accuracy because:\n  - Accelerometers provide a stable long-term reference for tilt (due to gravity), but are noisy during motion.\n  - Gyroscopes provide precise short-term data on angular velocity, but suffer from "drift" (accumulated error) over time when integrated to find angle.\n\nBy fusing the data, the IMU can use the gyroscope\'s fast response for immediate rotational changes while periodically correcting the gyroscope\'s drift using the accelerometer\'s more stable (though noisy during motion) tilt reference. This synergistic approach provides a robust and accurate estimate of orientation and motion, essential for applications like drone stabilization and robotics.',
+              explanation: 'IMUs and sensor fusion address the limitations of individual inertial sensors. Gyroscopes are good for short-term, fast changes but drift. Accelerometers provide a stable long-term reference (gravity vector) but are affected by linear accelerations. Sensor fusion intelligently combines their strengths to provide a more reliable and accurate overall orientation solution.'
+            }
+          ];
 
-function showSection(sectionId) {
-    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    document.querySelectorAll('.nav-button').forEach(button => {
-        button.classList.remove('active');
-        if (button.getAttribute('onclick').includes(sectionId)) {
-            button.classList.add('active');
-        }
-    });
-    window.scrollTo(0, 0);
-}
+          const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
 
-function closeMenu() {
-    document.getElementById('mobile-menu').classList.add('hidden');
-}
+          const handleHomeworkChange = (id, value) => {
+            setHomeworkAnswers(prev => ({
+              ...prev,
+              [id]: value
+            }));
+          };
 
-</script>
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
+
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
+            });
+            setQuizResults(newResults);
+          };
+
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
+
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
+
+              <div className="flex mb-6 space-x-4">
+                <button
+                  onClick={() => setActiveTab('homework')}
+                  className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+                    activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Homework Questions
+                </button>
+              </div>
+
+              {activeTab === 'homework' && (
+                <div>
+                  <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-blue-500"/>
+                    Homework Questions
+                  </h3>
+                  <p className="text-gray-700 mb-4">
+                    Instructions: Show all work and steps clearly.
+                  </p>
+                  {homeworkQuestions.map((q) => (
+                    <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+                      {q.type === 'text' ? (
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                          placeholder="Type your answer here..."
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
+                        ></textarea>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                              />
+                              <span className="ml-2">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
+                        </div>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
+                        </div>
+                      )}
+                      <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                        <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                        <div className="mt-2 text-indigo-700">
+                          <p className="whitespace-pre-wrap">{q.explanation}</p>
+                        </div >
+                      </details>
+                    </div>
+                  ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+
+        // Main App Component
+        const App = () => {
+          const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
+
+          return (
+            <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+              <header className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+                  Mechatronics 1 Study Guide
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 11: Temperature, Light & Inertial Sensors</p>
+                <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                    <Home className="w-5 h-5 mr-2" />
+                    Back to Course Hub
+                </a>
+              </header>
+
+              <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+                <button
+                  onClick={() => setActiveSection('review')}
+                  className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+                >
+                  <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Concept Review</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('sandbox')}
+                  className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+                >
+                  <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Interactive Sandbox</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('practice')}
+                  className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Practice Problems</span>
+                </button>
+              </nav>
+
+              <main className="container">
+                {activeSection === 'review' && <ConceptReview />}
+                {activeSection === 'sandbox' && <SensorReadingSimulator />}
+                {activeSection === 'practice' && <PracticeProblems />}
+              </main>
+
+              <footer className="text-center text-gray-500 text-sm mt-12">
+                <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+              </footer>
+            </div>
+          );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 </body>
 </html>
