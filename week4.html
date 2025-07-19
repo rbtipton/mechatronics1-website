@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -60,64 +60,6 @@
             padding: 1rem 1.5rem;
           }
         }
-        /* Custom styles for the circuit visualization */
-        .circuit-diagram {
-            border: 2px solid #374151; /* Darker gray border */
-            border-radius: 0.75rem; /* More rounded */
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            background-color: #f9fafb; /* Lighter background for the diagram */
-        }
-        .circuit-label {
-            position: absolute;
-            background-color: #f9fafb; /* Match diagram background */
-            padding: 0 0.5rem;
-            font-size: 0.875rem; /* text-sm */
-            color: #4b5563; /* gray-600 */
-            border-radius: 0.25rem;
-        }
-        .voltage-source {
-            width: 4rem; /* 64px */
-            height: 4rem; /* 64px */
-            background-color: #3b82f6; /* Blue-500 */
-            border-radius: 9999px; /* Fully rounded */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700; /* font-bold */
-            font-size: 1.125rem; /* text-lg */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .resistor-element {
-            width: 6rem; /* 96px */
-            height: 2rem; /* 32px */
-            background-color: #ef4444; /* Red-500 */
-            border-radius: 0.375rem; /* rounded-md */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700; /* font-bold */
-            font-size: 1.125rem; /* text-lg */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .wire {
-            width: 0.25rem; /* 4px */
-            height: 3rem; /* 48px */
-            background-color: #374151; /* Dark gray */
-            margin: 0.5rem 0;
-        }
-        .current-indicator {
-            color: #1f2937; /* Dark gray */
-            font-weight: 700; /* font-bold */
-            font-size: 1.125rem; /* text-lg */
-            margin-top: 0.5rem;
-        }
         .formula-box {
             background-color: #e0f2fe; /* Light blue background */
             border-left: 4px solid #38bdf8; /* Blue border on left */
@@ -142,35 +84,19 @@
         const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
         const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
         const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
-        const Lightbulb = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2C7.8 2 4.1 4.3 2.4 8.7A4.4 4.4 0 0 0 4 15h.3c.7 0 1.4.3 1.8.9l.4.9c1.4 2.3 3.4 3.4 5.4 3.4 2 0 4-.9 5.4-3.4l.4-.9c.4-.6 1.1-.9 1.8-.9H20a4.4 4.4 0 0 0 1.6-6.3C19.9 4.3 16.2 2 12 2z"/></svg>;
-        const Zap = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>;
-        const Bolt = ({ className }) => <Zap className={className} />; // Reusing Zap for Bolt
-        const CircuitBoard = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><path d="M9 9h6v6H9z"/><path d="M12 1v3"/><path d="M12 20v3"/><path d="M1 12h3"/><path d="M20 12h3"/></svg>;
-        const Split = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 18V9"/><path d="M17 13l-5 5-5-5"/></svg>;
         const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
 
-        // Icons for Week 2
-        const CapacitorIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7 5h10M7 19h10M12 5v14"/></svg>;
-        const InductorIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 12s3-4 6-4 6 4 6 4 3 4 6 4"/></svg>;
-        const Grid = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>;
-
-        // Icons for Week 3
-        const SemiconductorIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2v20"/><path d="M17 5H7"/><path d="M17 19H7"/><path d="M5 12h14"/></svg>;
-        const DiodeIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 12h20"/><path d="M18 7l4 5-4 5"/><path d="M14 7v10"/></svg>;
-        const LedIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 12v2"/><path d="M10 10l-2 2"/><path d="M14 10l2 2"/><path d="M12 2a4 4 0 0 0-4 4v2a4 4 0 0 0 4 4 4 4 0 0 0 4-4V6a4 4 0 0 0-4-4z"/><path d="M7 17h10"/><path d="M12 22v-3"/></svg>;
-        const TransistorIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10h-4V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v6H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v4a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-4h4a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2z"/></svg>;
-        const Power = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2v10"/><path d="M18.36 6.64A9 9 0 1 1 5.64 6.64L12 12L18.36 6.64z"/></svg>;
-
-        // New Icons for Week 4
+        // Icons for Week 4
         const OpAmpIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2L3 9h18z"/><path d="M12 22V9"/></svg>;
         const SensorIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2v20"/><path d="M17 5H7"/><path d="M17 19H7"/><path d="M5 12h14"/></svg>;
+        const VoltageDividerIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2v20"/><path d="M5 12h14"/><path d="M12 5l-7 7 7 7"/><path d="M12 19l7-7-7-7"/></svg>;
 
 
         // Concept Review Component
         const ConceptReview = () => {
           return (
             <div className="p-6 bg-white rounded-lg shadow-lg">
-              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 4: Op-Amps & Sensors</h2>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 4: Operational Amplifiers and Sensors</h2>
 
               {/* Operational Amplifiers (Op-Amps) */}
               <section className="mb-8">
@@ -179,254 +105,163 @@
                     1. Operational Amplifiers (Op-Amps)
                 </h3>
                 <p className="text-gray-700 leading-relaxed mb-2">
-                  Definition: A high-gain, differential amplifier with a very high input impedance and a very low output impedance. It's a voltage-controlled voltage source.
+                  <span className="font-medium">Definition:</span> An Op-Amp is a high-gain, differential amplifier with a very high input impedance and a very low output impedance. It's a voltage-controlled voltage source.
                 </p>
-                <p className="text-gray-700 mb-2">Integrated Circuit (IC): Op-Amps are typically found as integrated circuits, meaning many transistors, resistors, and other components are fabricated on a single silicon chip (e.g., the LM741, TL082).</p>
-                <p className="text-gray-700 mb-2"><span className="font-medium">Key Role in Mechatronics:</span> Signal conditioning, amplification, filtering, buffering, and performing mathematical operations (summing, differentiating, integrating).</p>
-
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Op-Amp Symbol and Terminals:</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Non-inverting Input (+):</span> The voltage at this terminal influences the output in the same direction.</li>
-                  <li><span className="font-medium">Inverting Input (-):</span> The voltage at this terminal influences the output in the opposite direction.</li>
-                  <li><span className="font-medium">Output (V_out):</span> The amplified output voltage.</li>
-                  <li><span className="font-medium">Positive Power Supply (+Vcc):</span> Connects to the positive voltage rail.</li>
-                  <li><span className="font-medium">Negative Power Supply (-Vee):</span> Connects to the negative voltage rail (often ground for single-supply operation).</li>
-                </ul>
-
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Ideal Op-Amp Characteristics:</h4>
-                <p className="text-gray-700 leading-relaxed mb-2">
-                  To simplify analysis, we often assume an "ideal" Op-Amp.
+                <p className="text-gray-700 mb-2">
+                  <span className="font-medium">Key Role in Mechatronics:</span> Signal conditioning, amplification, filtering, buffering, and performing mathematical operations.
                 </p>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Infinite Open-Loop Gain (AOL = ∞):</span> Even a tiny difference between the input terminals results in a huge output voltage.</li>
-                  <li><span className="font-medium">Infinite Input Impedance (Rin = ∞):</span> No current flows into the input terminals (`I+ = I- = 0`). This is crucial for analysis.</li>
-                  <li><span className="font-medium">Zero Output Impedance (Rout = 0):</span> The Op-Amp can deliver any required current to the load without any voltage drop at its output.</li>
-                  <li><span className="font-medium">Infinite Bandwidth:</span> Can amplify any frequency signal.</li>
-                  <li><span className="font-medium">Zero Offset Voltage:</span> When both inputs are at the same voltage, the output is exactly zero.</li>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Ideal Op-Amp Characteristics (Golden Rules):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Infinite Input Impedance:</span> No current flows into the input terminals (I+ = I- = 0).</li>
+                  <li><span className="font-medium">Zero Output Impedance:</span> The Op-Amp can supply any current needed to maintain its output voltage.</li>
+                  <li><span className="font-medium">Infinite Open-Loop Gain:</span> Even a tiny difference between input voltages results in a very large output.</li>
+                  <li><span className="font-medium">Zero Input Offset Voltage:</span> If inputs are equal, output is zero.</li>
                 </ul>
 
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Golden Rules of Op-Amps in Negative Feedback:</h4>
-                <p className="text-gray-700 leading-relaxed mb-2">
-                  When an Op-Amp is operating with negative feedback (a portion of the output is fed back to the inverting input, which is how they are almost always used for stable operation), two "golden rules" apply due to the infinite gain:
-                </p>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">No current flows into the input terminals (`I+ = I- = 0`).</span> (From infinite input impedance)</li>
-                  <li><span className="font-medium">The voltage at the inverting input (-) equals the voltage at the non-inverting input (+). (`V- = V+`).</span> This is often called the "virtual short" or "virtual ground" concept.</li>
-                </ul>
-
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Basic Op-Amp Configurations:</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Voltage Follower (Buffer):</span>
-                    <ul className="list-circle list-inside ml-4">
-                      <li>Configuration: Output directly connected to the inverting input. Input signal applied to the non-inverting input.</li>
-                      <li>Purpose: Provides isolation between a source and a load. Has a very high input impedance and very low output impedance, preventing loading effects.</li>
-                      <li>Gain: `AV = V_out / V_in = 1` (unity gain).</li>
-                    </ul>
-                  </li>
-                  <li><span className="font-medium">Non-inverting Amplifier:</span>
-                    <ul className="list-circle list-inside ml-4">
-                      <li>Configuration: Input applied to the non-inverting input. A feedback resistor (`Rf`) connects output to inverting input, and another resistor (`Ri`) connects inverting input to ground.</li>
-                      <li>Purpose: Amplifies the input voltage without inverting its phase.</li>
-                      <li>Gain: `AV = V_out / V_in = 1 + (Rf / Ri)`</li>
-                    </ul>
-                  </li>
-                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Basic Configurations:</h4>
+                <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h5 className="text-lg font-semibold text-gray-800 mb-2">Voltage Follower (Buffer):</h5>
+                  <p className="text-gray-700 mb-1">Function: Provides isolation between stages, preventing loading effects. Output voltage equals input voltage (V_out = V_in).</p>
+                  <p className="text-gray-700 mb-2">Characteristics: Gain of 1, high input impedance, low output impedance.</p>
+                </div>
+                <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h5 className="text-lg font-semibold text-gray-800 mb-2">Non-Inverting Amplifier:</h5>
+                  <p className="text-gray-700 mb-1">Function: Amplifies the input signal without inverting its phase.</p>
+                  <p className="text-gray-700 mb-2">Gain Formula: A_v = 1 + R_f / R_i where R_f is feedback resistor and R_i is input resistor.</p>
+                </div>
               </section>
 
               {/* Introduction to Sensors */}
               <section className="mb-8">
                 <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
-                    <SensorIcon className="w-7 h-7 mr-3 text-orange-500"/>
+                    <SensorIcon className="w-7 h-7 mr-3 text-green-600"/>
                     2. Introduction to Sensors
                 </h3>
                 <p className="text-gray-700 leading-relaxed mb-2">
-                  Definition: A device that detects or measures a physical quantity (e.g., temperature, light, pressure, force, position) and converts it into a usable signal, typically an electrical signal.
+                  <span className="font-medium">Definition:</span> A device that detects or measures a physical quantity (e.g., temperature, light, pressure, force, position) and converts it into a usable signal, typically an electrical signal.
                 </p>
-                <p className="text-gray-700 mb-2"><span className="font-medium">Role in Mechatronics:</span> Sensors provide the <span className="font-medium">input</span> information for control systems. They bridge the gap between the real world and the electronic control system.</p>
-                <p className="text-gray-700 mb-2"><span className="font-medium">Transducer:</span> Often, the terms "sensor" and "transducer" are used interchangeably. Technically, a transducer is a device that converts one form of energy into another. A sensor is a type of transducer specifically designed for measurement.</p>
-
+                <p className="text-gray-700 mb-2">
+                  <span className="font-medium">Role in Mechatronics:</span> Sensors provide the input information for control systems, bridging the gap between the real world and the electronic control system.
+                </p>
                 <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Sensor Classification:</h4>
-                <p className="text-gray-700 leading-relaxed mb-2">
-                  Sensors can be classified in many ways, but two common distinctions are:
-                </p>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">A. Active vs. Passive Sensors:</span>
-                    <ul className="list-circle list-inside ml-4">
-                      <li><span className="font-medium">Active Sensors:</span> Require an external power source to operate and produce an output signal. They typically modify the energy from the external source based on the physical quantity.
-                        <ul className="list-square list-inside ml-4">
-                          <li>Examples: Strain gauges (require excitation voltage), thermistors (resistance changes with temperature, need a voltage divider), photodiodes (produce current proportional to light when reverse biased).</li>
-                        </ul>
-                      </li>
-                      <li><span className="font-medium">Passive Sensors:</span> Do not require an external power source. They directly generate an electrical signal in response to the physical quantity.
-                        <ul className="list-square list-inside ml-4">
-                          <li>Examples: Thermocouples (generate voltage based on temperature difference), photodiodes (can generate a small voltage in photovoltaic mode), piezoelectric sensors (generate voltage from pressure/force).</li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </li>
-                  <li><span className="font-medium">B. Analog vs. Digital Sensors:</span>
-                    <ul className="list-circle list-inside ml-4">
-                      <li><span className="font-medium">Analog Sensors:</span> Produce an output signal that is a continuous function of the measured physical quantity (e.g., a voltage proportional to temperature). The signal can take on any value within a range.
-                        <ul className="list-square list-inside ml-4">
-                          <li>Examples: Potentiometers, thermistors, many pressure sensors.</li>
-                        </ul>
-                      </li>
-                      <li><span className="font-medium">Digital Sensors:</span> Produce discrete, quantized output signals (e.g., ON/OFF states, pulse trains, or serial data words).
-                        <ul className="list-square list-inside ml-4">
-                          <li>Examples: Limit switches, optical encoders, some digital temperature sensors (e.g., DS18B20).</li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </section>
-
-              {/* Common Analog Sensors & Voltage Dividers */}
-              <section className="mb-8">
-                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
-                    <Split className="w-7 h-7 mr-3 text-red-500"/>
-                    3. Common Analog Sensors & Voltage Dividers
-                </h3>
-                <h4 className="text-xl font-medium text-gray-800 mb-2">Potentiometer (Pot):</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li>Definition: A three-terminal resistor with a sliding or rotating contact that forms an adjustable voltage divider.</li>
-                  <li>Function: Converts rotary or linear position into a variable resistance, and thus a variable voltage.</li>
-                  <li>Application: Position sensing, volume control, tuning.</li>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Passive Sensors:</span> Do not require external power to operate (e.g., thermistors, photoresistors, thermocouples). They produce a signal directly from the measured phenomenon.</li>
+                  <li><span className="font-medium">Active Sensors:</span> Require external power to operate (e.g., potentiometers, strain gauges, ultrasonic sensors). They modify an external power source based on the measured phenomenon.</li>
                 </ul>
 
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Thermistor:</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li>Definition: A type of resistor whose resistance is highly dependent on temperature.</li>
-                  <li>Types:
-                    <ul className="list-circle list-inside ml-4">
-                      <li>NTC (Negative Temperature Coefficient): Resistance decreases as temperature increases (most common).</li>
-                      <li>PTC (Positive Temperature Coefficient): Resistance increases as temperature increases.</li>
-                    </ul>
-                  </li>
-                  <li>Application: Temperature measurement, temperature compensation.</li>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Common Analog Sensors & Voltage Dividers:</h4>
+                <p className="text-gray-700 mb-2">Many analog sensors (like thermistors and photoresistors) change their resistance based on a physical quantity. A <span className="font-medium">voltage divider</span> is commonly used to convert this resistance change into a measurable voltage change.</p>
+                <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h5 className="text-lg font-semibold text-gray-800 mb-2">Voltage Divider Formula:</h5>
+                  <p className="text-gray-700 mb-2">
+                    V_out = V_in * (R_2 / (R_1 + R_2))
+                  </p>
+                  <p className="text-gray-700">
+                    Where V_in is the supply voltage, R_1 and R_2 are the two resistors in series, and V_out is the voltage across R_2.
+                  </p>
+                </div>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Potentiometer (Pot):</span> A variable resistor used to measure linear or angular position. Can act as a simple voltage divider.</li>
+                  <li><span className="font-medium">Thermistor:</span> A resistor whose resistance changes significantly with temperature. Commonly used in voltage dividers for temperature sensing.</li>
+                  <li><span className="font-medium">Photoresistor (LDR - Light Dependent Resistor):</span> A resistor whose resistance changes with light intensity. Commonly used in voltage dividers for light sensing.</li>
                 </ul>
-
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Photoresistor (Light Dependent Resistor - LDR):</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li>Definition: A resistor whose resistance decreases with increasing light intensity.</li>
-                  <li>Application: Light sensing, automatic street lights, light meters.</li>
-                </ul>
-
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Using Voltage Dividers with Resistive Sensors:</h4>
-                <p className="text-gray-700 leading-relaxed mb-2">
-                  Many analog sensors (potentiometers, thermistors, LDRs) change their resistance in response to a physical quantity. To convert this resistance change into a measurable voltage signal for a microcontroller (e.g., via an ADC), they are often used in a voltage divider circuit.
-                </p>
-                <p className="formula-box mb-3">
-                  Voltage Divider Formula: `V_out = V_in * (R_2 / (R_1 + R_2))`
-                </p>
-                <p className="text-gray-700 text-sm">
-                  (Where R1 or R2 can be the sensor, and the other is a fixed resistor).
-                </p>
               </section>
             </div>
           );
         };
 
         // Op-Amp Gain Calculator Sandbox
-        const OpAmpGainSandbox = () => {
-          const [feedbackResistor, setFeedbackResistor] = useState('');
-          const [inputResistor, setInputResistor] = useState('');
-          const [calculatedGain, setCalculatedGain] = useState('');
+        const OpAmpGainCalculator = () => {
+          const [rf, setRf] = useState('');
+          const [ri, setRi] = useState('');
+          const [gain, setGain] = useState('');
           const [message, setMessage] = useState('');
 
           const calculateGain = () => {
             setMessage('');
-            const Rf = parseFloat(feedbackResistor);
-            const Ri = parseFloat(inputResistor);
+            const feedbackResistor = parseFloat(rf);
+            const inputResistor = parseFloat(ri);
 
-            if (isNaN(Rf) || isNaN(Ri) || Ri === 0) {
-              setMessage("Please enter valid numerical values for both resistors. Input resistor (Ri) cannot be zero.");
-              setCalculatedGain('');
+            if (isNaN(feedbackResistor) || isNaN(inputResistor) || feedbackResistor < 0 || inputResistor <= 0) {
+              setMessage("Please enter valid positive numbers for resistors. Input resistor (Ri) cannot be zero.");
+              setGain('');
               return;
             }
 
-            const gain = 1 + (Rf / Ri);
-            setCalculatedGain(gain.toFixed(3));
+            const calculatedGain = 1 + (feedbackResistor / inputResistor);
+            setGain(calculatedGain.toFixed(3)); // Display with 3 decimal places
           };
 
           const resetFields = () => {
-            setFeedbackResistor('');
-            setInputResistor('');
-            setCalculatedGain('');
+            setRf('');
+            setRi('');
+            setGain('');
             setMessage('');
           };
 
           return (
             <div className="p-6 bg-white rounded-lg shadow-lg">
-              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Non-inverting Op-Amp Gain Calculator</h2>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Op-Amp Non-Inverting Gain Calculator</h2>
               <p className="text-gray-700 mb-4">
-                Calculate the voltage gain for a non-inverting Op-Amp configuration.
+                Calculate the theoretical voltage gain of a non-inverting Op-Amp configuration.
+                <br/>Formula: A_v = 1 + R_f / R_i
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div className="flex flex-col">
-                  <label htmlFor="feedbackResistor" className="text-lg font-medium text-gray-700 mb-2">Feedback Resistor (Rf, Ω)</label>
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="rfInput" className="text-lg font-medium text-gray-700 mb-2">Feedback Resistor (R<sub>f</sub> in Ω)</label>
                   <input
                     type="number"
-                    id="feedbackResistor"
-                    value={feedbackResistor}
-                    onChange={(e) => setFeedbackResistor(e.target.value)}
+                    id="rfInput"
+                    value={rf}
+                    onChange={(e) => setRf(e.target.value)}
                     placeholder="e.g., 10000 (10kΩ)"
-                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 mb-3"
                   />
                 </div>
-                <div className="flex flex-col">
-                  <label htmlFor="inputResistor" className="text-lg font-medium text-gray-700 mb-2">Input Resistor (Ri, Ω)</label>
+
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="riInput" className="text-lg font-medium text-gray-700 mb-2">Input Resistor (R<sub>i</sub> in Ω)</label>
                   <input
                     type="number"
-                    id="inputResistor"
-                    value={inputResistor}
-                    onChange={(e) => setInputResistor(e.target.value)}
+                    id="riInput"
+                    value={ri}
+                    onChange={(e) => setRi(e.target.value)}
                     placeholder="e.g., 1000 (1kΩ)"
-                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-                <div className="flex flex-col col-span-full">
-                  <label htmlFor="calculatedGain" className="text-lg font-medium text-gray-700 mb-2">Calculated Voltage Gain (AV)</label>
-                  <input
-                    type="text"
-                    id="calculatedGain"
-                    value={calculatedGain}
-                    readOnly
-                    placeholder="Calculated Gain"
-                    className="p-3 bg-gray-100 border border-gray-300 rounded-md"
+                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 mb-3"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-4 mb-4">
+              <div className="flex justify-center mt-4 gap-4">
                 <button
                   onClick={calculateGain}
-                  className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                  className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md flex-1"
                 >
                   Calculate Gain
                 </button>
                 <button
                   onClick={resetFields}
-                  className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                  className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md flex-1"
                 >
                   Reset
                 </button>
               </div>
 
+              {gain && (
+                <div className="mt-6 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-md font-semibold text-center">
+                  Calculated Voltage Gain (A<sub>v</sub>): <span className="text-blue-900 text-xl">{gain}</span>
+                </div>
+              )}
               {message && (
-                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-md relative" role="alert">
+                <div className="mt-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-md relative" role="alert">
                   <span className="block sm:inline">{message}</span>
                 </div>
               )}
-
-              <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">Formula Used:</h3>
-                <p className="formula-box">`AV = 1 + (Rf / Ri)`</p>
-              </div>
             </div>
           );
         };
+
 
         // Practice Problems Component
         const PracticeProblems = () => {
@@ -436,49 +271,74 @@
             {
               id: 1,
               type: 'text',
-              question: 'Define an Operational Amplifier (Op-Amp) and explain its primary role in mechatronic systems.',
-              answer: 'An Op-Amp is a high-gain, differential amplifier with very high input impedance and very low output impedance, acting as a voltage-controlled voltage source. Its primary role in mechatronic systems is signal conditioning, which involves taking weak, noisy, or inappropriate electrical signals from sensors and preparing them for use by other parts of the system, such as an Analog-to-Digital Converter (ADC) in a microcontroller.'
+              question: 'An Op-Amp is configured as a non-inverting amplifier. If the feedback resistor (Rf) is 47 kΩ and the input resistor (Ri) is 1 kΩ, what is the theoretical voltage gain (Av) of the amplifier?',
+              answer: 'The theoretical voltage gain (Av) is 48.',
+              explanation: 'For a non-inverting Op-Amp, the gain formula is Av = 1 + Rf / Ri.\nGiven Rf = 47 kΩ = 47000 Ω and Ri = 1 kΩ = 1000 Ω.\nAv = 1 + 47000 / 1000 = 1 + 47 = 48.\nSo, the theoretical voltage gain is 48.'
             },
             {
               id: 2,
               type: 'text',
-              question: 'List and briefly explain two "golden rules" of Op-Amps when operating with negative feedback.',
-              answer: '1. No current flows into the input terminals (I+ = I- = 0): Due to the infinite input impedance of an ideal Op-Amp, no current can enter its input terminals. 2. The voltage at the inverting input (-) equals the voltage at the non-inverting input (+) (V- = V+): Because of the infinite open-loop gain, any tiny difference in voltage between the inputs would cause the output to swing to the power rails. In negative feedback, the circuit adjusts itself to keep the input voltages virtually equal (known as a "virtual short" or "virtual ground").'
+              question: 'A thermistor (variable resistor) is used in a voltage divider circuit with a fixed resistor (R_fixed) and a 5V supply. If the thermistor\'s resistance (R_thermistor) is 10 kΩ and R_fixed is 5 kΩ, what is the output voltage (Vout) across the thermistor?',
+              answer: 'The output voltage (Vout) across the thermistor is approximately 3.33V.',
+              explanation: 'The voltage divider formula is V_out = V_in * (R_thermistor / (R_fixed + R_thermistor)).\nGiven V_in = 5V, R_thermistor = 10 kΩ, and R_fixed = 5 kΩ.\nV_out = 5V * (10 kΩ / (5 kΩ + 10 kΩ)) = 5V * (10 kΩ / 15 kΩ) = 5V * (2 / 3) ≈ 3.33V.\nSo, the output voltage across the thermistor is approximately 3.33V.'
             },
             {
               id: 3,
-              type: 'calculation',
-              question: 'Non-inverting Amplifier Gain: You are designing a non-inverting Op-Amp circuit. If the feedback resistor (Rf) is 47 kΩ and the input resistor (Ri) is 1.5 kΩ, what is the voltage gain (AV) of this amplifier?',
-              subQuestions: [
-                { label: 'Voltage Gain (AV)', key: 'gain', expected: '32.333' }
-              ],
-              explanation: 'Using the formula `AV = 1 + (Rf / Ri)`, we have `AV = 1 + (47000 Ω / 1500 Ω) = 1 + 31.333... ≈ 32.333`.'
+              type: 'multiple_choice',
+              question: 'Which of the following is NOT an ideal characteristic of an Op-Amp?',
+              options: ['Infinite input impedance', 'Zero output impedance', 'Finite open-loop gain', 'Zero input offset voltage'],
+              correctAnswer: 'Finite open-loop gain',
+              explanation: 'An ideal Op-Amp is characterized by infinite open-loop gain, not finite. The other options are indeed ideal characteristics.'
             },
             {
               id: 4,
               type: 'text',
-              question: 'What is a sensor, and what is its fundamental role in a mechatronic system? Provide an example of an "active" sensor and a "passive" sensor.',
-              answer: 'A sensor is a device that detects or measures a physical quantity (like temperature, light, pressure) and converts it into a usable electrical signal. Its fundamental role in a mechatronic system is to provide input information about the physical environment for control systems. Example of an active sensor: A thermistor (requires a voltage divider to convert resistance change to a voltage signal). Example of a passive sensor: A thermocouple (generates a voltage directly based on temperature difference).'
+              question: 'Explain the primary difference between a passive sensor and an active sensor, and provide one example of each.',
+              answer: 'Passive sensors do not require external power to operate; they generate a signal directly from the measured phenomenon (e.g., thermistor, thermocouple). Active sensors require external power to operate and modify this power source based on the measured phenomenon (e.g., potentiometer, strain gauge).',
+              explanation: 'Passive sensors, like a thermistor, produce a change in resistance (or voltage/current) directly in response to a physical change (e.g., temperature) without needing a power supply. Active sensors, such as a potentiometer, need to be powered (e.g., with a voltage supply) and then vary a characteristic of that power (e.g., voltage output) based on the physical input (e.g., position).'
             },
             {
               id: 5,
               type: 'text',
-              question: 'Explain how a Photoresistor (LDR) works and how it can be used in a voltage divider circuit to provide a measurable voltage signal proportional to light intensity.',
-              answer: 'A Photoresistor (LDR) is a resistor whose resistance decreases as the intensity of light falling on it increases. To use it in a voltage divider, you can place it as either R1 or R2 in the `V_out = V_in * (R_2 / (R_1 + R_2))` formula. For example, if the LDR is R2 and a fixed resistor is R1, as light increases, LDR resistance decreases, causing V_out to decrease. If the LDR is R1 and a fixed resistor is R2, as light increases, LDR resistance decreases, causing V_out to increase. This converts the light intensity into a variable voltage that can be read by a microcontroller\'s ADC.'
+              question: 'A non-inverting Op-Amp circuit needs a voltage gain of 33. If you use an input resistor (Ri) of 1 kΩ, what value should the feedback resistor (Rf) be?',
+              answer: 'The feedback resistor (Rf) should be 32 kΩ.',
+              explanation: 'For a non-inverting Op-Amp, the gain formula is Av = 1 + Rf / Ri.\nWe are given Av = 33 and Ri = 1 kΩ = 1000 Ω.\n33 = 1 + Rf / 1000 Ω\n32 = Rf / 1000 Ω\nRf = 32 * 1000 Ω = 32000 Ω = 32 kΩ.\nSo, the feedback resistor should be 32 kΩ.'
             }
           ];
 
           const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
 
-          const handleHomeworkChange = (id, key, value) => {
+          const handleHomeworkChange = (id, value) => {
             setHomeworkAnswers(prev => ({
               ...prev,
-              [id]: {
-                ...(prev[id] || {}),
-                [key]: value
-              }
+              [id]: value
             }));
           };
+
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
+
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
+            });
+            setQuizResults(newResults);
+          };
+
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
+
 
           return (
             <div className="p-6 bg-white rounded-lg shadow-lg">
@@ -502,7 +362,7 @@
                     Homework Questions
                   </h3>
                   <p className="text-gray-700 mb-4">
-                    Instructions: Show all work and steps clearly. Include units in your final answers.
+                    Instructions: Show all work and steps clearly.
                   </p>
                   {homeworkQuestions.map((q) => (
                     <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
@@ -511,24 +371,41 @@
                         <textarea
                           className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
                           placeholder="Type your answer here..."
-                          value={homeworkAnswers[q.id]?.answer || ''}
-                          onChange={(e) => handleHomeworkChange(q.id, 'answer', e.target.value)}
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
                         ></textarea>
-                      ) : (
-                        <div className="space-y-3">
-                          {q.subQuestions.map(sq => (
-                            <div key={sq.key} className="flex flex-col">
-                              <label htmlFor={`hw-${q.id}-${sq.key}`} className="text-md text-gray-700 mb-1">{sq.label}</label>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
                               <input
-                                type="number"
-                                id={`hw-${q.id}-${sq.key}`}
-                                className="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                                value={homeworkAnswers[q.id]?.[sq.key] || ''}
-                                onChange={(e) => handleHomeworkChange(q.id, sq.key, e.target.value)}
-                                placeholder={`Enter ${sq.label}`}
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
                               />
-                            </div>
+                              <span className="ml-2">{option}</span>
+                            </label>
                           ))}
+                        </div>
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
+                        </div>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
                         </div>
                       )}
                       <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
@@ -539,6 +416,20 @@
                       </details>
                     </div>
                   ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -556,7 +447,7 @@
                 <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
                   Mechatronics 1 Study Guide
                 </h1>
-                <p className="text-xl sm:text-2xl text-gray-600">Week 4: Op-Amps & Sensors</p>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 4: Operational Amplifiers and Sensors</p>
                 <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
                     <Home className="w-5 h-5 mr-2" />
                     Back to Course Hub
@@ -589,7 +480,7 @@
 
               <main className="container">
                 {activeSection === 'review' && <ConceptReview />}
-                {activeSection === 'sandbox' && <OpAmpGainSandbox />}
+                {activeSection === 'sandbox' && <OpAmpGainCalculator />}
                 {activeSection === 'practice' && <PracticeProblems />}
               </main>
 
