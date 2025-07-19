@@ -1,1 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics I: Exam 1 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #1f2937; /* Dark gray text */
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .header-section {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .section-title {
+            font-size: 2.25rem; /* 3xl text */
+            font-weight: 700;
+            color: #1f2937;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .question-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.125rem; /* lg text */
+            color: #374151; /* Gray-700 */
+            margin-bottom: 1rem;
+        }
+        .options-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 1rem;
+        }
+        .options-list li {
+            margin-bottom: 0.5rem;
+            color: #4b5563; /* Gray-600 */
+        }
+        details {
+            background-color: #f9fafb; /* Lightest gray */
+            border: 1px solid #e5e7eb; /* Gray-200 */
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+        details summary {
+            font-weight: 600;
+            color: #4f46e5; /* Indigo-600 */
+            outline: none;
+        }
+        details summary:hover {
+            color: #3730a3; /* Indigo-800 */
+        }
+        details p {
+            margin-top: 0.75rem;
+            color: #374151; /* Gray-700 */
+        }
+        pre {
+            background-color: #e0e7ff; /* Indigo-100 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            color: #1e3a8a; /* Blue-900 */
+            margin-top: 0.75rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            background-color: #6366f1; /* Indigo-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+            text-align: center;
+            width: fit-content;
+        }
+        .back-link:hover {
+            background-color: #4f46e5; /* Indigo-600 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header-section">
+            <h1 class="text-4xl font-extrabold text-indigo-800 mb-2">
+                Mechatronics I: Exam 1 Study Guide
+            </h1>
+            <p class="text-lg text-gray-600">Prepare for your first exam with these practice problems and solutions.</p>
+            <a href="index.html" class="back-link">← Back to Course Hub</a>
+        </header>
 
+        <main>
+            <h2 class="section-title">Section 1: Conceptual Questions</h2>
+
+            <!-- Question 1 -->
+            <div class="question-card">
+                <p class="question-text">
+                    1. What interdisciplinary field focuses on the synergistic integration of mechanical engineering, electronics, and computer control to design and manufacture products and processes?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>Mechatronics</b>. This field combines these three core disciplines to create integrated, intelligent systems.</p>
+                </details>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-card">
+                <p class="question-text">
+                    2. Explain why a "holistic" or "systems approach" is crucial in mechatronics design, contrasting it with a component-by-component optimization strategy.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A holistic systems approach is crucial because mechatronic systems involve tightly integrated components (mechanical, electrical, software) where the behavior of one significantly impacts others. Optimizing components in isolation often leads to suboptimal overall system performance, unforeseen interactions, or even system failure. A systems approach considers these interactions from the outset, leading to more efficient, reliable, and effective designs.</p>
+                </details>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-card">
+                <p class="question-text">
+                    3. Describe the fundamental role of a resistor in an electrical circuit and how it achieves this function.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The fundamental role of a resistor in an electrical circuit is to oppose or limit the flow of electric current. It achieves this by converting some of the electrical energy into heat, thereby reducing the current that can pass through a given voltage difference.</p>
+                </details>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-card">
+                <p class="question-text">
+                    4. How does a capacitor behave in a direct current (DC) circuit once it has accumulated its maximum charge?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Once a capacitor is fully charged in a DC circuit, it acts as an open circuit, meaning it blocks the flow of direct current. It maintains a constant voltage across its plates equal to the source voltage, and no more current flows through it from the DC source.</p>
+                </details>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-card">
+                <p class="question-text">
+                    5. Explain the phenomenon that occurs when the current through an inductor changes rapidly, and what principle governs the direction of the induced voltage.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>When the current through an inductor changes rapidly, the inductor generates a voltage (electromotive force, EMF) across itself. This induced voltage always opposes the change in current that caused it, a principle known as Lenz's Law. This opposition is due to the inductor's property of storing energy in a magnetic field, and it resists changes to that stored energy.</p>
+                </details>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-card">
+                <p class="question-text">
+                    6. Describe the conditions under which a semiconductor P-N junction diode permits significant current flow, and what happens to the depletion region during this state.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A semiconductor P-N junction diode permits significant current flow when it is "forward biased." This occurs when a positive voltage is applied to the P-type side and a negative voltage to the N-type side, which reduces the width of the depletion region. The reduced depletion region allows charge carriers (electrons and holes) to easily cross the junction, leading to a large current.</p>
+                </details>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-card">
+                <p class="question-text">
+                    7. What is the defining characteristic of a diode's behavior regarding the direction of current flow in an electrical circuit?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The defining characteristic of a diode's behavior is that it allows current to flow predominantly in only one direction (unidirectional flow) while blocking or severely limiting current flow in the opposite direction.</p>
+                </details>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="question-card">
+                <p class="question-text">
+                    8. List three ideal characteristics of an Operational Amplifier (Op-Amp) and explain why these are difficult to achieve perfectly in practical devices.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Three ideal characteristics of an Op-Amp are:
+                        <br>1.  <b>Infinite Input Impedance:</b> An ideal Op-Amp draws no current from its input terminals. In practice, Op-Amps have very high, but finite, input impedance due to the internal circuitry (e.g., MOSFETs or BJTs).
+                        <br>2.  <b>Zero Output Impedance:</b> An ideal Op-Amp can supply any amount of current to the load without any voltage drop across its output. Real Op-Amps have a small, but non-zero, output impedance which causes a slight voltage drop under load.
+                        <br>3.  <b>Infinite Open-Loop Gain:</b> An ideal Op-Amp would have an infinitely large voltage amplification without feedback. Practical Op-Amps have a very high, but finite, open-loop gain (e.g., 10<sup>5</sup> to 10<sup>6</sup>).
+                        <br>These are difficult to achieve perfectly due to physical limitations of semiconductor materials, manufacturing processes, and the need for internal components that consume power and have inherent resistances/capacitances.</p>
+                </details>
+            </div>
+
+            <!-- Question 9 -->
+            <div class="question-card">
+                <p class="question-text">
+                    9. Fill-in-the-Blank: The term ________ refers to how close a measurement is to the true value, while ________ describes the degree to which repeated measurements under the same conditions show the same results.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>Accuracy, precision</b>. Accuracy relates to correctness, while precision relates to consistency.</p>
+                </details>
+            </div>
+
+            <!-- Question 10 -->
+            <div class="question-card">
+                <p class="question-text">
+                    10. Which of the following attributes is an example of a *static* characteristic of a measurement system?
+                </p>
+                <ul class="options-list">
+                    <li>a) Rise time</li>
+                    <li>b) Settling time</li>
+                    <li>c) Sensitivity</li>
+                    <li>d) Frequency response</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>c) Sensitivity</b>. Static characteristics describe the performance of a measurement system when the input is constant or changing very slowly. Rise time, settling time, and frequency response are all dynamic characteristics.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 11 -->
+            <div class="question-card">
+                <p class="question-text">
+                    11. What is the primary advantage of integrating computer control into mechanical and electronic systems in a mechatronic design?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The primary advantage is the ability to achieve intelligent, adaptive, and autonomous behavior. Computer control allows for complex decision-making, real-time adjustments, data processing, and communication, leading to systems that are more efficient, precise, and versatile than purely mechanical or electronic systems.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 12 -->
+            <div class="question-card">
+                <p class="question-text">
+                    12. Describe a real-world example of a mechatronic system and identify its mechanical, electronic, and computer control components.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A common example is an Anti-lock Braking System (ABS) in a car.
+                        <br><b>Mechanical:</b> Brake calipers, brake pads, rotors, wheels.
+                        <br><b>Electronic:</b> Wheel speed sensors, solenoid valves, electronic control unit (ECU) circuitry.
+                        <br><b>Computer Control:</b> The ECU's microcontroller runs algorithms that monitor wheel speed, detect wheel lock-up, and rapidly modulate brake pressure via the solenoid valves to prevent skidding and maintain steering control.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 13 -->
+            <div class="question-card">
+                <p class="question-text">
+                    13. How does the resistance of a typical conductor change as its temperature increases?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>For most metallic conductors, the resistance increases as its temperature increases. This is because higher temperatures cause increased thermal vibrations of atoms, which impede the flow of electrons more effectively.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 14 -->
+            <div class="question-card">
+                <p class="question-text">
+                    14. What is the main difference in energy storage between a capacitor and an inductor?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A capacitor stores energy in an electric field between its plates, while an inductor stores energy in a magnetic field created by the current flowing through its coil.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 15 -->
+            <div class="question-card">
+                <p class="question-text">
+                    15. Explain what happens to the current in a series RL circuit immediately after a DC voltage source is connected.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Immediately after a DC voltage source is connected to a series RL circuit, the inductor acts like an open circuit (or very high resistance) because it opposes the sudden change in current. Therefore, the current starts at zero and gradually increases exponentially towards its steady-state value (V/R) as the inductor's magnetic field builds up.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 16 -->
+            <div class="question-card">
+                <p class="question-text">
+                    16. What is the "knee voltage" or "cut-in voltage" of a diode, and why is it significant in circuit analysis?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The "knee voltage" (or cut-in voltage/forward voltage drop) is the minimum forward-bias voltage required across a diode for it to begin conducting significant current. For silicon diodes, it's typically around 0.7 V, and for germanium, it's about 0.3 V. It's significant because it must be overcome by the applied voltage for the diode to function as a switch or rectifier in a circuit.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 17 -->
+            <div class="question-card">
+                <p class="question-text">
+                    17. In the context of Op-Amps, what does "negative feedback" typically achieve for circuit performance?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Negative feedback in Op-Amp circuits is used to stabilize the gain, reduce distortion, increase bandwidth, and make the circuit's performance less dependent on the Op-Amp's inherent characteristics (like its very high open-loop gain). It allows for precise control over the amplifier's behavior.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 18 -->
+            <div class="question-card">
+                <p class="question-text">
+                    18. Differentiate between accuracy and resolution in the context of a digital multimeter.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>Accuracy</b> refers to how close a measurement taken by the multimeter is to the true value of the quantity being measured. <b>Resolution</b> refers to the smallest change in the measured quantity that the multimeter can detect and display. A multimeter can have high resolution (many digits) but low accuracy if it's not calibrated correctly.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 19 -->
+            <div class="question-card">
+                <p class="question-text">
+                    19. What is the purpose of a Wheatstone bridge circuit, and in what type of applications is it commonly used?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The purpose of a Wheatstone bridge circuit is to measure an unknown electrical resistance by balancing two legs of a bridge circuit, one leg of which contains the unknown component. It is commonly used in sensor applications (e.g., strain gauges, thermistors) to convert small changes in resistance into measurable voltage changes, often for precision measurements.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 20 -->
+            <div class="question-card">
+                <p class="question-text">
+                    20. Explain the concept of "loading effect" in measurement systems.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The "loading effect" occurs when a measurement instrument draws current or power from the circuit or system it is measuring, thereby altering the very quantity it is trying to measure. This leads to an inaccurate reading because the act of measurement itself changes the system's behavior. For example, a voltmeter with low input impedance connected across a high-resistance circuit can significantly alter the voltage it's trying to measure.</p>
+                </details>
+            </div>
+
+            <h2 class="section-title">Section 2: Mathematical Problems</h2>
+
+            <!-- Question 21 -->
+            <div class="question-card">
+                <p class="question-text">
+                    21. Calculate the equivalent resistance (R<sub>eq</sub>) for the following circuit:
+                    Resistors R<sub>1</sub> = 60 &Omega; and R<sub>2</sub> = 90 &Omega; are connected in parallel.
+                    This parallel combination is then connected in series with R<sub>3</sub> = 30 &Omega;.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>First, calculate the equivalent resistance of the parallel combination (R<sub>parallel</sub>):</p>
+                    <pre>1 / R<sub>parallel</sub> = 1 / R<sub>1</sub> + 1 / R<sub>2</sub>
+1 / R<sub>parallel</sub> = 1 / 60 &Omega; + 1 / 90 &Omega;
+1 / R<sub>parallel</sub> = 3 / 180 &Omega; + 2 / 180 &Omega; = 5 / 180 &Omega;
+R<sub>parallel</sub> = 180 &Omega; / 5 = 36 &Omega;</pre>
+                    <p>Next, calculate the equivalent resistance of R<sub>parallel</sub> in series with R<sub>3</sub>:</p>
+                    <pre>R<sub>eq</sub> = R<sub>parallel</sub> + R<sub>3</sub>
+R<sub>eq</sub> = 36 &Omega; + 30 &Omega; = 66 &Omega;</pre>
+                    <p>Therefore, the equivalent resistance is <b>66 &Omega;</b>.</p>
+                </details>
+            </div>
+
+            <!-- Question 22 -->
+            <div class="question-card">
+                <p class="question-text">
+                    22. A simple series circuit contains a 24 V DC source and two resistors, R<sub>A</sub> = 3.0 k&Omega; and R<sub>B</sub> = 5.0 k&Omega;.
+                    <br><br>
+                    a) Determine the voltage drop across R<sub>A</sub>.
+                    <br>
+                    b) What is the power dissipated by R<sub>B</sub>?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Voltage drop across R<sub>A</sub>:</b></p>
+                    <p>First, calculate the total resistance of the series circuit:</p>
+                    <pre>R<sub>total</sub> = R<sub>A</sub> + R<sub>B</sub> = 3.0 k&Omega; + 5.0 k&Omega; = 8.0 k&Omega;</pre>
+                    <p>Next, calculate the total current flowing through the circuit:</p>
+                    <pre>I = V<sub>source</sub> / R<sub>total</sub> = 24 V / 8.0 k&Omega; = 24 V / 8000 &Omega; = 0.003 A = 3 mA</pre>
+                    <p>Finally, calculate the voltage drop across R<sub>A</sub>:</p>
+                    <pre>V<sub>RA</sub> = I * R<sub>A</sub> = 0.003 A * 3000 &Omega; = 9 V</pre>
+                    <p><b>b) Power dissipated by R<sub>B</sub>:</b></p>
+                    <p>Using the current calculated in part a):</p>
+                    <pre>P<sub>RB</sub> = I<sup>2</sup> * R<sub>B</sub>
+P<sub>RB</sub> = (0.003 A)<sup>2</sup> * 5000 &Omega;
+P<sub>RB</sub> = (9 * 10<sup>-6</sup>) * 5000
+P<sub>RB</sub> = 0.045 W = 45 mW</pre>
+                    <p>Therefore:</p>
+                    <p>a) Voltage across R<sub>A</sub>: <b>9 V</b></p>
+                    <p>b) Power dissipated by R<sub>B</sub>: <b>45 mW</b></p>
+                </details>
+            </div>
+
+            <!-- Question 23 -->
+            <div class="question-card">
+                <p class="question-text">
+                    23. An uncharged 68 &mu;F capacitor is charged by a constant current source of 0.08 A. How long will it take for the voltage across the capacitor to reach 100 V?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The relationship between charge (Q), current (I), and time (t) is:</p>
+                    <pre>Q = I * t</pre>
+                    <p>The relationship between charge (Q), capacitance (C), and voltage (V) is:</p>
+                    <pre>Q = C * V</pre>
+                    <p>Combining these equations to solve for time (t):</p>
+                    <pre>I * t = C * V
+t = (C * V) / I</pre>
+                    <p>Given:</p>
+                    <pre>C = 68 &mu;F = 68 * 10<sup>-6</sup> F
+V = 100 V
+I = 0.08 A</pre>
+                    <p>Calculation:</p>
+                    <pre>t = (68 * 10<sup>-6</sup> F * 100 V) / 0.08 A
+t = 68 * 10<sup>-4</sup> / 0.08
+t = 0.0068 / 0.08
+t = 0.085 s</pre>
+                    <p>Therefore, it will take <b>0.085 seconds</b> for the voltage across the capacitor to reach 100 V.</p>
+                </details>
+            </div>
+
+            <!-- Question 24 -->
+            <div class="question-card">
+                <p class="question-text">
+                    24. If a voltage of 7.5 V is induced across a 30 mH inductor, at what rate is the current through the inductor changing?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The voltage induced across an inductor is given by the formula:</p>
+                    <pre>V = L * (dI/dt)</pre>
+                    <p>To find the rate of change of current (dI/dt), rearrange the formula:</p>
+                    <pre>dI/dt = V / L</pre>
+                    <p>Given:</p>
+                    <pre>V = 7.5 V
+L = 30 mH = 30 * 10<sup>-3</sup> H</pre>
+                    <p>Calculation:</p>
+                    <pre>dI/dt = 7.5 V / (30 * 10<sup>-3</sup> H)
+dI/dt = 7.5 / 0.03
+dI/dt = 250 A/s</pre>
+                    <p>Therefore, the current through the inductor is changing at a rate of <b>250 A/s</b>.</p>
+                </details>
+            </div>
+
+            <!-- Question 25 -->
+            <div class="question-card">
+                <p class="question-text">
+                    25. A series circuit consists of a 6V DC power supply, a 470 &Omega; resistor, and a light-emitting diode (LED) with a forward voltage drop of 2.2 V.
+                    <br><br>
+                    a) Calculate the current flowing through the resistor and the LED.
+                    <br>
+                    b) Determine the power dissipated by the LED.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Current flowing through the resistor and the LED:</b></p>
+                    <p>In a series circuit, the voltage across the resistor is the supply voltage minus the voltage drop across the LED:</p>
+                    <pre>V<sub>R</sub> = V<sub>supply</sub> - V<sub>LED</sub>
+V<sub>R</sub> = 6 V - 2.2 V
+V<sub>R</sub> = 3.8 V</pre>
+                    <p>Now, use Ohm's Law to find the current (I = V/R). Since it's a series circuit, this current flows through both the resistor and the LED:</p>
+                    <pre>I = V<sub>R</sub> / R
+I = 3.8 V / 470 &Omega;
+I &approx; 0.008085 A or 8.085 mA</pre>
+                    <p><b>b) Power dissipated by the LED:</b></p>
+                    <p>The power dissipated by the LED is calculated as the product of the voltage across the LED and the current flowing through it:</p>
+                    <pre>P<sub>LED</sub> = V<sub>LED</sub> * I
+P<sub>LED</sub> = 2.2 V * 0.008085 A
+P<sub>LED</sub> &approx; 0.017787 W or 17.787 mW</pre>
+                    <p>Therefore:</p>
+                    <p>a) Current flowing through the resistor and LED: <b>8.085 mA</b></p>
+                    <p>b) Power dissipated by the LED: <b>17.787 mW</b></p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 26 -->
+            <div class="question-card">
+                <p class="question-text">
+                    26. A parallel circuit consists of three resistors: R<sub>A</sub> = 100 &Omega;, R<sub>B</sub> = 200 &Omega;, and R<sub>C</sub> = 50 &Omega;. If a 10 V DC source is connected across this parallel combination:
+                    <br><br>
+                    a) Calculate the equivalent resistance of the parallel circuit.
+                    <br>
+                    b) Determine the total current drawn from the source.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Equivalent resistance of the parallel circuit:</b></p>
+                    <pre>1 / R<sub>eq</sub> = 1 / R<sub>A</sub> + 1 / R<sub>B</sub> + 1 / R<sub>C</sub>
+1 / R<sub>eq</sub> = 1 / 100 &Omega; + 1 / 200 &Omega; + 1 / 50 &Omega;
+1 / R<sub>eq</sub> = 2 / 200 &Omega; + 1 / 200 &Omega; + 4 / 200 &Omega; = 7 / 200 &Omega;
+R<sub>eq</sub> = 200 &Omega; / 7 &approx; 28.57 &Omega;</pre>
+                    <p><b>b) Total current drawn from the source:</b></p>
+                    <pre>I<sub>total</sub> = V<sub>source</sub> / R<sub>eq</sub>
+I<sub>total</sub> = 10 V / 28.57 &Omega; &approx; 0.35 A or 350 mA</pre>
+                    <p>Therefore:</p>
+                    <p>a) Equivalent resistance: <b>28.57 &Omega;</b></p>
+                    <p>b) Total current: <b>350 mA</b></p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 27 -->
+            <div class="question-card">
+                <p class="question-text">
+                    27. A 10 mH inductor is part of a circuit where the current changes from 0.5 A to 1.5 A in 20 ms.
+                    <br><br>
+                    a) What is the average rate of change of current (dI/dt)?
+                    <br>
+                    b) Calculate the magnitude of the average induced voltage across the inductor during this time.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Average rate of change of current:</b></p>
+                    <pre>dI/dt = &Delta;I / &Delta;t = (I<sub>final</sub> - I<sub>initial</sub>) / (t<sub>final</sub> - t<sub>initial</sub>)
+dI/dt = (1.5 A - 0.5 A) / (20 * 10<sup>-3</sup> s) = 1 A / 0.02 s = 50 A/s</pre>
+                    <p><b>b) Magnitude of the average induced voltage:</b></p>
+                    <pre>V = L * (dI/dt)
+V = (10 * 10<sup>-3</sup> H) * (50 A/s)
+V = 0.5 V</pre>
+                    <p>Therefore:</p>
+                    <p>a) Average rate of change of current: <b>50 A/s</b></p>
+                    <p>b) Average induced voltage: <b>0.5 V</b></p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 28 -->
+            <div class="question-card">
+                <p class="question-text">
+                    28. A 100 &mu;F capacitor is initially charged to 50 V. It is then discharged through a resistor. If the capacitor fully discharges in 0.5 seconds with an average discharge current of 0.01 A, what was the initial charge stored in the capacitor?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The initial charge stored in a capacitor can be calculated using the formula:</p>
+                    <pre>Q = C * V</pre>
+                    <p>Given:</p>
+                    <pre>C = 100 &mu;F = 100 * 10<sup>-6</sup> F
+V = 50 V</pre>
+                    <p>Calculation:</p>
+                    <pre>Q = (100 * 10<sup>-6</sup> F) * (50 V)
+Q = 5000 * 10<sup>-6</sup> C = 0.005 C</pre>
+                    <p>Alternatively, using the average current and time:</p>
+                    <pre>Q = I<sub>avg</sub> * t
+Q = 0.01 A * 0.5 s = 0.005 C</pre>
+                    <p>Therefore, the initial charge stored in the capacitor was <b>0.005 C</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 29 -->
+            <div class="question-card">
+                <p class="question-text">
+                    29. An Op-Amp is configured as an inverting amplifier with an input resistor (R<sub>in</sub>) of 10 k&Omega; and a feedback resistor (R<sub>f</sub>) of 100 k&Omega;. If the input voltage (V<sub>in</sub>) is 0.2 V, what is the output voltage (V<sub>out</sub>)?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>For an ideal inverting Op-Amp configuration, the output voltage is given by the formula:</p>
+                    <pre>V<sub>out</sub> = - (R<sub>f</sub> / R<sub>in</sub>) * V<sub>in</sub></pre>
+                    <p>Given:</p>
+                    <pre>R<sub>in</sub> = 10 k&Omega;
+R<sub>f</sub> = 100 k&Omega;
+V<sub>in</sub> = 0.2 V</pre>
+                    <p>Calculation:</p>
+                    <pre>V<sub>out</sub> = - (100 k&Omega; / 10 k&Omega;) * 0.2 V
+V<sub>out</sub> = -10 * 0.2 V
+V<sub>out</sub> = -2 V</pre>
+                    <p>Therefore, the output voltage is <b>-2 V</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 30 -->
+            <div class="question-card">
+                <p class="question-text">
+                    30. A series circuit contains a 9V battery, a 1.5 k&Omega; resistor, and a Zener diode used for voltage regulation. If the Zener diode has a breakdown voltage of 5.6 V and is operating in its breakdown region, what is the current flowing through the resistor?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>When a Zener diode is operating in its breakdown region, it maintains a constant voltage across itself (the Zener voltage). In this series circuit, the voltage across the resistor will be the supply voltage minus the Zener voltage:</p>
+                    <pre>V<sub>R</sub> = V<sub>supply</sub> - V<sub>Zener</sub>
+V<sub>R</sub> = 9 V - 5.6 V
+V<sub>R</sub> = 3.4 V</pre>
+                    <p>Now, use Ohm's Law to find the current flowing through the resistor:</p>
+                    <pre>I = V<sub>R</sub> / R
+I = 3.4 V / 1.5 k&Omega; = 3.4 V / 1500 &Omega;
+I &approx; 0.002267 A or 2.267 mA</pre>
+                    <p>Therefore, the current flowing through the resistor is approximately <b>2.267 mA</b>.</p>
+                </details>
+            </div>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="text-center text-gray-500 text-sm mt-12 py-6">
+            <p>&copy; <script>document.write(new Date().getFullYear())</script> Mechatronics 1 Course. All rights reserved.</p>
+            <p>Designed for a World-Class Learning Experience</p>
+        </footer>
+    </div>
+</body>
+</html>
