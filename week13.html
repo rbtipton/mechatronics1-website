@@ -3,332 +3,581 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 13 - Power Electronics & Drives</title>
+    <title>Mechatronics 1: Week 13 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chosen Palette: Calm Harmony -->
-    <!-- Application Structure Plan: The application is structured as an interactive dashboard with five tabs: Introduction, DC-DC Converters, Motor Control, Applications, and Knowledge Check. This modular design allows users to explore complex topics in a non-linear way. The core of the experience is the interactive labs. The 'DC-DC Converters' lab provides hands-on sliders to demonstrate how Buck and Boost converters function. The 'Motor Control' lab includes an interactive H-Bridge diagram to visually explain bidirectional control. This learn-by-doing approach is more effective for grasping abstract power electronics concepts than static diagrams. -->
-    <!-- Visualization & Content Choices: 
-        - DC-DC Converters -> Goal: Understand voltage conversion -> Viz: Chart.js Bar Chart & text output -> Interaction: Sliders for 'Input Voltage' and 'Duty Cycle' dynamically update the chart and calculated output voltage. Justification: Provides immediate, quantitative feedback on how input parameters affect output, clarifying the Buck/Boost principles.
-        - H-Bridge -> Goal: Understand DC motor direction control -> Viz: HTML/CSS diagram with dynamic styling for switches and arrows. -> Interaction: Buttons for 'Forward', 'Reverse', and 'Brake' update the diagram's CSS classes to show active paths. Justification: A static diagram of an H-bridge is confusing; this interactive version makes the current flow for each state clear and easy to understand.
-        - PWM Speed Control -> Goal: Understand speed control -> Viz: A simple CSS-animated bar. -> Interaction: A slider for 'Duty Cycle' changes the width of the bar and a text display. Justification: Simple but effective visual representation of how average power (and thus speed) changes with duty cycle.
-        - Knowledge Check -> Goal: Reinforce learning -> Viz: Interactive cards -> Interaction: A "Reveal Answer" button toggles visibility. Justification: Promotes active recall.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
-        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
-        .nav-button.active, .nav-button:hover { color: #059669; border-bottom-color: #059669; }
-        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .content-section { display: none; }
-        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-        .slider-label { font-size: 0.875rem; font-weight: 500; color: #57534e; }
-        .slider-value, .output-value { font-family: 'Roboto Mono', monospace; font-size: 0.9rem; background-color: #e7e5e4; padding: 0.1rem 0.5rem; border-radius: 0.25rem; }
-        .output-value { font-size: 1.25rem; padding: 0.5rem 1rem; }
-        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 40vh; }
-        .h-bridge-switch { width: 30px; height: 15px; background-color: #d4d4d8; border: 2px solid #a1a1aa; transition: all 0.3s ease; }
-        .h-bridge-switch.active { background-color: #10b981; border-color: #059669; }
-        .h-bridge-line { position: absolute; background-color: #a1a1aa; transition: background-color 0.3s ease; }
-        .h-bridge-line.active { background-color: #fb923c; }
-        .h-bridge-arrow { position: absolute; width: 0; height: 0; border-style: solid; opacity: 0; transition: opacity 0.3s ease;}
-        .h-bridge-arrow.active { opacity: 1; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
+        }
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
+        }
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
+        }
+        .nav-button svg {
+          margin-bottom: 0.25rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
+        }
+        .formula-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border-left: 4px solid #38bdf8; /* Blue border on left */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 1rem;
+            color: #0c4a6e; /* Darker blue text */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="antialiased">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 13: Power Electronics</h1>
-                <nav class="hidden md:flex space-x-4 lg:space-x-6">
-                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
-                    <button class="nav-button" onclick="showSection('converters')">DC-DC Converters</button>
-                    <button class="nav-button" onclick="showSection('motor-control')">Motor Control</button>
-                    <button class="nav-button" onclick="showSection('apps')">Applications</button>
-                    <button class="nav-button" onclick="showSection('knowledge')">Knowledge Check</button>
-                </nav>
-                <button id="menu-btn" class="md:hidden">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Lucide React icons (inline SVGs for direct use in HTML)
+        const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+        const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+        const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+
+        // Icons for Week 13
+        const Cog = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M20 12h2"/><path d="M2 12h2"/><path d="M19.7 4.3l-1.4 1.4"/><path d="M6.3 17.7l-1.4 1.4"/><path d="M4.3 4.3l1.4 1.4"/><path d="M17.7 17.7l1.4 1.4"/></svg>;
+        const Gauge = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 14c1.449 0 2.706-.78 3.407-1.921A4.998 4.998 0 0 0 12 9c-1.449 0-2.706.78-3.407 1.921A4.998 4.998 0 0 0 12 14z"/><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 14v6"/><path d="M12 2v2"/><path d="M16.24 7.76l-1.41 1.41"/><path d="M7.76 7.76l1.41 1.41"/></svg>;
+        const Droplets = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7 16c-2.76 0-5-2.24-5-5s2.24-5 5-5c.44 0 .87.07 1.28.2"/><path d="M12.55 4.35a5.5 5.5 0 0 1 8.23 6.39c-.39.77-.96 1.46-1.67 2.03L12 22l-4.1-4.1"/><path d="M16.8 9.2c1.07.95 2.22 1.58 3.45 1.83"/><path d="M12 22v-6.5"/></svg>;
+
+
+        // Concept Review Component
+        const ConceptReview = () => {
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 13: Servomotors, Stepper Motors & Fluid Power Actuators</h2>
+
+              {/* Servomotors: Precise Angular Position Control */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Cog className="w-7 h-7 mr-3 text-blue-600"/>
+                    1. Servomotors: Precise Angular Position Control
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A servomotor (often simply "servo") is a rotary actuator that allows for precise control of angular position, velocity, and acceleration.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Key Difference from DC/Stepper Motors:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>While DC motors provide continuous rotation with speed control, and stepper motors provide discrete steps without feedback, servomotors are designed for <span className="font-bold">precise positional control</span> through a <span className="font-bold">closed-loop feedback system</span>.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Principle of Operation (Hobby Servos):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>A typical hobby servomotor consists of four main components integrated into one compact unit:
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">DC Motor:</span> Provides the mechanical power.</li>
+                      <li><span className="font-medium">Gear Reduction:</span> Increases torque and reduces speed, allowing the small motor to move heavier loads.</li>
+                      <li><span className="font-medium">Position Sensor (Potentiometer):</span> Provides feedback on the current angular position of the output shaft.</li>
+                      <li><span className="font-medium">Control Circuit (PID Controller):</span> Compares the desired position (from input signal) with the actual position (from sensor) and adjusts the motor's power to correct any error.</li>
+                    </ul>
+                  </li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Control with Arduino (Servo Library):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Hobby servos are typically controlled by a Pulse Width Modulation (PWM) signal, but it's a specific type of PWM where the <span className="font-bold">pulse width</span> (duration of the HIGH pulse) determines the angular position, not the duty cycle.</li>
+                  <li>Arduino's `Servo.h` library simplifies control:
+                    <ul className="list-circle list-inside ml-4">
+                      <li>`servo.attach(pin)`: Attaches a servo object to a specified pin.</li>
+                      <li>`servo.write(angle)`: Sets the servo shaft to a specific angle (0-180 degrees).</li>
+                      <li>`servo.writeMicroseconds(us)`: Sets the pulse width directly (e.g., 1000us for 0 degrees, 1500us for 90 degrees, 2000us for 180 degrees).</li>
+                    </ul>
+                  </li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Characteristics:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Closed-Loop Control:</span> Self-correcting due to internal feedback.</li>
+                  <li><span className="font-medium">Precise Positioning:</span> Can move to and hold specific angles.</li>
+                  <li><span className="font-medium">Limited Rotation:</span> Most hobby servos have a limited range (e.g., 0-180 or 0-270 degrees). Continuous rotation servos exist but behave more like geared DC motors with speed control.</li>
+                  <li><span className="font-medium">High Torque at Low Speed:</span> Due to gear reduction.</li>
+                </ul>
+              </section>
+
+              {/* Stepper Motors: Discrete Step Control */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Cog className="w-7 h-7 mr-3 text-green-600"/>
+                    2. Stepper Motors: Discrete Step Control
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> An electromechanical device that converts electrical pulses into discrete mechanical rotational movements (steps).
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Key Feature:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>They move in fixed, repeatable angular increments (steps).</li>
+                  <li><span className="font-medium">Open-Loop Control:</span> Stepper motors are often operated in <span className="font-bold">open-loop control</span>, meaning they typically do not require position feedback sensors (like encoders) to know their position. The controller simply counts the pulses sent, assuming the motor executes each step perfectly. This simplifies the control system.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Principle of Operation:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>The motor has multiple coils (windings) arranged around a central rotor with permanent magnets or soft iron teeth.</li>
+                  <li>By sequentially energizing these coils in a specific pattern, the magnetic field shifts, causing the rotor to align itself with the new field, thus moving one step.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Types:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Unipolar Stepper Motors:</span> Have a center tap on each winding, allowing current to flow in only one direction. Easier to control but less torque.</li>
+                  <li><span className="font-medium">Bipolar Stepper Motors:</span> Have no center tap; current must be reversible through the coils. More complex to drive (requires H-bridge type driver for each coil) but provide higher torque.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Control Modes:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Full Step:</span> Simplest, highest torque, but coarser resolution.</li>
+                  <li><span className="font-medium">Half Step:</span> Doubles the resolution, smoother motion, slightly less torque.</li>
+                  <li><span className="font-medium">Microstepping:</span> Varies current in windings to achieve very fine resolution and extremely smooth motion, but requires more complex drivers.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Characteristics:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Precise Positioning:</span> Excellent for applications requiring exact, repeatable movements (e.g., 3D printers, CNC machines).</li>
+                  <li><span className="font-medium">Holding Torque:</span> Can hold a position without power when stationary (for permanent magnet types).</li>
+                  <li><span className="font-medium">Loss of Steps:</span> If the load is too high or acceleration too rapid, the motor can "lose steps," leading to position errors in open-loop control.</li>
+                  <li><span className="font-medium">Power Consumption:</span> Can consume significant power even when stationary (holding torque).</li>
+                </ul>
+              </section>
+
+              {/* Fluid Power Actuators: Pneumatic & Hydraulic Systems */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Droplets className="w-7 h-7 mr-3 text-teal-600"/>
+                    3. Fluid Power Actuators: Pneumatic & Hydraulic Systems
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Actuators that use compressed gases (pneumatics) or pressurized liquids (hydraulics) to generate powerful linear or rotary motion.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Pneumatic Systems:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Working Fluid:</span> Compressed air (or other gas).</li>
+                  <li><span className="font-medium">Components:</span> Compressor, air tank, FRL (Filter, Regulator, Lubricator) unit, directional control valves, pneumatic cylinders (linear) or motors (rotary).</li>
+                  <li><span className="font-medium">Characteristics:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">Fast Response:</span> Air is highly compressible, allowing for quick movements.</li>
+                      <li><span className="font-medium">Clean:</span> No fluid leaks, suitable for food processing, medical applications.</li>
+                      <li><span className="font-medium">Moderate Force:</span> Limited by available air pressure.</li>
+                      <li><span className="font-medium">"Spongy" Motion:</span> Due to air compressibility, precise positioning under varying loads can be challenging without feedback.</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Applications:</span> Pick-and-place robots, clamping, opening/closing valves, assembly lines.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Hydraulic Systems:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Working Fluid:</span> Incompressible liquid (typically oil).</li>
+                  <li><span className="font-medium">Components:</span> Hydraulic pump, reservoir, directional control valves, hydraulic cylinders (linear) or motors (rotary).</li>
+                  <li><span className="font-medium">Characteristics:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">Extremely High Force & Torque:</span> Due to the incompressibility of oil, capable of generating immense forces.</li>
+                      <li><span className="font-medium">High Stiffness & Rigidity:</span> Very little "give" or "squishiness," allowing for precise and rigid force application.</li>
+                      <li><span className="font-medium">Slow Response:</span> Compared to pneumatics, due to fluid inertia and higher pressures.</li>
+                      <li><span className="font-medium">Messy:</span> Potential for oil leaks.</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Applications:</span> Heavy construction equipment (excavators), industrial presses, aircraft landing gear, power steering.</li>
+                </ul>
+              </section>
+            </div>
+          );
+        };
+
+        // Actuator Control Simulator Sandbox
+        const ActuatorControlSimulator = () => {
+          const [servoAngle, setServoAngle] = useState(90);
+          const [stepperSteps, setStepperSteps] = useState(0);
+          const [pneumaticState, setPneumaticState] = useState('Retracted'); // 'Retracted', 'Extended'
+          const [hydraulicForce, setHydraulicForce] = useState(0); // kN
+          const [message, setMessage] = useState('');
+
+          useEffect(() => {
+            updateMessages();
+          }, [servoAngle, stepperSteps, pneumaticState, hydraulicForce]);
+
+          const updateMessages = () => {
+            let msg = "Actuator Status:\n";
+            msg += `  - Servo: Set to ${servoAngle}°\n`;
+            msg += `  - Stepper: Moved ${stepperSteps} steps from home\n`;
+            msg += `  - Pneumatic Cylinder: ${pneumaticState}\n`;
+            msg += `  - Hydraulic System: Applying ${hydraulicForce} kN of force\n`;
+            setMessage(msg);
+          };
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Actuator Control Simulator</h2>
+              <p className="text-gray-700 mb-4">
+                Control different types of actuators and observe their simulated states.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Servo Control */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Servomotor Control</h3>
+                  <label htmlFor="servoAngleInput" className="text-lg font-medium text-gray-700 mb-2">Servo Angle (°): {servoAngle}</label>
+                  <input
+                    type="range"
+                    id="servoAngleInput"
+                    min="0"
+                    max="180"
+                    step="1"
+                    value={servoAngle}
+                    onChange={(e) => setServoAngle(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>0°</span>
+                    <span>90°</span>
+                    <span>180°</span>
+                  </div>
+                </div>
+
+                {/* Stepper Control */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Stepper Motor Control</h3>
+                  <label htmlFor="stepperStepsInput" className="text-lg font-medium text-gray-700 mb-2">Steps from Home: {stepperSteps}</label>
+                  <input
+                    type="range"
+                    id="stepperStepsInput"
+                    min="-100"
+                    max="100"
+                    step="1"
+                    value={stepperSteps}
+                    onChange={(e) => setStepperSteps(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>-100 steps</span>
+                    <span>0 steps (Home)</span>
+                    <span>+100 steps</span>
+                  </div>
+                </div>
+
+                {/* Pneumatic Control */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Pneumatic Cylinder</h3>
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => setPneumaticState('Retracted')}
+                      className={`py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md flex-1 ${
+                        pneumaticState === 'Retracted' ? 'bg-blue-700 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      Retract
+                    </button>
+                    <button
+                      onClick={() => setPneumaticState('Extended')}
+                      className={`py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md flex-1 ${
+                        pneumaticState === 'Extended' ? 'bg-blue-700 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      Extend
+                    </button>
+                  </div>
+                </div>
+
+                {/* Hydraulic Control */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Hydraulic System</h3>
+                  <label htmlFor="hydraulicForceInput" className="text-lg font-medium text-gray-700 mb-2">Applied Force (kN): {hydraulicForce}</label>
+                  <input
+                    type="range"
+                    id="hydraulicForceInput"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={hydraulicForce}
+                    onChange={(e) => setHydraulicForce(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>0 kN</span>
+                    <span>50 kN</span>
+                    <span>100 kN</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-md font-semibold whitespace-pre-wrap">
+                {message}
+              </div>
+            </div>
+          );
+        };
+
+
+        // Practice Problems Component
+        const PracticeProblems = () => {
+          const [activeTab, setActiveTab] = useState('homework');
+
+          const homeworkQuestions = [
+            {
+              id: 1,
+              type: 'text',
+              question: 'Explain the key difference in control philosophy between a servomotor and a stepper motor. For what type of application would each be more suitable?',
+              answer: 'Servomotor: Operates using <span class="font-bold">closed-loop control</span>. It has an internal position sensor (e.g., potentiometer or encoder) that provides feedback to a control circuit. The control circuit continuously compares the desired position with the actual position and adjusts the motor\'s power to correct any error, ensuring precise positioning. Suitable for applications requiring precise angular positioning, smooth motion, and high torque at varying speeds, such as robotic joints, camera gimbals, or RC vehicles.\n\nStepper Motor: Often operates using <span class="font-bold">open-loop control</span>. It moves in discrete, fixed steps by sequentially energizing its coils. The controller assumes the motor executes each step perfectly and simply counts the pulses sent. It typically does not require a feedback sensor for basic operation. Suitable for applications requiring precise, repeatable positioning without feedback, such as 3D printers, CNC machines, or plotters, where the load is well-known and step loss is unlikely.',
+              explanation: 'The fundamental difference lies in feedback. Servos use feedback to achieve and maintain position, making them more robust to varying loads. Steppers rely on precise pulse counting, making them simpler to control in applications with predictable loads, but susceptible to step loss if overloaded.'
+            },
+            {
+              id: 2,
+              type: 'text',
+              question: 'Describe how a hobby servomotor achieves precise angular positioning. What are its main internal components?',
+              answer: 'A hobby servomotor achieves precise angular positioning through a <span class="font-bold">closed-loop feedback system</span>. It receives a control signal (typically a PWM pulse width) indicating the desired angle. Internally, its control circuit compares this desired angle with the actual angle of the output shaft, which is measured by a built-in position sensor (usually a potentiometer).\n\nIts main internal components are:\n1.  <span class="font-bold">DC Motor:</span> Provides the rotational power.\n2.  <span class="font-bold">Gear Reduction:</span> A set of gears that reduces the motor\'s speed and increases its torque, allowing the servo to move a load.\n3.  <span class="font-bold">Position Sensor (Potentiometer):</span> Connected to the output shaft, it provides an electrical signal proportional to the current angular position.\n4.  <span class="font-bold">Control Circuit (PID Controller):</span> Reads the desired angle from the input signal and the actual angle from the potentiometer, calculates the error, and drives the DC motor until the error is minimized.',
+              explanation: 'The combination of a DC motor, gear train, position sensor, and control circuit allows the servo to continuously monitor and adjust its position, effectively "closing the loop" to maintain the desired angle.'
+            },
+            {
+              id: 3,
+              type: 'multiple_choice',
+              question: 'Which type of fluid power system is characterized by extremely high force capability and high stiffness (minimal "give") due to the incompressibility of its working fluid?',
+              options: ['A) Pneumatic System', 'B) Hydraulic System', 'C) Both Pneumatic and Hydraulic Systems', 'D) Neither Pneumatic nor Hydraulic Systems'],
+              correctAnswer: 'B) Hydraulic System',
+              explanation: 'Hydraulic systems use incompressible liquids (like oil), which allows them to transmit immense forces with very little deflection or "squishiness," resulting in high stiffness and rigidity. Pneumatic systems use compressible air, making them faster but less stiff and capable of lower forces.'
+            },
+            {
+              id: 4,
+              type: 'text',
+              question: 'You are designing a robotic arm for a pick-and-place operation that requires very fast, repetitive linear movements of a lightweight object. Would you choose a pneumatic or hydraulic cylinder for this task, and why?',
+              answer: 'For very fast, repetitive linear movements of a lightweight object, a <span class="font-bold">pneumatic cylinder</span> would be the better choice.\n\nReasons:\n1.  <span class="font-bold">Speed:</span> Pneumatic systems use compressed air, which is highly compressible, allowing for very rapid extension and retraction of cylinders.\n2.  <span class="font-bold">Cleanliness:</span> Air systems are inherently cleaner as there are no oil leaks, which is often desirable in manufacturing or assembly environments.\n3.  <span class="font-bold">Cost & Simplicity:</span> Pneumatic systems are generally simpler and less expensive to implement for moderate force, high-speed applications compared to hydraulics.\n\nHydraulic systems, while capable of much higher forces, are typically slower, messier, and more complex, making them overkill for lightweight, high-speed tasks.',
+              explanation: 'The compressibility of air makes pneumatic systems fast, while the incompressibility of oil makes hydraulic systems powerful and rigid. For lightweight, high-speed tasks, speed is prioritized, making pneumatics the ideal choice.'
+            },
+            {
+              id: 5,
+              type: 'text',
+              question: 'A 3D printer uses stepper motors for its X, Y, and Z axes. Why are limit switches (or Hall-effect sensors) often used in conjunction with these open-loop stepper motors for "homing" the printer?',
+              answer: 'Limit switches (or Hall-effect sensors) are used with open-loop stepper motors for "homing" a 3D printer because stepper motors, by themselves, operate in open-loop control and do not inherently know their absolute position, especially after power-up or if steps are lost due to external forces or missed pulses.\n\n"Homing" involves driving the print head (or bed) towards a known end-stop until it activates a limit switch. This tells the printer\'s controller that the print head is now at a precise, known reference (home) position (e.g., X=0, Y=0, Z=0). From this established home position, the controller can then accurately track all subsequent movements by simply counting the steps it commands the stepper motors to take. These sensors provide a necessary <span class="font-bold">absolute reference point</span> to re-zero the open-loop system and ensure accurate positioning at the start of each print or operation.',
+              explanation: 'While steppers are precise in their incremental movements, they lack absolute position feedback. Limit switches provide a crucial "reset" or calibration point, allowing the system to re-establish a known absolute position and prevent cumulative errors from affecting future movements.'
+            }
+          ];
+
+          const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
+
+          const handleHomeworkChange = (id, value) => {
+            setHomeworkAnswers(prev => ({
+              ...prev,
+              [id]: value
+            }));
+          };
+
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
+
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
+            });
+            setQuizResults(newResults);
+          };
+
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
+
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
+
+              <div className="flex mb-6 space-x-4">
+                <button
+                  onClick={() => setActiveTab('homework')}
+                  className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+                    activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Homework Questions
                 </button>
-            </div>
-             <div id="mobile-menu" class="hidden md:hidden py-2">
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('converters'); closeMenu();">DC-DC Converters</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('motor-control'); closeMenu();">Motor Control</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('apps'); closeMenu();">Applications</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('knowledge'); closeMenu();">Knowledge Check</button>
-            </div>
-        </div>
-    </header>
+              </div>
 
-    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
-        
-        <section id="intro" class="content-section active">
-            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
-                <h2 class="text-3xl font-bold text-stone-800 mb-4">Power Electronics & Motor Drives</h2>
-                <p class="text-lg text-stone-600 mb-6">This module explores the critical link between low-power control signals (from a microcontroller) and high-power actuators (like motors). Power electronics manage and convert electrical power efficiently and safely. This interactive module allows you to experiment with the core building blocks of this field, such as DC-DC converters and motor drive circuits, to build an intuitive understanding of how they work.</p>
-                <div class="mt-6 p-4 bg-emerald-50 border-l-4 border-emerald-500">
-                    <p class="text-emerald-800">Navigate using the tabs above to explore the interactive labs, see real-world applications, and test your knowledge.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="converters" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">DC-DC Converter Lab</h2>
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- BUCK CONVERTER -->
-                <div class="card p-6">
-                    <h3 class="text-xl font-bold text-center text-stone-700 mb-4">Buck Converter (Step-Down)</h3>
-                    <div class="space-y-4 mb-6">
-                        <div>
-                            <label for="buck-vin-slider" class="slider-label">Input Voltage (Vin): <span id="buck-vin-value" class="slider-value">12.0 V</span></label>
-                            <input id="buck-vin-slider" type="range" min="1" max="24" value="12" step="0.5" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
+              {activeTab === 'homework' && (
+                <div>
+                  <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-blue-500"/>
+                    Homework Questions
+                  </h3>
+                  <p className="text-gray-700 mb-4">
+                    Instructions: Show all work and steps clearly.
+                  </p>
+                  {homeworkQuestions.map((q) => (
+                    <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+                      {q.type === 'text' ? (
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                          placeholder="Type your answer here..."
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
+                        ></textarea>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                              />
+                              <span className="ml-2">{option}</span>
+                            </label>
+                          ))}
                         </div>
-                        <div>
-                            <label for="buck-duty-slider" class="slider-label">Duty Cycle: <span id="buck-duty-value" class="slider-value">50 %</span></label>
-                            <input id="buck-duty-slider" type="range" min="0" max="100" value="50" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
                         </div>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
+                        </div>
+                      )}
+                      <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                        <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                        <div className="mt-2 text-indigo-700">
+                          <p className="whitespace-pre-wrap">{q.explanation}</p>
+                        </div >
+                      </details>
                     </div>
-                    <div class="text-center">
-                        <p class="text-stone-600 mb-2">Calculated Output Voltage (Vout)</p>
-                        <p id="buck-vout-display" class="output-value text-emerald-700">6.00 V</p>
-                    </div>
+                  ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
                 </div>
-                <!-- BOOST CONVERTER -->
-                <div class="card p-6">
-                    <h3 class="text-xl font-bold text-center text-stone-700 mb-4">Boost Converter (Step-Up)</h3>
-                    <div class="space-y-4 mb-6">
-                        <div>
-                            <label for="boost-vin-slider" class="slider-label">Input Voltage (Vin): <span id="boost-vin-value" class="slider-value">3.7 V</span></label>
-                            <input id="boost-vin-slider" type="range" min="1" max="12" value="3.7" step="0.1" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                        <div>
-                            <label for="boost-duty-slider" class="slider-label">Duty Cycle: <span id="boost-duty-value" class="slider-value">50 %</span></label>
-                            <input id="boost-duty-slider" type="range" min="0" max="90" value="50" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-stone-600 mb-2">Calculated Output Voltage (Vout)</p>
-                        <p id="boost-vout-display" class="output-value text-emerald-700">7.40 V</p>
-                    </div>
-                </div>
+              )}
             </div>
-        </section>
+          );
+        };
 
-        <section id="motor-control" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Motor Control Lab</h2>
-            <div class="grid lg:grid-cols-2 gap-8">
-                <!-- H-Bridge -->
-                <div class="card p-6">
-                    <h3 class="text-xl font-bold text-center text-stone-700 mb-4">Interactive H-Bridge</h3>
-                    <div id="h-bridge-diagram" class="relative w-[300px] h-[200px] mx-auto bg-stone-50 rounded-lg border-2 border-stone-200">
-                        <!-- Switches -->
-                        <div id="sw1" class="h-bridge-switch absolute top-4 left-4"></div>
-                        <div id="sw2" class="h-bridge-switch absolute top-4 right-4"></div>
-                        <div id="sw3" class="h-bridge-switch absolute bottom-4 left-4"></div>
-                        <div id="sw4" class="h-bridge-switch absolute bottom-4 right-4"></div>
-                        <!-- Motor -->
-                        <div class="absolute top-1/2 left-1/2 w-16 h-16 bg-stone-300 rounded-full -translate-x-1/2 -translate-y-1/2 flex items-center justify-center font-bold text-stone-600">M</div>
-                        <!-- Wires & Arrows -->
-                        <div class="h-bridge-line absolute top-10 left-10 w-2 h-16" data-path="v1"></div>
-                        <div class="h-bridge-line absolute top-10 right-10 w-2 h-16" data-path="v2"></div>
-                        <div class="h-bridge-line absolute top-1/2 left-12 w-16 h-2 -translate-y-1" data-path="h1"></div>
-                        <div class="h-bridge-line absolute top-1/2 right-12 w-16 h-2 -translate-y-1" data-path="h2"></div>
-                        <!-- Arrows -->
-                        <div class="h-bridge-arrow absolute top-1/2 left-20 border-t-8 border-b-8 border-r-8 border-l-0 border-transparent border-r-orange-500" data-arrow="h1r"></div>
-                        <div class="h-bridge-arrow absolute top-1/2 right-20 border-t-8 border-b-8 border-l-8 border-r-0 border-transparent border-l-orange-500" data-arrow="h2l"></div>
 
-                    </div>
-                    <div class="flex justify-center space-x-4 mt-6">
-                        <button class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700" onclick="setHBridge('forward')">Forward</button>
-                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" onclick="setHBridge('reverse')">Reverse</button>
-                        <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" onclick="setHBridge('brake')">Brake</button>
-                        <button class="px-4 py-2 bg-stone-500 text-white rounded hover:bg-stone-600" onclick="setHBridge('off')">Off</button>
-                    </div>
-                </div>
-                <!-- PWM Speed Control -->
-                <div class="card p-6">
-                    <h3 class="text-xl font-bold text-center text-stone-700 mb-4">PWM Speed Control</h3>
-                     <div>
-                        <label for="pwm-duty-slider" class="slider-label">Duty Cycle: <span id="pwm-duty-value" class="slider-value">50 %</span></label>
-                        <input id="pwm-duty-slider" type="range" min="0" max="100" value="50" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer mt-2">
-                    </div>
-                    <div class="mt-6">
-                        <p class="text-stone-600 mb-2 text-center">Motor Speed (Average Power)</p>
-                        <div class="w-full bg-stone-200 rounded-full h-8">
-                             <div id="pwm-speed-bar" class="bg-emerald-500 h-8 rounded-full text-center text-white font-bold leading-8 transition-all duration-200" style="width: 50%;">50%</div>
-                        </div>
-                    </div>
-                </div>
+        // Main App Component
+        const App = () => {
+          const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
+
+          return (
+            <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+              <header className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+                  Mechatronics 1 Study Guide
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 13: Servomotors, Stepper Motors & Fluid Power Actuators</p>
+                <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                    <Home className="w-5 h-5 mr-2" />
+                    Back to Course Hub
+                </a>
+              </header>
+
+              <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+                <button
+                  onClick={() => setActiveSection('review')}
+                  className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+                >
+                  <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Concept Review</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('sandbox')}
+                  className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+                >
+                  <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Interactive Sandbox</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('practice')}
+                  className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Practice Problems</span>
+                </button>
+              </nav>
+
+              <main className="container">
+                {activeSection === 'review' && <ConceptReview />}
+                {activeSection === 'sandbox' && <ActuatorControlSimulator />}
+                {activeSection === 'practice' && <PracticeProblems />}
+              </main>
+
+              <footer className="text-center text-gray-500 text-sm mt-12">
+                <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+              </footer>
             </div>
-        </section>
+          );
+        };
 
-        <section id="apps" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Real-World Applications</h2>
-            <div id="apps-grid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
-        </section>
-
-        <section id="knowledge" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
-            <div id="knowledge-grid" class="space-y-4"></div>
-        </section>
-    </main>
-
-<script>
-const knowledgeData = [
-    { question: "What type of DC-DC converter would you use to power a 3.3V sensor from a 5V supply?", answer: "A **Buck converter** (step-down) is needed because the output voltage (3.3V) is lower than the input voltage (5V)." },
-    { question: "How does an H-Bridge allow a DC motor to spin in reverse?", answer: "It reverses the polarity of the voltage applied to the motor. By closing the opposite pair of diagonal switches, the current flows through the motor in the reverse direction, causing it to spin the other way." },
-    { question: "What is the primary function of a Variable Frequency Drive (VFD) in AC motor control?", answer: "A VFD controls the speed of an AC motor efficiently by converting fixed-frequency AC power into variable-frequency, variable-voltage AC power. Motor speed is directly related to the frequency." },
-    { question: "Why is an IGBT often chosen over a MOSFET for high-power applications like an electric car's motor drive?", answer: "IGBTs combine the easy voltage-based control of a MOSFET with the high current and voltage handling capabilities of a Bipolar Junction Transistor (BJT), making them ideal for very high-power switching applications." }
-];
-
-const appsData = [
-    { title: "Phone/Laptop Charger", text: "A compact AC-to-DC converter (a type of power electronics) that safely charges your battery.", icon: "🔌" },
-    { title: "Electric Vehicles", text: "Power inverters with IGBTs convert DC battery power to AC to drive the motors. DC-DC converters power the lights and infotainment.", icon: "🚗" },
-    { title: "Industrial Conveyors", text: "Variable Frequency Drives (VFDs) control the speed of AC motors on conveyor belts, saving energy and providing precise control.", icon: "⚙️" },
-    { title: "Hobby Drones", text: "Small MOSFETs are used in Electronic Speed Controllers (ESCs) to apply PWM signals to brushless DC motors, controlling their speed with high frequency.", icon: "🚁" },
-];
-
-function updateBuckConverter() {
-    const vin = parseFloat(document.getElementById('buck-vin-slider').value);
-    const duty = parseInt(document.getElementById('buck-duty-slider').value);
-    document.getElementById('buck-vin-value').textContent = `${vin.toFixed(1)} V`;
-    document.getElementById('buck-duty-value').textContent = `${duty} %`;
-    const vout = vin * (duty / 100);
-    document.getElementById('buck-vout-display').textContent = `${vout.toFixed(2)} V`;
-}
-
-function updateBoostConverter() {
-    const vin = parseFloat(document.getElementById('boost-vin-slider').value);
-    const duty = parseInt(document.getElementById('boost-duty-slider').value);
-    document.getElementById('boost-vin-value').textContent = `${vin.toFixed(1)} V`;
-    document.getElementById('boost-duty-value').textContent = `${duty} %`;
-    const vout = vin / (1 - (duty / 100));
-    document.getElementById('boost-vout-display').textContent = `${vout.toFixed(2)} V`;
-}
-
-function updatePwm() {
-    const duty = parseInt(document.getElementById('pwm-duty-slider').value);
-    document.getElementById('pwm-duty-value').textContent = `${duty} %`;
-    const speedBar = document.getElementById('pwm-speed-bar');
-    speedBar.style.width = `${duty}%`;
-    speedBar.textContent = `${duty}%`;
-}
-
-function setHBridge(state) {
-    const allSwitches = ['sw1', 'sw2', 'sw3', 'sw4'];
-    const allPaths = document.querySelectorAll('#h-bridge-diagram [data-path]');
-    const allArrows = document.querySelectorAll('#h-bridge-diagram [data-arrow]');
-
-    allSwitches.forEach(sw => document.getElementById(sw).classList.remove('active'));
-    allPaths.forEach(path => path.classList.remove('active'));
-    allArrows.forEach(arrow => arrow.classList.remove('active'));
-
-    switch(state) {
-        case 'forward':
-            document.getElementById('sw1').classList.add('active');
-            document.getElementById('sw4').classList.add('active');
-            document.querySelector('[data-path="v1"]').classList.add('active');
-            document.querySelector('[data-path="h1"]').classList.add('active');
-            document.querySelector('[data-path="h2"]').classList.add('active');
-            document.querySelector('[data-path="v2"]').classList.add('active');
-            document.querySelector('[data-arrow="h1r"]').classList.add('active');
-            break;
-        case 'reverse':
-            document.getElementById('sw2').classList.add('active');
-            document.getElementById('sw3').classList.add('active');
-            document.querySelector('[data-path="v2"]').classList.add('active');
-            document.querySelector('[data-path="h2"]').classList.add('active');
-            document.querySelector('[data-path="h1"]').classList.add('active');
-            document.querySelector('[data-path="v1"]').classList.add('active');
-            document.querySelector('[data-arrow="h2l"]').classList.add('active');
-            break;
-        case 'brake':
-            document.getElementById('sw3').classList.add('active');
-            document.getElementById('sw4').classList.add('active');
-            break;
-        case 'off':
-            // do nothing, all are off
-            break;
-    }
-}
-
-
-function initKnowledgeCheck() {
-    const container = document.getElementById('knowledge-grid');
-    container.innerHTML = knowledgeData.map(item => `
-        <div class="question-card bg-white p-6 rounded-lg shadow-md border border-stone-200">
-            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
-            <div class="answer" style="display: none; margin-top: 1rem; padding: 1rem; background-color: #f0fdf4; border-left: 4px solid #22c55e; color: #15803d;">
-                <p><strong>Answer:</strong> ${item.answer}</p>
-            </div>
-            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 transition-colors text-sm" onclick="toggleAnswer(this)">Reveal Answer</button>
-        </div>
-    `).join('');
-}
-
-function initApps() {
-    const container = document.getElementById('apps-grid');
-    container.innerHTML = appsData.map(item => `
-        <div class="card p-6 flex flex-col items-center text-center">
-            <div class="text-5xl mb-4">${item.icon}</div>
-            <h3 class="font-bold text-lg text-stone-800 mb-2">${item.title}</h3>
-            <p class="text-stone-600 text-sm">${item.text}</p>
-        </div>
-    `).join('');
-}
-
-function toggleAnswer(button) {
-    const answerEl = button.previousElementSibling;
-    const isVisible = answerEl.style.display === 'block';
-    answerEl.style.display = isVisible ? 'none' : 'block';
-    button.textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Converter listeners
-    document.getElementById('buck-vin-slider').addEventListener('input', updateBuckConverter);
-    document.getElementById('buck-duty-slider').addEventListener('input', updateBuckConverter);
-    document.getElementById('boost-vin-slider').addEventListener('input', updateBoostConverter);
-    document.getElementById('boost-duty-slider').addEventListener('input', updateBoostConverter);
-    updateBuckConverter();
-    updateBoostConverter();
-
-    // Motor control listeners
-    document.getElementById('pwm-duty-slider').addEventListener('input', updatePwm);
-    updatePwm();
-    setHBridge('off');
-
-    // Init sections
-    initKnowledgeCheck();
-    initApps();
-
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-});
-
-function showSection(sectionId) {
-    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    document.querySelectorAll('.nav-button').forEach(button => {
-        button.classList.remove('active');
-        if (button.getAttribute('onclick').includes(sectionId)) {
-            button.classList.add('active');
-        }
-    });
-    window.scrollTo(0, 0);
-}
-
-function closeMenu() {
-    document.getElementById('mobile-menu').classList.add('hidden');
-}
-
-</script>
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 </body>
 </html>
