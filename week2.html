@@ -3,913 +3,721 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 2 - DC Circuit Analysis</title>
+    <title>Mechatronics 1: Week 2 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Academic Blue -->
-    <!-- Application Structure Plan: The SPA is structured using a main navigation bar to switch between three sections: 'Analysis Techniques', 'Interactive Sandbox', and 'Practice Problems'. The 'Analysis Techniques' section uses a sub-navigation (tabs) for 'Nodal Analysis', 'Mesh Analysis', 'Superposition', 'Thevenin's Theorem', and 'Norton's Theorem'. This architecture organizes the content thematically, allowing students to focus on one technique at a time. The 'Interactive Sandbox' allows side-by-side comparison of results from different techniques on a single circuit. The user flow encourages progressive learning: grasp a concept, see it applied in an interactive calculation, compare results visually, and test knowledge. This is more effective than a static document. -->
-    <!-- Visualization & Content Choices: Technique definitions/steps -> Styled text blocks (HTML/Tailwind). Math Examples -> Interactive step-by-step reveal with a button (JS). Circuit diagrams -> HTML/CSS divs for components and wires to avoid SVG. Sandbox Comparison -> Bar chart (Chart.js/Canvas) to verify consistent results across methods. Practice Problems -> Cards with a 'show answer' toggle (JS). This mix of static and interactive content enhances engagement and comprehension. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .tab-active { 
-            border-color: #3b82f6; /* blue-500 */
-            color: #1d4ed8; /* blue-700 */
-            background-color: #eff6ff; /* blue-50 */
-        }
-        .step-content {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .step-content.visible {
-            display: block;
-            opacity: 1;
-        }
-        .solution-box {
-            background-color: #f8fafc;
-            border-left: 4px solid #3b82f6;
-            padding: 1rem;
-            margin-top: 1rem;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-        }
-        .btn {
-            background-color: #3b82f6;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-        .btn:hover { background-color: #2563eb; }
-        .btn-secondary {
-            background-color: #6b7280;
-        }
-        .btn-secondary:hover { background-color: #4b5563; }
-        .hidden { display: none; }
-        .katex-display { display: block; overflow-x: auto; white-space: nowrap; }
-
-        /* Circuit Diagram Styling */
-        .circuit-diagram {
-            position: relative;
+        body {
+            font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
-            border: 2px solid #d1d5db;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 1rem;
-            border-radius: 0.5rem;
-            min-height: 200px; /* Base height */
+        }
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
+        }
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
+        }
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
+        }
+        .nav-button svg {
+          margin-bottom: 0.25rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
+        }
+        /* Custom styles for the circuit visualization */
+        .circuit-diagram {
+            border: 2px solid #374151; /* Darker gray border */
+            border-radius: 0.75rem; /* More rounded */
+            padding: 1.5rem;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-family: 'Inter', sans-serif;
-            overflow: hidden; /* Ensure contents don't spill out */
-            margin-bottom: 1rem;
-            box-sizing: border-box; /* Include padding/border in element's total width and height */
+            position: relative;
+            background-color: #f9fafb; /* Lighter background for the diagram */
         }
-        .component, .voltage-source, .current-source-symbol, .resistor-symbol, .node-label {
+        .circuit-label {
             position: absolute;
-            font-size: 0.75rem;
-            text-align: center;
-            color: #374151;
-            white-space: nowrap;
-        }
-        .resistor-symbol {
-            width: 50px; /* Smaller to fit better */
-            height: 15px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 20'%3E%3Cpath d='M0 10 L10 10 L15 15 L25 5 L35 15 L45 5 L55 15 L60 10 L80 10' fill='none' stroke='%23374151' stroke-width='2'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
-        }
-        .wire {
-            position: absolute;
-            background-color: #374151;
+            background-color: #f9fafb; /* Match diagram background */
+            padding: 0 0.5rem;
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* gray-600 */
+            border-radius: 0.25rem;
         }
         .voltage-source {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #374151;
-            border-radius: 50%;
-            line-height: 1;
-            font-weight: bold;
-        }
-        .current-source-symbol {
-            width: 40px;
-            height: 40px;
+            width: 4rem; /* 64px */
+            height: 4rem; /* 64px */
+            background-color: #3b82f6; /* Blue-500 */
+            border-radius: 9999px; /* Fully rounded */
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid #374151;
-            border-radius: 50%;
-            font-weight: bold;
+            color: white;
+            font-weight: 700; /* font-bold */
+            font-size: 1.125rem; /* text-lg */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .arrow {
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            position: absolute;
-        }
-        .arrow-down { border-top: 8px solid #374151; top: 100%; left: 50%; transform: translateX(-50%); }
-        .arrow-up { border-bottom: 8px solid #374151; bottom: 100%; left: 50%; transform: translateX(-50%); }
-        .node-dot {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background-color: #374151;
-            border-radius: 50%;
-        }
-        .ground-symbol-container {
-            position: absolute;
-            width: 20px;
-            height: 15px;
+        .resistor-element {
+            width: 6rem; /* 96px */
+            height: 2rem; /* 32px */
+            background-color: #ef4444; /* Red-500 */
+            border-radius: 0.375rem; /* rounded-md */
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700; /* font-bold */
+            font-size: 1.125rem; /* text-lg */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .ground-symbol-container div { background-color: #374151; height: 2px; }
-        .ground-symbol-container .line1 { width: 100%; }
-        .ground-symbol-container .line2 { width: 70%; }
-        .ground-symbol-container .line3 { width: 40%; }
+        .wire {
+            width: 0.25rem; /* 4px */
+            height: 3rem; /* 48px */
+            background-color: #374151; /* Dark gray */
+            margin: 0.5rem 0;
+        }
+        .current-indicator {
+            color: #1f2937; /* Dark gray */
+            font-weight: 700; /* font-bold */
+            font-size: 1.125rem; /* text-lg */
+            margin-top: 0.5rem;
+        }
+        .formula-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border-left: 4px solid #38bdf8; /* Blue border on left */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 1rem;
+            color: #0c4a6e; /* Darker blue text */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="antialiased">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-md sticky top-0 z-10">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-bold text-blue-700">Mechatronics 1: Week 2 - DC Circuit Analysis</h1>
-                <div class="flex space-x-4 text-sm font-medium">
-                    <button data-target="techniques" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Analysis Techniques</button>
-                    <button data-target="sandbox" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Interactive Sandbox</button>
-                    <button data-target="practice" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Practice Problems</button>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Lucide React icons (inline SVGs for direct use in HTML)
+        const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+        const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+        const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const Lightbulb = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2C7.8 2 4.1 4.3 2.4 8.7A4.4 4.4 0 0 0 4 15h.3c.7 0 1.4.3 1.8.9l.4.9c1.4 2.3 3.4 3.4 5.4 3.4 2 0 4-.9 5.4-3.4l.4-.9c.4-.6 1.1-.9 1.8-.9H20a4.4 4.4 0 0 0 1.6-6.3C19.9 4.3 16.2 2 12 2z"/></svg>;
+        const Zap = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>;
+        const Bolt = ({ className }) => <Zap className={className} />; // Reusing Zap for Bolt
+        const CircuitBoard = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><path d="M9 9h6v6H9z"/><path d="M12 1v3"/><path d="M12 20v3"/><path d="M1 12h3"/><path d="M20 12h3"/></svg>;
+        const Split = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 18V9"/><path d="M17 13l-5 5-5-5"/></svg>;
+        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+
+        // New Icons for Week 2
+        const CapacitorIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7 5h10M7 19h10M12 5v14"/></svg>;
+        const InductorIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 12s3-4 6-4 6 4 6 4 3 4 6 4"/></svg>;
+        const Grid = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>;
+
+
+        // Concept Review Component
+        const ConceptReview = () => {
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 2: Circuit Analysis & Components</h2>
+
+              {/* Resistors in Series and Parallel */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Split className="w-7 h-7 mr-3 text-purple-500"/>
+                    1. Resistors in Series and Parallel
+                </h3>
+                <h4 className="text-xl font-medium text-gray-800 mb-2">Resistors in Series:</h4>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Definition: Resistors are connected in series when they are arranged in a single path, so the <span className="font-medium">same current</span> flows through each resistor.
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>The <span className="font-medium">total resistance</span> (equivalent resistance, Req) is the sum of the individual resistances.</li>
+                  <li>The voltage drops across each resistor are additive.</li>
+                  <li>Formula for Equivalent Resistance: `Req = R1 + R2 + R3 + ... + Rn`</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Resistors in Parallel:</h4>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Definition: Resistors are connected in parallel when they are arranged in multiple paths, so the <span className="font-medium">same voltage</span> is applied across each resistor.
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>The <span className="font-medium">total current</span> from the source divides among the parallel branches.</li>
+                  <li>The reciprocal of the total resistance is the sum of the reciprocals of the individual resistances.</li>
+                  <li>The equivalent resistance of parallel resistors is always <span className="font-medium">less</span> than the smallest individual resistance.</li>
+                  <li>Formula for Equivalent Resistance: `1/Req = 1/R1 + 1/R2 + 1/R3 + ... + 1/Rn`</li>
+                  <li>For just two resistors in parallel, a common shortcut is: `Req = (R1 * R2) / (R1 + R2)`</li>
+                </ul>
+              </section>
+
+              {/* Kirchhoff's Voltage Law (KVL) */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <CircuitBoard className="w-7 h-7 mr-3 text-green-500"/>
+                    2. Kirchhoff's Voltage Law (KVL)
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Statement: The algebraic sum of all voltages around any closed loop in a circuit must be equal to zero.
+                </p>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Analogy: If you walk around a complete loop on a hiking trail, your net change in elevation is zero. Any "voltage rises" (like from a battery) must be offset by "voltage drops" (across resistors).
+                </p>
+                <p className="text-gray-700 mb-2"><span className="font-medium">Key Idea:</span> It's a statement of conservation of energy.</p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Application:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>Pick a starting point in a closed loop.</li>
+                  <li>Traverse the loop in one direction (clockwise or counter-clockwise).</li>
+                  <li>Sum the voltage changes:
+                    <ul className="list-circle list-inside ml-4">
+                      <li>Voltage source: `+V` if traversing from - to +, `-V` if traversing from + to -.</li>
+                      <li>Resistor: `-IR` (voltage drop) if traversing in the direction of assumed current, `+IR` if against.</li>
+                    </ul>
+                  </li>
+                  <li>Set the sum to zero.</li>
+                </ul>
+                <p className="formula-box mt-3">
+                  Formal Statement: `Sum of Voltages around a closed loop = 0`
+                </p>
+              </section>
+
+              {/* Kirchhoff's Current Law (KCL) */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <CircuitBoard className="w-7 h-7 mr-3 text-green-500"/>
+                    3. Kirchhoff's Current Law (KCL)
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Statement: The algebraic sum of all currents entering a node (junction) in a circuit must be equal to the algebraic sum of all currents leaving that node.
+                </p>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Analogy: Imagine a junction in water pipes. All water flowing into the junction must flow out. There's no build-up or loss of water at the junction.
+                </p>
+                <p className="text-gray-700 mb-2"><span className="font-medium">Key Idea:</span> It's a statement of conservation of charge.</p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Application:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>Identify a node (a point where three or more components connect).</li>
+                  <li>Assign directions to currents entering and leaving the node.</li>
+                  <li>Sum currents entering = Sum currents leaving (or sum all currents with entering as positive and leaving as negative, equaling zero).</li>
+                </ul>
+                <p className="formula-box mt-3">
+                  Formal Statement: `Sum of Currents entering a node = Sum of Currents exiting a node`
+                </p>
+              </section>
+
+              {/* Capacitors */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <CapacitorIcon className="w-7 h-7 mr-3 text-teal-500"/>
+                    4. Capacitors
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Definition: A capacitor is an electronic component that stores electrical energy in an electric field.
+                </p>
+                <p className="text-gray-700 mb-2">Construction: Typically consists of two conductive plates separated by an insulating material called a <span className="font-medium">dielectric</span>.</p>
+                <p className="text-gray-700 mb-2">Analogy: A water tank (stores water pressure/volume).</p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Key Characteristics:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>Capacitance (C): A measure of a capacitor's ability to store charge. Units: <span className="font-medium">Farads (F)</span>.</li>
+                  <li>Voltage across a Capacitor: Cannot change instantaneously.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Behavior in DC Circuits (Steady State):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>When fully charged, a capacitor acts like an <span className="font-medium">open circuit</span> (no current flows through it in steady state DC).</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Applications in Mechatronics:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>Filtering: Smoothing out voltage ripples (e.g., in power supplies).</li>
+                  <li>Timing Circuits: Used in conjunction with resistors to create time delays (RC circuits).</li>
+                  <li>Energy Storage: Providing bursts of power, decoupling noise.</li>
+                </ul>
+              </section>
+
+              {/* Inductors */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <InductorIcon className="w-7 h-7 mr-3 text-red-500"/>
+                    5. Inductors
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Definition: An inductor is an electronic component that stores energy in a magnetic field when current flows through it.
+                </p>
+                <p className="text-gray-700 mb-2">Construction: Typically consists of a coil of wire wound around a core (air, iron, ferrite).</p>
+                <p className="text-gray-700 mb-2">Analogy: A flywheel (stores kinetic energy, resists changes in rotational speed).</p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Key Characteristics:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>Inductance (L): A measure of an inductor's ability to store energy in a magnetic field. Units: <span className="font-medium">Henrys (H)</span>.</li>
+                  <li>Current through an Inductor: Cannot change instantaneously.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Behavior in DC Circuits (Steady State):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>When fully "charged" (current is constant), an inductor acts like a <span className="font-medium">short circuit</span> (zero voltage drop across it in steady state DC, assuming ideal).</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Applications in Mechatronics:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>Filtering: Used in power supplies (along with capacitors) to create LC filters.</li>
+                  <li>Energy Storage/Transfer: In switching power supplies (e.g., buck/boost converters).</li>
+                  <li>Electromagnets: Coils of wire form electromagnets, used in relays, solenoids, and motors.</li>
+                </ul>
+              </section>
+
+              {/* Comparison of R, C, L */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Lightbulb className="w-7 h-7 mr-3 text-yellow-500"/>
+                    6. Comparison of Resistors, Capacitors, and Inductors
+                </h3>
+                <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <thead>
+                            <tr className="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+                                <th className="py-3 px-6 text-left">Component</th>
+                                <th className="py-3 px-6 text-left">Stores Energy As...</th>
+                                <th className="py-3 px-6 text-left">DC Steady State Behavior</th>
+                                <th className="py-3 px-6 text-left">Key Property</th>
+                                <th className="py-3 px-6 text-left">Equation</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-gray-600 text-sm font-light">
+                            <tr className="border-b border-gray-200 hover:bg-gray-50">
+                                <td className="py-3 px-6 text-left whitespace-nowrap">Resistor</td>
+                                <td className="py-3 px-6 text-left">Heat (dissipates)</td>
+                                <td className="py-3 px-6 text-left">Pass current/drop voltage</td>
+                                <td className="py-3 px-6 text-left">Resistance (R)</td>
+                                <td className="py-3 px-6 text-left">`V=IR`</td>
+                            </tr>
+                            <tr className="border-b border-gray-200 hover:bg-gray-50">
+                                <td className="py-3 px-6 text-left whitespace-nowrap">Capacitor</td>
+                                <td className="py-3 px-6 text-left">Electric Field</td>
+                                <td className="py-3 px-6 text-left">Open Circuit</td>
+                                <td className="py-3 px-6 text-left">Capacitance (C)</td>
+                                <td className="py-3 px-6 text-left">`Q=CV`</td>
+                            </tr>
+                            <tr className="hover:bg-gray-50">
+                                <td className="py-3 px-6 text-left whitespace-nowrap">Inductor</td>
+                                <td className="py-3 px-6 text-left">Magnetic Field</td>
+                                <td className="py-3 px-6 text-left">Short Circuit</td>
+                                <td className="py-3 px-6 text-left">Inductance (L)</td>
+                                <td className="py-3 px-6 text-left">`V=L(dI/dt)`</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+                <p className="text-gray-700 text-sm mt-4">
+                    (Emphasize the different ways they interact with energy and their steady-state DC behavior, which is important for DC circuit analysis later).
+                </p>
+              </section>
+
+              {/* Introduction to Breadboards */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Grid className="w-7 h-7 mr-3 text-blue-600"/>
+                    7. Introduction to Breadboards
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Definition: A breadboard is a re-usable, solderless device used to build temporary prototypes of electronic circuits. It allows you to quickly connect components and test designs without soldering.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Structure:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li><span className="font-medium">Terminal Strips (Main Area):</span> Rows of holes, usually 5 holes per row, interconnected <span className="font-medium">horizontally</span>. Components are plugged into these.</li>
+                  <li><span className="font-medium">Bus Strips (Power Rails):</span> Long columns of holes along the sides, usually marked with '+' and '-' or red and blue lines. These are interconnected <span className="font-medium">vertically</span> (or sometimes horizontally across halves, check your specific board). Used for power supply connections (VCC/5V and GND).</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">How to Use:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>Components (like resistors, wires) are inserted into the holes.</li>
+                  <li>Connections are made by plugging component leads or jumper wires into holes that are electrically connected on the breadboard.</li>
+                  <li>Always connect your power supply to the bus strips first.</li>
+                  <li>Avoid bending leads too much; insert gently.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Benefits:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4">
+                  <li>Quick prototyping.</li>
+                  <li>Easy to modify and troubleshoot circuits.</li>
+                  <li>No soldering required for initial testing.</li>
+                </ul>
+              </section>
             </div>
-        </nav>
-    </header>
-
-    <main id="app-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Section: Analysis Techniques -->
-        <section id="techniques" class="app-section">
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-3xl font-bold mb-4 text-gray-900">Advanced DC Circuit Analysis Techniques</h2>
-                <p class="text-gray-600 mb-6">Last week, we covered the fundamentals. This week, we explore powerful, systematic methods to solve complex DC circuits with multiple sources and components. These techniques are essential tools for any mechatronics engineer. Select a technique below to learn more.</p>
-
-                <!-- Tabs -->
-                <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex flex-wrap" aria-label="Tabs">
-                        <button class="technique-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-technique="nodal">Nodal Analysis</button>
-                        <button class="technique-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-technique="mesh">Mesh Analysis</button>
-                        <button class="technique-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-technique="superposition">Superposition</button>
-                        <button class="technique-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-technique="thevenin">Thevenin's Theorem</button>
-                        <button class="technique-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-technique="norton">Norton's Theorem</button>
-                    </nav>
-                </div>
-
-                <!-- Content Area for Techniques -->
-                <div id="technique-content" class="mt-6">
-                    <!-- Content will be injected here by JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Section: Interactive Sandbox -->
-        <section id="sandbox" class="app-section hidden">
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-3xl font-bold mb-2 text-gray-900">Interactive Sandbox: Compare Analysis Methods</h2>
-                <p class="text-gray-600 mb-6">This sandbox allows you to analyze a single circuit using different methods and see how they all lead to the same result. Select a method below to see its step-by-step application and the final current through the 6Ω resistor.</p>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4">Sandbox Circuit</h3>
-                        <div class="circuit-diagram h-64 md:h-80 relative">
-                            <!-- Common circuit from Mesh/Superposition examples -->
-                            <div class="voltage-source" style="top: 20%; left: 10%;"><span>+</span>20V<span>-</span></div>
-                            <div class="resistor-symbol" style="top: 15%; left: 30%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R1=2Ω</span></div>
-                            <div class="resistor-symbol" style="top: 15%; left: 60%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R2=4Ω</span></div>
-                            <div class="voltage-source" style="top: 20%; right: 10%;"><span>+</span>10V<span>-</span></div>
-                            <div class="resistor-symbol" style="top: 45%; left: 45%; transform: rotate(90deg);"><span class="absolute -left-8 top-1/2 -translate-y-1/2">R3=6Ω</span></div>
-                            
-                            <!-- Wires -->
-                            <div class="wire" style="left: 10%; top: 45%; width: 2px; height: 35%;"></div> <!-- Left vertical -->
-                            <div class="wire" style="left: 90%; top: 45%; width: 2px; height: 35%;"></div> <!-- Right vertical -->
-                            <div class="wire" style="left: 10%; top: 45%; width: 80%; height: 2px;"></div> <!-- Top horizontal -->
-                            <div class="wire" style="left: 10%; top: 80%; width: 80%; height: 2px;"></div> <!-- Bottom horizontal -->
-
-                            <div class="wire" style="left: 45%; top: 45%; width: 2px; height: 35%;"></div> <!-- Middle vertical -->
-                        </div>
-                        <div class="mt-4 flex flex-wrap gap-2 justify-center">
-                            <button class="sandbox-btn btn" data-method="mesh">Solve with Mesh Analysis</button>
-                            <button class="sandbox-btn btn" data-method="superposition">Solve with Superposition</button>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4">Solution & Verification</h3>
-                        <div id="sandbox-solution" class="bg-gray-100 p-4 rounded-lg min-h-64">
-                            Select a method to see the step-by-step solution.
-                        </div>
-                        <div class="mt-4">
-                            <div class="chart-container w-full max-w-lg mx-auto h-64 md:h-80 relative">
-                                <canvas id="sandboxChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section: Practice Problems -->
-        <section id="practice" class="app-section hidden">
-            <div class="bg-white p-6 rounded-lg shadow">
-                 <h2 class="text-3xl font-bold mb-4 text-gray-900">Practice Problems</h2>
-                 <p class="text-gray-600 mb-6">Test your understanding with these problems. Click "Show Answer" to reveal the detailed solution.</p>
-                 <div id="practice-problems-container" class="space-y-6">
-                    <!-- Practice problems will be injected here -->
-                 </div>
-                 <h2 class="text-3xl font-bold mt-8 mb-4 text-gray-900">Quiz</h2>
-                 <p class="text-gray-600 mb-6">Challenge your knowledge with these multiple-choice questions. Select your answer and click 'Check Answer'.</p>
-                 <div id="quiz-container" class="space-y-6">
-                    <!-- Quiz questions will be injected here -->
-                 </div>
-            </div>
-        </section>
-
-    </main>
-    
-<script>
-const appData = {
-    nodal: {
-        title: "Nodal Analysis (Based on KCL)",
-        description: "Nodal analysis is a systematic method for solving circuits using Kirchhoff's Current Law (KCL). The primary goal is to find the node voltages (voltages at specific points relative to a reference node). Once node voltages are known, all other currents and voltages in the circuit can be easily determined using Ohm's Law. It's particularly effective for circuits with many parallel branches or voltage sources.",
-        steps: [
-            "Identify all nodes in the circuit. A node is a point where two or more circuit elements connect.",
-            "Choose a reference node (ground) and label it 0V. This is often the node with the most connections.",
-            "Label the voltages of all non-reference nodes with unique variables (e.g., V1, V2, ...).",
-            "Apply KCL at each non-reference node. Assume currents leaving the node are positive. Write the currents in terms of the node voltages and resistances using Ohm's Law (I = (V_from - V_to) / R).",
-            "Solve the resulting system of linear equations to find the unknown node voltages.",
-            "Real-Life Application: Nodal analysis is critical in analyzing sensor networks to determine voltages at various sensor output points or junctions within a complex system, ensuring data integrity. It's also used in power distribution on PCBs to ensure stable voltage levels for ICs and components."
-        ],
-        example: {
-            problem: "Find the node voltages V1 and V2 in the circuit below.",
-            circuitHTML: `<div class="circuit-diagram h-64 relative">
-                            <div class="voltage-source" style="top: 15%; left: 10%;"><span>+</span>10V<span>-</span></div>
-                            <div class="resistor-symbol" style="top: 10%; left: 25%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R1=2Ω</span></div>
-                            <div class="node-label" style="top: 8%; left: 47%;">V1</div>
-                            <div class="node-dot" style="top: 15%; left: 49.5%;"></div>
-                            <div class="resistor-symbol" style="top: 10%; left: 60%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R2=4Ω</span></div>
-                            <div class="node-label" style="top: 8%; left: 87%;">V2</div>
-                            <div class="node-dot" style="top: 15%; left: 89.5%;"></div>
-                            <div class="resistor-symbol" style="top: 45%; left: 30%; transform: rotate(90deg);"><span class="absolute -left-8 top-1/2 -translate-y-1/2">R3=6Ω</span></div>
-                            <div class="current-source-symbol" style="top: 55%; left: 70%;"><span class="absolute top-0 left-1/2 -translate-x-1/2 arrow arrow-up"></span>5A</div>
-                            <div class resistor-symbol" style="top: 45%; left: 85%; transform: rotate(90deg);"><span class="absolute -left-8 top-1/2 -translate-y-1/2">R4=8Ω</span></div>
-                            <div class="ground-symbol-container" style="bottom: 5%; left: 49%;">
-                                <div class="line1"></div><div class="line2"></div><div class="line3"></div>
-                            </div>
-
-                            <!-- Wires -->
-                            <div class="wire" style="top: 30%; left: 10%; width: 2px; height: 50%;"></div> <!-- left vertical from source -->
-                            <div class="wire" style="top: 30%; left: 10%; width: 40%; height: 2px;"></div> <!-- left horizontal to V1 -->
-                            <div class="wire" style="top: 30%; left: 50%; width: 40%; height: 2px;"></div> <!-- middle horizontal V1 to V2 -->
-                            <div class="wire" style="top: 30%; left: 90%; width: 2px; height: 50%;"></div> <!-- right vertical from V2 -->
-
-                            <div class="wire" style="top: 15%; left: 25%; width: 2px; height: 15%;"></div> <!-- R1 to V1 top -->
-                            <div class="wire" style="top: 15%; left: 60%; width: 2px; height: 15%;"></div> <!-- R2 to V2 top -->
-
-                            <div class="wire" style="top: 30%; left: 50%; width: 2px; height: 25%;"></div> <!-- V1 to R3 top -->
-                            <div class="wire" style="top: 55%; left: 50%; width: 2px; height: 25%;"></div> <!-- R3 to ground -->
-
-                            <div class="wire" style="top: 30%; left: 70%; width: 2px; height: 25%;"></div> <!-- Current source top -->
-                            <div class="wire" style="top: 55%; left: 70%; width: 2px; height: 25%;"></div> <!-- Current source bottom -->
-
-                            <div class="wire" style="top: 30%; left: 90%; width: 2px; height: 25%;"></div> <!-- V2 to R4 top -->
-                            <div class="wire" style="top: 55%; left: 90%; width: 2px; height: 25%;"></div> <!-- R4 to ground -->
-
-                            <div class="wire" style="bottom: 20%; left: 10%; width: 80%; height: 2px;"></div> <!-- Ground line -->
-                         </div>`, 
-            solutionSteps: [
-                {
-                    title: "Apply KCL at Node V1",
-                    content: `We assume currents leaving the node are positive. The current from the 10V source through R1 to V1 is (V1 - 10)/2 (as 10V is the source voltage). The current from V1 to V2 through R2 is (V1 - V2)/4. The current from V1 to ground through R3 is V1/6.<br>
-                    <div class="solution-box"> (V1 - 10)/2 + (V1 - V2)/4 + V1/6 = 0 </div>
-                    Multiplying by the LCM (12) to clear denominators gives:<br>
-                    <div class="solution-box"> 6(V1 - 10) + 3(V1 - V2) + 2V1 = 0 <br> 6V1 - 60 + 3V1 - 3V2 + 2V1 = 0 <br> 11V1 - 3V2 = 60 (Equation 1) </div>`
-                },
-                {
-                    title: "Apply KCL at Node V2",
-                    content: `Current from V2 to V1 through R2 is (V2 - V1)/4. Current from V2 to ground through R4 is V2/8. The 5A source exits V2, so it's +5.<br>
-                    <div class="solution-box"> (V2 - V1)/4 + V2/8 + 5 = 0 </div>
-                    Multiplying by the LCM (8) to clear denominators gives:<br>
-                    <div class="solution-box"> 2(V2 - V1) + V2 + 40 = 0 <br> 2V2 - 2V1 + V2 + 40 = 0 <br> -2V1 + 3V2 = -40 (Equation 2) </div>`
-                },
-                {
-                    title: "Solve the System of Equations",
-                    content: `We have a system of two linear equations:<br>
-                    1) 11V1 - 3V2 = 60 <br>
-                    2) -2V1 + 3V2 = -40 <br>
-                    Adding Equation 1 and Equation 2 (eliminating V2):<br>
-                    <div class="solution-box"> (11V1 - 2V1) + (-3V2 + 3V2) = 60 - 40 <br> 9V1 = 20 <br> V1 = 20/9 ≈ 2.222V </div>
-                    Substitute V1 into Equation 2:<br>
-                    <div class="solution-box"> -2(20/9) + 3V2 = -40 <br> -40/9 + 3V2 = -40 <br> 3V2 = -40 + 40/9 = (-360 + 40)/9 = -320/9 <br> V2 = -320/27 ≈ -11.852V </div>`
-                },
-                {
-                    title: "Final Answer",
-                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">Node Voltages: <br> V1 ≈ <strong>2.222V</strong> <br> V2 ≈ <strong>-11.852V</strong> </div>`
-                }
-            ]
-        }
-    },
-    mesh: {
-        title: "Mesh Analysis (Based on KVL)",
-        description: "Mesh analysis is a systematic method for solving circuits using Kirchhoff's Voltage Law (KVL). It is particularly useful for planar circuits (circuits that can be drawn without crossing wires) and is efficient when dealing with circuits containing many series components or voltage sources. The primary goal is to find 'mesh currents' – fictitious currents circulating in closed loops.",
-        steps: [
-            "Identify all meshes (loops that do NOT contain any other loops within them) in the circuit.",
-            "Assign a mesh current (e.g., I1, I2, ...) to each mesh, typically in a clockwise direction for consistency.",
-            "Apply KVL around each mesh. Sum voltage drops across resistors (using Ohm's Law, V=IR). For resistors shared between meshes, the current through it is the algebraic difference of the mesh currents passing through it. Account for voltage sources (add if traversing from negative to positive in the direction of your mesh current, subtract if positive to negative).",
-            "Solve the resulting system of linear equations to find the unknown mesh currents.",
-            "Once mesh currents are known, actual branch currents and component voltages can be derived.",
-            "Real-Life Application: Mesh analysis is employed in motor control circuits to analyze currents in multi-phase windings or H-bridge motor drivers for precise control. It's also used in power supply networks within industrial machinery to ensure load balancing and identify overcurrents."
-        ],
-        example: {
-            problem: "Find the mesh currents I1 and I2 and the current flowing through the 6Ω resistor (R3).",
-            circuitHTML: `<div class="circuit-diagram h-64 relative">
-                            <div class="voltage-source" style="top: 20%; left: 10%;"><span>+</span>20V<span>-</span></div>
-                            <div class="resistor-symbol" style="top: 15%; left: 30%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R1=2Ω</span></div>
-                            <div class="resistor-symbol" style="top: 15%; left: 60%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R2=4Ω</span></div>
-                            <div class="voltage-source" style="top: 20%; right: 10%;"><span>+</span>10V<span>-</span></div>
-                            <div class="resistor-symbol" style="top: 45%; left: 45%; transform: rotate(90deg);"><span class="absolute -left-8 top-1/2 -translate-y-1/2">R3=6Ω</span></div>
-                            
-                            <!-- Mesh Labels (Illustrative, not part of actual circuit) -->
-                            <div class="node-label font-bold text-blue-700" style="top: 60%; left: 25%;">I1</div>
-                            <div class="node-label font-bold text-blue-700" style="top: 60%; left: 75%;">I2</div>
-
-                            <!-- Wires -->
-                            <div class="wire" style="left: 10%; top: 45%; width: 2px; height: 35%;"></div> <!-- Left vertical from source -->
-                            <div class="wire" style="left: 90%; top: 45%; width: 2px; height: 35%;"></div> <!-- Right vertical from source -->
-                            <div class="wire" style="left: 10%; top: 45%; width: 80%; height: 2px;"></div> <!-- Top horizontal -->
-                            <div class="wire" style="left: 10%; top: 80%; width: 80%; height: 2px;"></div> <!-- Bottom horizontal -->
-
-                            <div class="wire" style="left: 45%; top: 45%; width: 2px; height: 35%;"></div> <!-- Middle vertical -->
-                        </div>`,
-            solutionSteps: [
-                 {
-                    title: "Apply KVL to Mesh 1 (Left Loop)",
-                    content: `Traverse the left loop clockwise. We encounter a voltage rise (+20V) from the source. The voltage drop across R1 (2Ω) is I1 * 2. The voltage drop across R3 (6Ω), which is shared, is 6 * (I1 - I2) because I1 goes down through R3 and I2 goes up.<br>
-                    <div class="solution-box"> +20 - (I1 ⋅ 2) - 6(I1 - I2) = 0 <br> 20 - 2I1 - 6I1 + 6I2 = 0 <br> -8I1 + 6I2 = -20 <br> 8I1 - 6I2 = 20 (Equation 1) </div>`
-                },
-                {
-                    title: "Apply KVL to Mesh 2 (Right Loop)",
-                    content: `Traverse the right loop clockwise. The voltage drop across R3 (6Ω) is 6 * (I2 - I1) (because I2 goes up through R3 and I1 goes down). The voltage drop across R2 (4Ω) is I2 * 4. We traverse the 10V source from positive to negative, so it's a voltage drop (-10V).<br>
-                    <div class="solution-box"> -6(I2 - I1) - (I2 ⋅ 4) - 10 = 0 <br> -6I2 + 6I1 - 4I2 - 10 = 0 <br> 6I1 - 10I2 = 10 (Equation 2) </div>`
-                },
-                {
-                    title: "Solve the System of Equations",
-                    content: `We have two linear equations:<br>
-                    1) 8I1 - 6I2 = 20 <br>
-                    2) 6I1 - 10I2 = 10 <br>
-                    To solve using elimination, multiply Equation 1 by 5 and Equation 2 by 3:<br>
-                    40I1 - 30I2 = 100 <br>
-                    18I1 - 30I2 = 30 <br>
-                    Subtract the second new equation from the first:<br>
-                    <div class="solution-box"> (40I1 - 18I1) - (30I2 - 30I2) = 100 - 30 <br> 22I1 = 70 <br> I1 = 70/22 = 35/11 ≈ 3.182A </div>
-                    Substitute I1 back into Equation 2:<br>
-                    <div class="solution-box"> 6(35/11) - 10I2 = 10 <br> 210/11 - 10I2 = 10 <br> -10I2 = 10 - 210/11 = (110 - 210)/11 = -100/11 <br> I2 = (-100/11) / -10 = 10/11 ≈ 0.909A </div>`
-                },
-                {
-                    title: "Find Current through 6Ω Resistor (R3)",
-                    content: `The actual current through R3 is the difference between the mesh currents flowing through it. Since I1 flows downwards and I2 flows upwards (in relation to our clockwise assumption), the net current downwards is I1 - I2.<br>
-                    <div class="p-4 bg-green-100 text-green-800 rounded-lg">Current through R3: I_R3 = I1 - I2 = 3.182A - 0.909A ≈ <strong>2.273A</strong> (downwards)</div>`
-                }
-            ]
-        }
-    },
-    superposition: {
-        title: "Superposition Principle",
-        description: "The Superposition Principle states that in any linear circuit with multiple independent sources, the total current or voltage at any point is the algebraic sum of the contributions from each independent source acting alone. This simplifies complex circuits by breaking them into multiple simpler circuits.",
-        steps: [
-            "Select one independent source (voltage or current) in the circuit.",
-            "\"Turn off\" all other independent sources: replace independent voltage sources with a short circuit (0V) and independent current sources with an open circuit (0A).",
-            "Calculate the desired current or voltage (e.g., through a specific resistor) in this simplified circuit due to the single active source.",
-            "Repeat steps 1-3 for each independent source in the original circuit.",
-            "Algebraically sum all the individual contributions to find the total current or voltage at the desired point. **Crucially, pay attention to the direction of currents and polarity of voltages for each contribution.**",
-            "Real-Life Application: Superposition is useful in mixed-signal systems to analyze how both DC power supplies and AC control signals affect a sensor or motor circuit. It allows separate analysis of DC bias and AC response, which is crucial for noise reduction and multi-input control systems."
-        ],
-         example: {
-            problem: "Use the Superposition Principle to find the current flowing through the 3Ω resistor (R2). Assume current is positive downwards through R2.",
-            circuitHTML: `<div class="circuit-diagram h-64 relative">
-                            <div class="voltage-source" style="top: 20%; left: 10%;"><span>+</span>10V<span>-</span></div>
-                            <div class="resistor-symbol" style="top: 15%; left: 30%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R1=2Ω</span></div>
-                            <div class="resistor-symbol" style="top: 15%; left: 60%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R2=3Ω</span></div>
-                            <div class="current-source-symbol" style="top: 20%; right: 10%;"><span class="absolute top-0 left-1/2 -translate-x-1/2 arrow arrow-down"></span>4A</div>
-                            
-                            <!-- Wires -->
-                            <div class="wire" style="left: 10%; top: 45%; width: 2px; height: 35%;"></div> <!-- Left vertical from source -->
-                            <div class="wire" style="left: 90%; top: 45%; width: 2px; height: 35%;"></div> <!-- Right vertical from current source -->
-                            <div class="wire" style="left: 10%; top: 45%; width: 80%; height: 2px;"></div> <!-- Top horizontal -->
-                            <div class="wire" style="left: 10%; top: 80%; width: 80%; height: 2px;"></div> <!-- Bottom horizontal (ground) -->
-                        </div>`,
-            solutionSteps: [
-                {
-                    title: "Case 1: 10V Voltage Source Acting Alone",
-                    content: `Replace the 4A current source with an **open circuit**. The circuit becomes a simple series circuit with the 10V source, R1 (2Ω), and R2 (3Ω).<br>
-                    Total Equivalent Resistance: R_eq = R1 + R2 = 2Ω + 3Ω = 5Ω.<br>
-                    Total Current: I_total = V / R_eq = 10V / 5Ω = 2A.<br>
-                    Since R1 and R2 are in series, this 2A current flows through R2.<br>
-                    <div class="solution-box">Contribution 1 (I_R2,1): <strong>2A</strong> (downwards through R2).</div>`
-                },
-                {
-                    title: "Case 2: 4A Current Source Acting Alone",
-                    content: `Replace the 10V voltage source with a **short circuit**. The 4A current source's current now splits between R1 (2Ω) and R2 (3Ω), which are in parallel due to the shorted voltage source.<br>
-                    Use the Current Divider Rule to find the current through R2 (I_R2,2).<br>
-                    <div class="solution-box">I_R2,2 = I_total ⋅ (R_opposite / (R_opposite + R_current_branch)) <br> I_R2,2 = 4A ⋅ (2Ω / (2Ω + 3Ω)) = 4A ⋅ (2/5) = 1.6A </div>
-                    <div class="solution-box">Contribution 2 (I_R2,2): <strong>1.6A</strong> (downwards through R2).</div>`
-                },
-                {
-                    title: "Final Summation",
-                    content: `Since both contributions for the current through R2 are in the same direction (downwards), we add them algebraically.<br>
-                    <div class="p-4 bg-green-100 text-green-800 rounded-lg">Total Current through R2: I_R2 = I_R2,1 + I_R2,2 = 2A + 1.6A = <strong>3.6A</strong> (downwards).</div>`
-                }
-            ]
-        }
-    },
-    thevenin: {
-        title: "Thevenin's Theorem",
-        description: "Thevenin's Theorem allows any complex linear circuit to be replaced by a simpler **Thevenin equivalent circuit** as viewed from any two output terminals (a-b). This equivalent circuit consists of a single Thevenin voltage source (V_Th) in series with a single Thevenin resistance (R_Th). This drastically simplifies analyzing a load's behavior when connected to a complex source circuit.",
-        steps: [
-            "Identify the two terminals (a-b) of interest where you want to find the equivalent circuit. Remove any load connected there.",
-            "Calculate V_Th (Thevenin Voltage): This is the **open-circuit voltage** across the two terminals (a-b). Use KVL, KCL, Nodal, or Mesh analysis to find it.",
-            "Calculate R_Th (Thevenin Resistance): To find R_Th, \"turn off\" all independent sources in the original circuit (replace independent voltage sources with a short circuit, and independent current sources with an open circuit). Then, find the equivalent resistance looking back into terminals a-b.",
-            "Draw the Thevenin equivalent circuit: Place V_Th in series with R_Th. You can then connect any load back to these terminals for simplified analysis.",
-            "Real-Life Application: Thevenin's theorem is used to model real batteries as an ideal voltage source in series with an internal resistance, helping predict battery voltage drop under load. It's also vital in sensor interface design, simplifying complex sensor outputs for optimal matching with amplifier inputs, and modularizing large mechatronic systems."
-        ],
-         example: {
-            problem: "Find the Thevenin equivalent circuit for the circuit below with respect to terminals a-b.",
-            circuitHTML: `<div class="circuit-diagram h-64 relative">
-                            <div class="voltage-source" style="top: 20%; left: 10%;"><span>+</span>5V<span>-</span></div>
-                            <div class="resistor-symbol" style="top: 15%; left: 30%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R1=1Ω</span></div>
-                            <div class="resistor-symbol" style="top: 45%; left: 20%; transform: rotate(90deg);"><span class="absolute -left-8 top-1/2 -translate-y-1/2">R2=2Ω</span></div>
-                            <div class="resistor-symbol" style="top: 15%; left: 60%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R3=4Ω</span></div>
-                            
-                            <div class="node-label" style="top: 8%; right: 8%;">a</div>
-                            <div class="node-dot" style="top: 15%; right: 9.5%;"></div>
-                            <div class="node-label" style="bottom: 8%; right: 8%;">b</div>
-                            <div class="node-dot" style="bottom: 15%; right: 9.5%;"></div>
-
-                            <div class="ground-symbol-container" style="bottom: 5%; left: 49%;">
-                                <div class="line1"></div><div class="line2"></div><div class="line3"></div>
-                            </div>
-                            
-                            <!-- Wires -->
-                            <div class="wire" style="left: 10%; top: 45%; width: 2px; height: 35%;"></div> <!-- Left vertical from source -->
-                            <div class="wire" style="left: 10%; top: 45%; width: 20%; height: 2px;"></div> <!-- Left horizontal to R2/R1 junction -->
-                            <div class="wire" style="left: 30%; top: 45%; width: 40%; height: 2px;"></div> <!-- Horizontal to R3/a junction -->
-                            <div class="wire" style="right: 10%; top: 45%; width: 2px; height: 35%;"></div> <!-- Right vertical to b -->
-
-                            <div class="wire" style="top: 15%; left: 25%; width: 2px; height: 30%;"></div> <!-- R1 top to R1 bottom -->
-                            <div class="wire" style="top: 15%; left: 60%; width: 2px; height: 30%;"></div> <!-- R3 top to R3 bottom -->
-
-                            <div class="wire" style="bottom: 20%; left: 10%; width: 80%; height: 2px;"></div> <!-- Ground line -->
-                        </div>`,
-            solutionSteps: [
-                {
-                    title: "Step 1: Find V_Th (Open-Circuit Voltage across a-b)",
-                    content: `With terminals a-b open, no current flows through R3 (4Ω) since it's connected only at one end to the path and at the other end to the open circuit. Thus, the voltage at terminal 'a' will be the same as the voltage at the node above R3, and the voltage at terminal 'b' will be the same as the voltage at the node below R3, which is ground (0V). The voltage across 'a-b' is simply the voltage at 'a' relative to 'b' (ground). <br>
-                    The 5V source, R1 (1Ω), and R2 (2Ω) form a simple series voltage divider. V_Th is the voltage across R2 (2Ω).<br>
-                    <div class="solution-box"> V_Th = V_source ⋅ (R2 / (R1 + R2)) <br> V_Th = 5V ⋅ (2Ω / (1Ω + 2Ω)) = 5V ⋅ (2/3) = 10/3V ≈ 3.333V </div>`
-                },
-                {
-                    title: "Step 2: Find R_Th (Equivalent Resistance looking into a-b)",
-                    content: `Turn off the 5V independent voltage source (replace with a short circuit). Now, looking into terminals a-b, we see R3 (4Ω) is in series with the parallel combination of R1 (1Ω) and R2 (2Ω).<br>
-                    First, calculate the parallel combination of R1 and R2:<br>
-                    <div class="solution-box"> R_parallel = (R1 ⋅ R2) / (R1 + R2) = (1Ω ⋅ 2Ω) / (1Ω + 2Ω) = 2/3Ω ≈ 0.667Ω </div>
-                    Then, add R3 in series:<br>
-                    <div class="solution-box"> R_Th = R3 + R_parallel = 4Ω + 2/3Ω = 12/3Ω + 2/3Ω = 14/3Ω ≈ 4.667Ω </div>`
-                },
-                {
-                    title: "Thevenin Equivalent Circuit",
-                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">The Thevenin equivalent circuit consists of a voltage source of V_Th ≈ <strong>3.333V</strong> in series with a resistor of R_Th ≈ <strong>4.667Ω</strong>.</div>`
-                },
-                {
-                    title: "Real-Life Application Example: Battery Modeling",
-                    content: `A real battery is not an ideal voltage source; it has an internal resistance. Thevenin's theorem allows us to model a real battery as an ideal voltage source (V_Th, the open-circuit voltage when new) in series with an internal resistance (R_Th). This model helps predict how the battery's terminal voltage will drop under different loads, giving a more accurate representation of its real-world performance.`
-                }
-            ]
-        }
-    },
-    norton: {
-        title: "Norton's Theorem",
-        description: "Norton's Theorem simplifies any complex linear circuit to an equivalent circuit containing a single **Norton current source (I_N)** in parallel with a single **Norton resistance (R_N)** as viewed from any two output terminals (a-b). It is particularly useful for analyzing loads connected in parallel or when dealing with current-output devices. Importantly, R_N is always equal to R_Th.",
-        steps: [
-            "Identify the two terminals (a-b) of interest and remove any load connected there.",
-            "Calculate I_N (Norton Current): This is the **short-circuit current** that flows directly between terminals a-b if they were directly shorted together. Use KVL, KCL, Nodal, or Mesh analysis to find this current.",
-            "Calculate R_N (Norton Resistance): This is identical to R_Th from Thevenin's Theorem. \"Turn off\" all independent sources (short voltage sources, open current sources) and find the equivalent resistance looking back into terminals a-b. (R_N = R_Th).",
-            "Draw the Norton equivalent circuit: Place I_N in parallel with R_N. Any load can then be connected in parallel with this equivalent circuit for simplified analysis.",
-            "Relationship to Thevenin: These two theorems are duals and directly interconvertible: V_Th = I_N ⋅ R_N and I_N = V_Th / R_Th. This conversion flexibility is powerful in circuit analysis."
-        ],
-         example: {
-            problem: "Find the Norton equivalent circuit for the circuit below with respect to terminals a-b.",
-            circuitHTML: `<div class="circuit-diagram h-64 relative">
-                            <div class="voltage-source" style="top: 20%; left: 10%;"><span>+</span>20V<span>-</span></div>
-                            <div class="resistor-symbol" style="top: 15%; left: 30%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R1=10Ω</span></div>
-                            <div class="resistor-symbol" style="top: 45%; left: 20%; transform: rotate(90deg);"><span class="absolute -left-8 top-1/2 -translate-y-1/2">R2=5Ω</span></div>
-                            <div class="current-source-symbol" style="top: 55%; left: 50%;"><span class="absolute top-0 left-1/2 -translate-x-1/2 arrow arrow-up"></span>2A</div>
-                            <div class="resistor-symbol" style="top: 15%; left: 60%;"><span class="absolute -top-4 left-1/2 -translate-x-1/2">R3=15Ω</span></div>
-                            
-                            <div class="node-label" style="top: 8%; right: 8%;">a</div>
-                            <div class="node-dot" style="top: 15%; right: 9.5%;"></div>
-                            <div class="node-label" style="bottom: 8%; right: 8%;">b</div>
-                            <div class="node-dot" style="bottom: 15%; right: 9.5%;"></div>
-
-                            <div class="ground-symbol-container" style="bottom: 5%; left: 49%;">
-                                <div class="line1"></div><div class="line2"></div><div class="line3"></div>
-                            </div>
-                            
-                            <!-- Wires -->
-                            <div class="wire" style="left: 10%; top: 45%; width: 2px; height: 35%;"></div> <!-- Left vertical from source -->
-                            <div class="wire" style="left: 10%; top: 45%; width: 20%; height: 2px;"></div> <!-- Left horizontal to R2/R1 junction -->
-                            <div class="wire" style="left: 30%; top: 45%; width: 20%; height: 2px;"></div> <!-- Horizontal to current source -->
-                            <div class="wire" style="left: 50%; top: 45%; width: 20%; height: 2px;"></div> <!-- Horizontal from current source to R3 -->
-                            <div class="wire" style="right: 10%; top: 45%; width: 2px; height: 35%;"></div> <!-- Right vertical to b -->
-
-                            <div class="wire" style="top: 15%; left: 25%; width: 2px; height: 30%;"></div> <!-- R1 top to R1 bottom -->
-                            <div class="wire" style="top: 15%; left: 60%; width: 2px; height: 30%;"></div> <!-- R3 top to R3 bottom -->
-
-                            <div class="wire" style="bottom: 20%; left: 10%; width: 80%; height: 2px;"></div> <!-- Ground line -->
-                        </div>`,
-            solutionSteps: [
-                 {
-                    title: "Step 1: Find R_N (Norton Resistance)",
-                    content: `The Norton Resistance (R_N) is identical to the Thevenin Resistance (R_Th). To find it, turn off all independent sources: The 20V voltage source becomes a short circuit. The 2A current source becomes an open circuit. <br>
-                    Looking into terminals a-b, R3 (15Ω) is in series with the parallel combination of R1 (10Ω) and R2 (5Ω). <br>
-                    First, calculate the parallel combination of R1 and R2: <br>
-                    <div class="solution-box"> R_parallel = (R1 ⋅ R2) / (R1 + R2) = (10Ω ⋅ 5Ω) / (10Ω + 5Ω) = 50/15Ω = 10/3Ω ≈ 3.333Ω </div>
-                    Then, add R3 in series: <br>
-                    <div class="solution-box"> R_N = R3 + R_parallel = 15Ω + 10/3Ω = 45/3Ω + 10/3Ω = 55/3Ω ≈ 18.333Ω </div>`
-                },
-                {
-                    title: "Step 2: Find I_N (Short-Circuit Current across a-b)",
-                    content: `Place a short circuit directly across terminals a-b. This short circuit bypasses R3 (15Ω), meaning all current that would normally flow through R3 now flows through the short. <br>
-                    The current through the short (I_N) is the sum of currents contributed by the 20V source and the 2A source. <br>
-                    Current from 20V source branch: The 20V source, R1 (10Ω), and R2 (5Ω) form a series path. The current here is I = 20V / (10Ω + 5Ω) = 20V / 15Ω = 4/3A ≈ 1.333A. This current flows into the short at 'a'. <br>
-                    Current from 2A source: The 2A current source also flows directly towards the short. <br>
-                    <div class="solution-box"> I_N = (Current from 20V source) + (Current from 2A source) <br> I_N = 4/3A + 2A = 4/3A + 6/3A = 10/3A ≈ 3.333A </div>`
-                },
-                 {
-                    title: "Norton Equivalent Circuit",
-                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">The Norton equivalent circuit consists of a current source of I_N ≈ <strong>3.333A</strong> in parallel with a resistor of R_N ≈ <strong>18.333Ω</strong>.</div>`
-                }
-            ]
-        }
-    }
-};
-
-const practiceProblems = [
-    {
-        id: 1,
-        title: "Nodal Analysis Problem",
-        problemHTML: `Consider a circuit with a 12V voltage source connected to a 4Ω resistor (R1). This branches into two paths: one with a 6Ω resistor (R2) and another with an 8Ω resistor (R3) in series with a 2A current source flowing towards the ground. All components connect to a common ground. Using Nodal Analysis, find the voltage at the node between R1 and the parallel branches.`,
-        answerHTML: `<b>Solution:</b><br>
-        Let V1 be the node voltage. <br>
-        Apply KCL at V1: (V1 - 12)/4 + V1/6 + (V1 - 0)/8 - 2 = 0 (assuming current source flows out, so it's -2 if it flows into the node)<br>
-        Multiply by LCM (24): 6(V1 - 12) + 4V1 + 3V1 - 48 = 0 <br>
-        6V1 - 72 + 4V1 + 3V1 - 48 = 0 <br>
-        13V1 = 120 <br>
-        <div class="solution-box">V1 = 120/13 ≈ 9.23V</div>`
-    },
-    {
-        id: 2,
-        title: "Mesh Analysis Problem",
-        problemHTML: `In a two-mesh circuit: Mesh 1 has a 15V voltage source, a 5Ω resistor (R1), and a shared 10Ω resistor (R2). Mesh 2 has the shared 10Ω resistor (R2) and a 20Ω resistor (R3), and a 10V voltage source (positive at top). Find the mesh currents I1 and I2.`,
-        answerHTML: `<b>Solution:</b><br>
-        KVL Mesh 1 (clockwise): +15V - (I1 * 5Ω) - 10Ω * (I1 - I2) = 0 => 15 - 5I1 - 10I1 + 10I2 = 0 => 15I1 - 10I2 = 15 (Eq 1)<br>
-        KVL Mesh 2 (clockwise): -10Ω * (I2 - I1) - (I2 * 20Ω) - 10V = 0 => -10I2 + 10I1 - 20I2 - 10 = 0 => 10I1 - 30I2 = 10 (Eq 2)<br>
-        From Eq 2: I1 = 1 + 3I2. Substitute into Eq 1:<br>
-        15(1 + 3I2) - 10I2 = 15<br>
-        15 + 45I2 - 10I2 = 15<br>
-        35I2 = 0 => I2 = 0A<br>
-        Substitute I2 back: I1 = 1 + 3(0) => I1 = 1A<br>
-        <div class="solution-box">I1 = 1A, I2 = 0A</div>`
-    },
-    {
-        id: 3,
-        title: "Superposition Problem",
-        problemHTML: `A circuit has a 6V voltage source and a 3A current source. Both are connected to a parallel combination of a 2Ω resistor (R1) and a 4Ω resistor (R2). Find the current through the 4Ω resistor (R2) using Superposition.`,
-        answerHTML: `<b>Solution:</b><br>
-        Case 1 (6V source active, 3A source open):<br>
-        Current through R2 = 6V / (2Ω + 4Ω) = 6V / 6Ω = 1A.<br>
-        Case 2 (3A source active, 6V source shorted):<br>
-        R1 and R2 are in parallel. Using Current Divider:<br>
-        I_R2 = 3A * (2Ω / (2Ω + 4Ω)) = 3A * (2/6) = 3A * (1/3) = 1A.<br>
-        Total current through R2 = 1A (from 6V) + 1A (from 3A) = 2A.<br>
-        <div class="solution-box">Current through 4Ω resistor = 2A</div>`
-    },
-    {
-        id: 4,
-        title: "Thevenin & Norton Equivalence",
-        problemHTML: `If a Thevenin equivalent circuit has V_Th = 10V and R_Th = 5Ω, what is its equivalent Norton current (I_N) and Norton resistance (R_N)?`,
-        answerHTML: `<b>Solution:</b><br>
-        R_N = R_Th = 5Ω.<br>
-        I_N = V_Th / R_Th = 10V / 5Ω = 2A.<br>
-        <div class="solution-box">I_N = 2A, R_N = 5Ω</div>`
-    }
-];
-
-const quizQuestions = [
-    {
-        id: 1,
-        question: "Which circuit analysis technique is primarily based on Kirchhoff's Current Law (KCL)?",
-        options: ["Mesh Analysis", "Nodal Analysis", "Superposition Principle", "Thevenin's Theorem"],
-        answer: "Nodal Analysis",
-        explanation: "Nodal analysis focuses on finding unknown node voltages by applying KCL at each non-reference node."
-    },
-    {
-        id: 2,
-        question: "When applying the Superposition Principle, how do you 'turn off' an independent voltage source?",
-        options: ["Replace it with an open circuit", "Replace it with a short circuit", "Replace it with a resistor equal to its internal resistance", "Reverse its polarity"],
-        answer: "Replace it with a short circuit",
-        explanation: "Turning off a voltage source means setting its voltage to zero, which is equivalent to a short circuit."
-    },
-    {
-        id: 3,
-        question: "What is the relationship between Thevenin resistance (R_Th) and Norton resistance (R_N) for the same circuit?",
-        options: ["R_N = 1 / R_Th", "R_N = R_Th", "R_N = R_Th / 2", "R_N = R_Th ⋅ V_Th"],
-        answer: "R_N = R_Th",
-        explanation: "The equivalent resistance looking back into the terminals is the same for both Thevenin and Norton equivalent circuits."
-    },
-    {
-        id: 4,
-        question: "Which analysis technique is best suited for planar circuits with many voltage sources and series components?",
-        options: ["Nodal Analysis", "Superposition Principle", "Mesh Analysis", "Current Divider Rule"],
-        answer: "Mesh Analysis",
-        explanation: "Mesh analysis directly uses KVL around loops, which is efficient for circuits with many series elements and voltage sources."
-    }
-];
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    const navLinks = document.querySelectorAll('.nav-link');
-    const appSections = document.querySelectorAll('.app-section');
-    const techniqueTabs = document.querySelectorAll('.technique-tab');
-    const techniqueContentContainer = document.getElementById('technique-content');
-    let sandboxChart = null;
-
-    // Main navigation
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            const targetId = link.dataset.target;
-            appSections.forEach(section => section.classList.toggle('hidden', section.id !== targetId));
-            navLinks.forEach(l => l.classList.remove('font-bold', 'text-blue-600'));
-            link.classList.add('font-bold', 'text-blue-600');
-        });
-    });
-
-    // Technique tabs
-    techniqueTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const techniqueId = tab.dataset.technique;
-            techniqueTabs.forEach(t => t.classList.remove('tab-active'));
-            tab.classList.add('tab-active');
-            renderTechnique(techniqueId);
-        });
-    });
-
-    function renderTechnique(techniqueId) {
-        const data = appData[techniqueId];
-        if (!data) return;
-
-        let stepsHTML = data.steps.map(step => `<li class="mb-2">${step}</li>`).join('');
-        let exampleStepsHTML = data.example.solutionSteps.map((step, index) => `
-            <div id="step-${index}" class="step-content border-t pt-4 mt-4">
-                <h4 class="font-semibold text-lg text-blue-700">${step.title}</h4>
-                <div class="text-gray-700 mt-2">${step.content}</div>
-            </div>
-        `).join('');
-
-        techniqueContentContainer.innerHTML = `
-            <h3 class="text-2xl font-bold text-gray-800">${data.title}</h3>
-            <p class="mt-2 mb-4 text-gray-600">${data.description}</p>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div>
-                    <h4 class="text-xl font-semibold mb-2">General Steps & Real-Life Application</h4>
-                    <ul class="list-decimal list-inside text-gray-700 space-y-1">${stepsHTML}</ul>
-                </div>
-                <div>
-                    <h4 class="text-xl font-semibold mb-2">Interactive Example: ${data.example.problem}</h4>
-                    ${data.example.circuitHTML || ''}
-                    <div id="example-steps-container">${exampleStepsHTML}</div>
-                    <div class="mt-4 flex space-x-2">
-                         <button id="next-step-btn" class="btn">Start</button>
-                         <button id="reset-steps-btn" class="btn btn-secondary">Reset</button>
-                    </div>
-                </div>
-            </div>`;
-        
-        setupInteractiveExample();
-    }
-    
-    let currentStep = -1;
-    function setupInteractiveExample() {
-        const nextBtn = document.getElementById('next-step-btn');
-        const resetBtn = document.getElementById('reset-steps-btn');
-        const steps = document.querySelectorAll('.step-content');
-        currentStep = -1;
-
-        const showNextStep = () => {
-            if (currentStep >= 0) {
-                steps[currentStep].classList.remove('visible');
-            }
-            currentStep++;
-            if (currentStep < steps.length) {
-                steps[currentStep].classList.add('visible');
-                nextBtn.textContent = 'Next Step';
-            }
-            if (currentStep >= steps.length - 1) {
-                nextBtn.disabled = true;
-                nextBtn.textContent = 'Finished';
-            }
+          );
         };
 
-        const resetSteps = () => {
-            steps.forEach(step => step.classList.remove('visible'));
-            currentStep = -1;
-            nextBtn.disabled = false;
-            nextBtn.textContent = 'Start';
+        // Resistor Combinations Sandbox Component
+        const ResistorCombinationsSandbox = () => {
+          const [r1, setR1] = useState('');
+          const [r2, setR2] = useState('');
+          const [r3, setR3] = useState('');
+          const [seriesReq, setSeriesReq] = useState('');
+          const [parallelReq, setParallelReq] = useState('');
+          const [message, setMessage] = useState('');
+
+          const calculateCombinations = () => {
+            setMessage('');
+            const valR1 = parseFloat(r1);
+            const valR2 = parseFloat(r2);
+            const valR3 = parseFloat(r3);
+
+            let validInputs = 0;
+            if (!isNaN(valR1)) validInputs++;
+            if (!isNaN(valR2)) validInputs++;
+            if (!isNaN(valR3)) validInputs++;
+
+            if (validInputs < 1) {
+              setMessage("Please enter at least one resistor value.");
+              setSeriesReq('');
+              setParallelReq('');
+              return;
+            }
+
+            // Series Calculation
+            let currentSeriesReq = 0;
+            if (!isNaN(valR1)) currentSeriesReq += valR1;
+            if (!isNaN(valR2)) currentSeriesReq += valR2;
+            if (!isNaN(valR3)) currentSeriesReq += valR3;
+            setSeriesReq(currentSeriesReq.toFixed(2));
+
+            // Parallel Calculation
+            let reciprocalSum = 0;
+            if (!isNaN(valR1) && valR1 !== 0) reciprocalSum += (1 / valR1);
+            if (!isNaN(valR2) && valR2 !== 0) reciprocalSum += (1 / valR2);
+            if (!isNaN(valR3) && valR3 !== 0) reciprocalSum += (1 / valR3);
+
+            if (reciprocalSum > 0) {
+              setParallelReq((1 / reciprocalSum).toFixed(2));
+            } else {
+              setParallelReq('N/A (zero or invalid resistors)');
+            }
+          };
+
+          const resetFields = () => {
+            setR1('');
+            setR2('');
+            setR3('');
+            setSeriesReq('');
+            setParallelReq('');
+            setMessage('');
+          };
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Resistor Combinations Sandbox</h2>
+              <p className="text-gray-700 mb-4">
+                Enter up to three resistor values to calculate their equivalent resistance in series and parallel.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="flex flex-col">
+                  <label htmlFor="r1" className="text-lg font-medium text-gray-700 mb-2">Resistor 1 (Ω)</label>
+                  <input
+                    type="number"
+                    id="r1"
+                    value={r1}
+                    onChange={(e) => setR1(e.target.value)}
+                    placeholder="Enter R1"
+                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label htmlFor="r2" className="text-lg font-medium text-gray-700 mb-2">Resistor 2 (Ω)</label>
+                  <input
+                    type="number"
+                    id="r2"
+                    value={r2}
+                    onChange={(e) => setR2(e.target.value)}
+                    placeholder="Enter R2"
+                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label htmlFor="r3" className="text-lg font-medium text-gray-700 mb-2">Resistor 3 (Ω)</label>
+                  <input
+                    type="number"
+                    id="r3"
+                    value={r3}
+                    onChange={(e) => setR3(e.target.value)}
+                    placeholder="Enter R3"
+                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-4 mb-4">
+                <button
+                  onClick={calculateCombinations}
+                  className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                >
+                  Calculate
+                </button>
+                <button
+                  onClick={resetFields}
+                  className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                >
+                  Reset
+                </button>
+              </div>
+
+              {message && (
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-md relative" role="alert">
+                  <span className="block sm:inline">{message}</span>
+                </div>
+              )}
+
+              <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 className="text-xl font-semibold text-gray-800 mb-3">Results:</h3>
+                <div className="space-y-2">
+                  <p className="text-lg text-gray-700">
+                    <span className="font-medium">Equivalent Series Resistance (Req):</span> <span className="font-bold text-green-700">{seriesReq} Ω</span>
+                  </p>
+                  <p className="text-lg text-gray-700">
+                    <span className="font-medium">Equivalent Parallel Resistance (Req):</span> <span className="font-bold text-blue-700">{parallelReq} Ω</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
         };
 
-        nextBtn.addEventListener('click', showNextStep);
-        resetBtn.addEventListener('click', resetSteps);
-    }
-    
-    function renderPracticeProblems() {
-        const container = document.getElementById('practice-problems-container');
-        container.innerHTML = practiceProblems.map(p => `
-            <div class="border rounded-lg p-4">
-                <h4 class="text-lg font-semibold">${p.title}</h4>
-                <p class="mt-2 text-gray-700">${p.problemHTML}</p>
-                <div id="answer-${p.id}" class="mt-4 p-4 bg-blue-50 rounded hidden">
-                   ${p.answerHTML}
+        // Practice Problems Component
+        const PracticeProblems = () => {
+          const [activeTab, setActiveTab] = useState('homework'); // Only homework for now
+
+          const homeworkQuestions = [
+            {
+              id: 1,
+              type: 'calculation',
+              question: 'Series Circuit: You have three resistors with values `R1=100 Ω`, `R2=220 Ω`, and `R3=470 Ω`. If they are connected in series to a 12V power supply: What is the equivalent resistance of the series combination? What is the total current flowing from the power supply? What is the voltage drop across `R2`?',
+              subQuestions: [
+                { label: 'Equivalent Resistance (Ω)', key: 'req', expected: '790' },
+                { label: 'Total Current (A)', key: 'itotal', expected: '0.0152' },
+                { label: 'Voltage drop across R2 (V)', key: 'v2', expected: '3.34' }
+              ],
+              explanation: 'Equivalent Resistance: `Req = 100 + 220 + 470 = 790Ω`. Total Current: `IT = 12V / 790Ω ≈ 0.01519A` (rounded to 0.0152A). Voltage Drop across R2: `V2 = IT * R2 = 0.01519A * 220Ω ≈ 3.34V`.'
+            },
+            {
+              id: 2,
+              type: 'calculation',
+              question: 'Parallel Circuit: Let\'s take `R1=100 Ω` and `R2=220 Ω` and connect them in parallel to a 9V power supply. What is the equivalent resistance of the parallel combination? What is the total current flowing from the power supply? What is the current flowing through `R1`?',
+              subQuestions: [
+                { label: 'Equivalent Resistance (Ω)', key: 'req_parallel', expected: '68.75' },
+                { label: 'Total Current (A)', key: 'itotal_parallel', expected: '0.131' },
+                { label: 'Current through R1 (A)', key: 'i1', expected: '0.09' }
+              ],
+              explanation: 'Equivalent Resistance: `Req = (100 * 220) / (100 + 220) = 22000 / 320 = 68.75Ω`. Total Current: `IT = 9V / 68.75Ω ≈ 0.1309A` (rounded to 0.131A). Current through R1: `I1 = 9V / 100Ω = 0.09A`.'
+            },
+            {
+              id: 3,
+              type: 'text',
+              question: 'KCL Application: For the circuit with a 10V source, `R1=5Ω` in series, then parallel `R2=10Ω` and `R3=15Ω`. At the node where the total current `IT` splits into `I2` (through `R2`) and `I3` (through `R3`), write the KCL equation.',
+              answer: 'KCL Equation: `IT = I2 + I3` (Sum of currents entering equals sum of currents leaving).'
+            },
+            {
+              id: 4,
+              type: 'text',
+              question: 'KVL Application: For the same circuit (10V source, `R1=5Ω` in series, then parallel `R2=10Ω` and `R3=15Ω`), write the KVL equation for the loop containing the voltage source (`VS`), `R1`, and `R2`. Assume current direction for `IT` from positive terminal of `VS` through `R1` to the parallel branch.',
+              answer: 'KVL Equation (traversing clockwise): `VS - IT*R1 - I2*R2 = 0`.'
+            },
+            {
+              id: 5,
+              type: 'calculation',
+              question: 'Calculate for the circuit (10V source, `R1=5Ω` in series, then parallel `R2=10Ω` and `R3=15Ω`): Equivalent Resistance of R2 and R3 in parallel (Rp)? Total Equivalent Resistance of the entire circuit (Req_total)? Total Current (IT)?',
+              subQuestions: [
+                { label: 'Rp (Ω)', key: 'rp', expected: '6' },
+                { label: 'Req_total (Ω)', key: 'req_total', expected: '11' },
+                { label: 'IT (A)', key: 'it', expected: '0.909' }
+              ],
+              explanation: 'Equivalent Resistance of R2 and R3 in parallel: `Rp = (10 * 15) / (10 + 15) = 150 / 25 = 6Ω`. Total Equivalent Resistance: `Req_total = R1 + Rp = 5Ω + 6Ω = 11Ω`. Total Current: `IT = VS / Req_total = 10V / 11Ω ≈ 0.909A`.'
+            },
+            {
+              id: 6,
+              type: 'text',
+              question: 'Capacitor Behavior: You have a large capacitor (e.g., 1000μF) connected in series with a resistor and a switch to a DC battery. Immediately after closing the switch, what is the approximate current through the circuit? Why? After a very long time (when the circuit reaches "steady state"), what is the current through the circuit? Why?',
+              answer: 'Immediately after closing the switch: The current will be maximum (limited only by the resistor and battery voltage, following Ohm\'s Law I=V/R). Reason: An uncharged capacitor initially acts like a short circuit (zero resistance) because it readily accepts current. After a very long time (steady state): The current will be zero. Reason: Once the capacitor is fully charged to the battery voltage, it acts like an open circuit, blocking DC current.'
+            },
+            {
+              id: 7,
+              type: 'text',
+              question: 'Inductor Behavior: You have an ideal inductor (e.g., 100 mH) connected in series with a resistor and a switch to a DC battery. Immediately after closing the switch, what is the approximate current through the circuit? Why? After a very long time (when the circuit reaches "steady state"), what is the voltage drop across the inductor? Why?',
+              answer: 'Immediately after closing the switch: The current will be zero. Reason: An inductor resists sudden changes in current, acting like an open circuit initially. After a very long time (steady state): The voltage drop across the inductor will be zero. Reason: In steady-state DC, the current through the inductor is constant, and an ideal inductor acts like a short circuit (V=L(dI/dt), if dI/dt=0, then V=0).'
+            },
+            {
+              id: 8,
+              type: 'text',
+              question: 'Breadboard Layout: Imagine you need to build a simple LED circuit on a breadboard with a 5V DC power supply, one red LED, and one 220 Ω resistor. Describe how you would lay out these components on a standard breadboard, including the power and ground connections.',
+              answer: '1. Power Connections: Connect +5V supply to a vertical bus strip (e.g., red line) and GND to an adjacent vertical bus strip (e.g., blue line). 2. Resistor Placement: Place one leg of the 220Ω resistor into a hole in a terminal strip (e.g., row 10, column A) and the other leg into a hole in a different horizontal row (e.g., row 15, column A). 3. LED Placement: Connect the anode (longer leg) of the LED to the same row as the second leg of the resistor (e.g., row 15, column B). Place the cathode (shorter leg) into a hole in a new horizontal row (e.g., row 20, column B). 4. Connecting to Power and Ground: Use a short jumper wire to connect the first leg of the resistor (e.g., row 10, column A) to the +5V bus strip. Use another short jumper wire to connect the cathode of the LED (e.g., row 20, column B) to the GND bus strip. Current flows from +5V, through the resistor, through the LED, to GND.'
+            }
+          ];
+
+          const [homeworkAnswers, setHomeworkAnswers] = useState({});
+
+          const handleHomeworkChange = (id, key, value) => {
+            setHomeworkAnswers(prev => ({
+              ...prev,
+              [id]: {
+                ...(prev[id] || {}),
+                [key]: value
+              }
+            }));
+          };
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
+
+              <div className="flex mb-6 space-x-4">
+                <button
+                  onClick={() => setActiveTab('homework')}
+                  className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+                    activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Homework Questions
+                </button>
+              </div>
+
+              {activeTab === 'homework' && (
+                <div>
+                  <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-blue-500"/>
+                    Homework Questions
+                  </h3>
+                  <p className="text-gray-700 mb-4">
+                    Instructions: Show all work and steps clearly. Include units in your final answers.
+                  </p>
+                  {homeworkQuestions.map((q) => (
+                    <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+                      {q.type === 'text' ? (
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                          placeholder="Type your answer here..."
+                          value={homeworkAnswers[q.id]?.answer || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, 'answer', e.target.value)}
+                        ></textarea>
+                      ) : (
+                        <div className="space-y-3">
+                          {q.subQuestions.map(sq => (
+                            <div key={sq.key} className="flex flex-col">
+                              <label htmlFor={`hw-${q.id}-${sq.key}`} className="text-md text-gray-700 mb-1">{sq.label}</label>
+                              <input
+                                type="number"
+                                id={`hw-${q.id}-${sq.key}`}
+                                className="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                value={homeworkAnswers[q.id]?.[sq.key] || ''}
+                                onChange={(e) => handleHomeworkChange(q.id, sq.key, e.target.value)}
+                                placeholder={`Enter ${sq.label}`}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                        <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                        <div className="mt-2 text-indigo-700">
+                          <p>{q.explanation}</p>
+                        </div >
+                      </details>
+                    </div>
+                  ))}
                 </div>
-                <button data-answer-id="${p.id}" class="toggle-answer-btn btn mt-4 text-sm">Show Answer</button>
+              )}
             </div>
-        `).join('');
+          );
+        };
 
-        document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const answerId = btn.dataset.answerId;
-                const answerEl = document.getElementById(`answer-${answerId}`);
-                answerEl.classList.toggle('hidden');
-                btn.textContent = answerEl.classList.contains('hidden') ? 'Show Answer' : 'Hide Answer';
-            });
-        });
-    }
 
-    function renderQuiz() {
-        const container = document.getElementById('quiz-container');
-        container.innerHTML = quizQuestions.map((q, index) => `
-            <div class="border rounded-lg p-4">
-                <h4 class="text-lg font-semibold mb-3">Q${index + 1}: ${q.question}</h4>
-                <div class="space-y-2">
-                    ${q.options.map((option, optIndex) => `
-                        <label class="block">
-                            <input type="radio" name="quiz-q${q.id}" value="${option}" class="mr-2">
-                            ${option}
-                        </label>
-                    `).join('')}
-                </div>
-                <button data-question-id="${q.id}" class="check-quiz-btn btn mt-4 text-sm">Check Answer</button>
-                <div id="quiz-feedback-${q.id}" class="mt-3 text-sm font-semibold"></div>
+        // Main App Component
+        const App = () => {
+          const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
+
+          return (
+            <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+              <header className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+                  Mechatronics 1 Study Guide
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 2: Circuit Analysis & Components</p>
+                <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                    <Home className="w-5 h-5 mr-2" />
+                    Back to Course Hub
+                </a>
+              </header>
+
+              <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+                <button
+                  onClick={() => setActiveSection('review')}
+                  className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+                >
+                  <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Concept Review</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('sandbox')}
+                  className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+                >
+                  <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Interactive Sandbox</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('practice')}
+                  className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Practice Problems</span>
+                </button>
+              </nav>
+
+              <main className="container">
+                {activeSection === 'review' && <ConceptReview />}
+                {activeSection === 'sandbox' && <ResistorCombinationsSandbox />}
+                {activeSection === 'practice' && <PracticeProblems />}
+              </main>
+
+              <footer className="text-center text-gray-500 text-sm mt-12">
+                <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+              </footer>
             </div>
-        `).join('');
+          );
+        };
 
-        document.querySelectorAll('.check-quiz-btn').forEach(btn => {
-            btn.addEventListener('click', (event) => {
-                const questionId = btn.dataset.questionId;
-                const selectedOption = document.querySelector(`input[name="quiz-q${questionId}"]:checked`);
-                const feedbackEl = document.getElementById(`quiz-feedback-${questionId}`);
-                const question = quizQuestions.find(q => q.id == questionId);
-
-                if (!selectedOption) {
-                    feedbackEl.innerHTML = `<span class="text-yellow-600">Please select an option.</span>`;
-                    return;
-                }
-
-                if (selectedOption.value === question.answer) {
-                    feedbackEl.innerHTML = `<span class="text-green-600">Correct!</span> ${question.explanation}`;
-                } else {
-                    feedbackEl.innerHTML = `<span class="text-red-600">Incorrect.</span> The correct answer is: <strong>${question.answer}</strong>. ${question.explanation}`;
-                }
-            });
-        });
-    }
-
-    // Sandbox logic
-    const sandboxBtns = document.querySelectorAll('.sandbox-btn');
-    const sandboxSolutionEl = document.getElementById('sandbox-solution');
-    const sandboxChartCtx = document.getElementById('sandboxChart').getContext('2d');
-    
-    function updateSandboxChart(label, value) {
-        if (!sandboxChart) {
-            sandboxChart = new Chart(sandboxChartCtx, {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Current through 6Ω Resistor (A)',
-                        data: [],
-                        backgroundColor: [
-                            'rgba(59, 130, 246, 0.6)',
-                            'rgba(22, 163, 74, 0.6)'
-                        ],
-                        borderColor: [
-                            'rgba(59, 130, 246, 1)',
-                            'rgba(22, 163, 74, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Current (A)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: 'Verification Chart: 6Ω Resistor Current'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    return context[0].label;
-                                },
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    label += context.parsed.x.toFixed(3) + 'A';
-                                    return label;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        const existingLabelIndex = sandboxChart.data.labels.indexOf(label);
-        if(existingLabelIndex === -1) {
-            sandboxChart.data.labels.push(label);
-            sandboxChart.data.datasets[0].data.push(value);
-            sandboxChart.update();
-        }
-    }
-
-    const sandboxSolutions = {
-        mesh: `
-            <h4 class="font-semibold text-lg text-blue-700 mb-2">Mesh Analysis Solution for Sandbox Circuit</h4>
-            <p><strong>Result:</strong> I_6Ω ≈ 2.273A (downwards)</p>
-            <p class="text-sm mt-2"><strong>Steps Overview:</strong> Mesh currents I1 (left loop) and I2 (right loop) are assigned clockwise. KVL equations are written for each mesh, summing voltage rises/drops. The system of two linear equations is then solved for I1 and I2. Finally, the current through the 6Ω resistor (R3) is found as the algebraic difference of I1 and I2 (I1 - I2, assuming I1 acts downwards and I2 acts upwards through R3).</p>
-        `,
-        superposition: `
-            <h4 class="font-semibold text-lg text-blue-700 mb-2">Superposition Solution for Sandbox Circuit</h4>
-            <p><strong>Result:</strong> I_6Ω ≈ 2.273A (downwards)</p>
-            <p class="text-sm mt-2"><strong>Steps Overview:</strong> The circuit is analyzed twice, once with the 20V source active (10V source shorted) and once with the 10V source active (20V source shorted). For each case, the current through the 6Ω resistor is calculated. The individual contributions are then algebraically summed (paying attention to direction) to get the total current. This method demonstrates how each source contributes independently to the overall response.</p>
-        `,
-    };
-    
-    sandboxBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const method = btn.dataset.method;
-            sandboxSolutionEl.innerHTML = sandboxSolutions[method];
-            // The value 2.273A is the correct answer for the 6Ω resistor current in the sandbox circuit
-            updateSandboxChart(method.charAt(0).toUpperCase() + method.slice(1) + ' Analysis', 2.273);
-        });
-    });
-
-    // Initial setup
-    document.querySelector('.nav-link[data-target="techniques"]').click();
-    document.querySelector('.technique-tab[data-technique="nodal"]').click();
-    renderPracticeProblems();
-    renderQuiz();
-});
-</script>
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 </body>
 </html>
