@@ -3,361 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 12 - DAQ & Signal Conditioning</title>
+    <title>Mechatronics 1: Week 12 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chosen Palette: Calm Harmony -->
-    <!-- Application Structure Plan: The application is structured as an interactive dashboard with five tabs: Introduction, ADC & Sampling Lab, Signal Conditioning Sandbox, Applications, and Knowledge Check. This modular, task-oriented design encourages exploration over linear reading. The core of the experience lies in the two interactive labs ('ADC & Sampling' and 'Signal Conditioning'), which allow users to manipulate variables (like ADC bits, sampling rate, gain) and see the immediate graphical results. This hands-on approach is far more effective for teaching abstract concepts like quantization, aliasing, and amplification than static text and images. The other sections provide conceptual context and reinforcement. -->
-    <!-- Visualization & Content Choices: 
-        - ADC Resolution & Quantization -> Goal: Understand how bits affect precision -> Viz: Chart.js Line Chart with a stepped line overlay -> Interaction: A slider for 'ADC Resolution' dynamically updates the number of quantization steps in the chart. A text output displays the calculated voltage resolution. Justification: Visually demonstrates the trade-off between bits and precision in a clear, interactive manner.
-        - Sampling & Aliasing -> Goal: Understand the Nyquist theorem -> Viz: The same Chart.js chart with a scatter plot overlay for samples -> Interaction: A slider for 'Sampling Rate' updates the sample points. When the rate drops below 2x the signal frequency, the UI displays a warning and calculates/shows the alias frequency. Justification: This is the most intuitive way to teach aliasing. Users can "cause" the error themselves and see the mathematical result, creating a powerful learning moment.
-        - Signal Conditioning -> Goal: Understand amplification and filtering -> Viz: A Chart.js Line Chart showing a "raw" (noisy) signal and a "conditioned" signal -> Interaction: Toggles/sliders for 'Amplify' and 'Filter' redraw the conditioned signal. Justification: Directly visualizes the "before and after" effect of signal conditioning techniques.
-        - Knowledge Check -> Goal: Reinforce learning -> Viz: Interactive cards -> Interaction: A "Reveal Answer" button toggles visibility. Justification: Promotes active recall over passive reading.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
-        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
-        .nav-button.active, .nav-button:hover { color: #059669; border-bottom-color: #059669; }
-        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .content-section { display: none; }
-        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-        .question-card .answer { display: none; }
-        .slider-label { font-size: 0.875rem; font-weight: 500; color: #57534e; }
-        .slider-value { font-family: 'Roboto Mono', monospace; font-size: 0.9rem; background-color: #e7e5e4; padding: 0.1rem 0.5rem; border-radius: 0.25rem; }
-        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 45vh; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
+        }
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
+        }
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
+        }
+        .nav-button svg {
+          margin-bottom: 0.25rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
+        }
+        .formula-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border-left: 4px solid #38bdf8; /* Blue border on left */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 1rem;
+            color: #0c4a6e; /* Darker blue text */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="antialiased">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 12: DAQ</h1>
-                <nav class="hidden md:flex space-x-4 lg:space-x-6">
-                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
-                    <button class="nav-button" onclick="showSection('adc-lab')">ADC & Sampling Lab</button>
-                    <button class="nav-button" onclick="showSection('conditioning-lab')">Signal Conditioning</button>
-                    <button class="nav-button" onclick="showSection('apps')">Applications</button>
-                    <button class="nav-button" onclick="showSection('knowledge')">Knowledge Check</button>
-                </nav>
-                <button id="menu-btn" class="md:hidden">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Lucide React icons (inline SVGs for direct use in HTML)
+        const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+        const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+        const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+
+        // Icons for Week 12
+        const Motor = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10.5 14.5a2.5 2.5 0 0 0 5 0V8.5a2.5 2.5 0 0 0-5 0v6Z"/><path d="M12 2v3"/><path d="M12 19v3"/><path d="M12 14.5H2"/><path d="M12 8.5H22"/></svg>;
+        const Split = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 18V9"/><path d="M17 13l-5 5-5-5"/></svg>;
+
+
+        // Concept Review Component
+        const ConceptReview = () => {
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 12: DC Motors and Motor Drivers (H-Bridge)</h2>
+
+              {/* Actuators: The "Muscles" of Mechatronics */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Motor className="w-7 h-7 mr-3 text-blue-600"/>
+                    1. Actuators: The "Muscles" of Mechatronics
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> An actuator is a device that converts an electrical signal (or other energy form) into a physical action or motion. They provide the <span className="font-bold">output</span> action in a mechatronic system.
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Role in Mechatronics:</span> Actuators implement the decisions made by the control system (often a microcontroller) based on sensor inputs, thereby closing the control loop in intelligent systems.</li>
+                  <li><span className="font-medium">Examples:</span> Motors (DC, stepper, servo), solenoids, hydraulic/pneumatic cylinders, heaters, pumps, speakers.</li>
+                </ul>
+              </section>
+
+              {/* DC Motors: Principle of Operation */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Motor className="w-7 h-7 mr-3 text-green-600"/>
+                    2. DC Motors: Principle of Operation
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A DC motor is an electrical machine that converts direct current (DC) electrical energy into mechanical energy (rotational motion).
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. How it Works (Basics):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Electromagnetism:</span> Based on the principle that a current-carrying conductor placed in a magnetic field experiences a force.</li>
+                  <li><span className="font-medium">Stator:</span> The stationary part of the motor, typically containing permanent magnets or electromagnets that create a stationary magnetic field.</li>
+                  <li><span className="font-medium">Rotor (Armature):</span> The rotating part, consisting of coils of wire (windings) through which current flows.</li>
+                  <li><span className="font-medium">Commutator & Brushes:</span> Mechanical switches that reverse the direction of current in the armature coils as the rotor spins, ensuring continuous rotation in one direction. (For brushed DC motors).</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Motor Characteristics:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Speed-Voltage Relationship:</span> The rotational speed of a DC motor is approximately proportional to the voltage applied across its terminals. Higher voltage = higher speed.</li>
+                  <li><span className="font-medium">Torque-Current Relationship:</span> The torque produced by a DC motor is approximately proportional to the current flowing through its armature windings. Higher current = higher torque.</li>
+                  <li><span className="font-medium">Stall Torque:</span> The maximum torque a motor can produce when it is stalled (not rotating). Occurs at maximum current.</li>
+                  <li><span className="font-medium">No-Load Speed:</span> The maximum speed a motor can achieve when no load is applied to its shaft. Occurs at minimum current.</li>
+                  <li><span className="font-medium">Mechanical Power Output:</span> P_mech = τ * ω, where τ is torque and ω is angular velocity (in rad/s).</li>
+                </ul>
+              </section>
+
+              {/* Motor Drivers: H-Bridge */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Split className="w-7 h-7 mr-3 text-purple-600"/>
+                    3. Motor Drivers: H-Bridge
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Microcontrollers typically cannot supply enough current or voltage to directly drive most DC motors. A motor driver acts as an interface, amplifying the microcontroller's low-power signals to control higher-power motors.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. H-Bridge Configuration:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Structure:</span> Consists of four switching elements (transistors or MOSFETs) arranged in an "H" configuration, with the motor in the center.</li>
+                  <li><span className="font-medium">Functionality:</span> Allows for bidirectional control (forward/reverse) and speed control (using PWM) of a DC motor.</li>
+                  <li><span className="font-medium">Operation:</span> By activating pairs of switches, current can flow through the motor in either direction.
+                    <ul className="list-circle list-inside ml-4">
+                      <li>To drive forward: Activate top-left and bottom-right switches.</li>
+                      <li>To drive reverse: Activate top-right and bottom-left switches.</li>
+                      <li>To brake: Activate both top switches or both bottom switches (shorting motor terminals).</li>
+                      <li>To coast: Deactivate all switches (motor spins freely).</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Important:</span> Never activate both switches on the same "leg" of the H-bridge (e.g., top-left and bottom-left simultaneously) as this creates a direct short circuit across the power supply (shoot-through), potentially damaging the driver.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Speed Control with PWM:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>By applying a Pulse Width Modulated (PWM) signal to the enable pin or one of the control pins of the H-bridge, the average voltage supplied to the motor can be varied, thus controlling its speed.</li>
+                  <li>A higher PWM duty cycle results in a higher average voltage and faster motor speed.</li>
+                </ul>
+              </section>
             </div>
-             <div id="mobile-menu" class="hidden md:hidden py-2">
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('adc-lab'); closeMenu();">ADC & Sampling Lab</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('conditioning-lab'); closeMenu();">Signal Conditioning</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('apps'); closeMenu();">Applications</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('knowledge'); closeMenu();">Knowledge Check</button>
-            </div>
-        </div>
-    </header>
+          );
+        };
 
-    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
-        
-        <section id="intro" class="content-section active">
-            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
-                <h2 class="text-3xl font-bold text-stone-800 mb-4">Data Acquisition & Signal Conditioning</h2>
-                <p class="text-lg text-stone-600 mb-6">This module explores how mechatronic systems sense the physical world. Data Acquisition (DAQ) is the process of converting real-world phenomena like temperature or pressure into digital data a microcontroller can understand. Signal Conditioning is the vital step of cleaning and preparing raw sensor signals for accurate digital conversion. Instead of just reading, use the interactive labs in this module to build a hands-on intuition for these critical concepts.</p>
-                <div class="mt-6 p-4 bg-emerald-50 border-l-4 border-emerald-500">
-                    <p class="text-emerald-800">Navigate using the tabs above to explore the interactive labs, see real-world applications, and test your knowledge.</p>
-                </div>
-            </div>
-        </section>
+        // DC Motor Simulator Sandbox
+        const DCMotorSimulator = () => {
+          const [voltage, setVoltage] = useState(0);
+          const [direction, setDirection] = useState('STOP'); // 'FORWARD', 'REVERSE', 'STOP'
+          const [speed, setSpeed] = useState(0); // RPM
+          const [torque, setTorque] = useState(0); // Nm
+          const [current, setCurrent] = useState(0); // A
+          const [message, setMessage] = useState('');
 
-        <section id="adc-lab" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-2 text-center">Interactive ADC & Sampling Lab</h2>
-            <p class="text-stone-600 mb-6 text-center">See how ADC resolution and sampling rate affect the final digital signal.</p>
-            <div class="card p-6">
-                 <div class="grid lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 space-y-4">
-                        <h3 class="text-lg font-semibold text-stone-700">ADC & Signal Controls</h3>
-                        <div>
-                            <label for="adc-bits-slider" class="slider-label">ADC Resolution: <span id="adc-bits-value" class="slider-value">8 bits</span></label>
-                            <input id="adc-bits-slider" type="range" min="2" max="12" value="8" step="1" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                        <div>
-                            <label for="sampling-rate-slider" class="slider-label">Sampling Rate: <span id="sampling-rate-value" class="slider-value">400 Hz</span></label>
-                            <input id="sampling-rate-slider" type="range" min="20" max="800" value="400" step="10" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                         <div>
-                            <label for="signal-freq-slider" class="slider-label">Signal Frequency: <span id="signal-freq-value" class="slider-value">100 Hz</span></label>
-                            <input id="signal-freq-slider" type="range" min="10" max="200" value="100" step="5" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
+          useEffect(() => {
+            // Simulate motor behavior based on voltage and direction
+            let newSpeed = 0;
+            let newCurrent = 0;
+            let newTorque = 0;
 
-                        <div id="results-display" class="bg-stone-100 p-4 rounded-lg space-y-2">
-                            <div>
-                                <p class="text-sm text-stone-600">Voltage Resolution</p>
-                                <p id="voltage-res-display" class="text-lg font-bold text-emerald-700 font-mono">19.61 mV</p>
-                            </div>
-                            <div id="aliasing-warning" class="hidden">
-                                <p class="text-sm text-red-600">Nyquist Condition Violated!</p>
-                                <p id="alias-freq-display" class="text-lg font-bold text-red-700 font-mono">Alias at 100 Hz</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2">
-                         <div class="chart-container"><canvas id="adc-chart"></canvas></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="conditioning-lab" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Signal Conditioning Sandbox</h2>
-             <div class="card p-6">
-                 <div class="grid lg:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-xl font-semibold text-center text-stone-700 mb-2">Raw Sensor Signal</h3>
-                        <p class="text-sm text-center text-stone-500 mb-4">A typical noisy signal from a sensor.</p>
-                        <div class="chart-container" style="height:250px;"><canvas id="raw-signal-chart"></canvas></div>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-semibold text-center text-stone-700 mb-2">Conditioned Signal</h3>
-                        <p class="text-sm text-center text-stone-500 mb-4">The clean signal after processing.</p>
-                        <div class="chart-container" style="height:250px;"><canvas id="conditioned-signal-chart"></canvas></div>
-                    </div>
-                 </div>
-                 <div class="mt-6 pt-6 border-t border-stone-200">
-                    <h3 class="text-lg font-semibold text-stone-700 text-center mb-4">Apply Conditioning</h3>
-                    <div class="max-w-md mx-auto grid grid-cols-2 gap-4">
-                        <div class="flex items-center space-x-2">
-                            <input id="amplify-toggle" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600">
-                            <label for="amplify-toggle" class="slider-label">Amplify Signal</label>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <input id="filter-toggle" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600">
-                            <label for="filter-toggle" class="slider-label">Low-Pass Filter</label>
-                        </div>
-                    </div>
-                 </div>
-             </div>
-        </section>
-
-        <section id="apps" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Real-World Applications</h2>
-             <div id="apps-grid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
-        </section>
-
-        <section id="knowledge" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
-            <div id="knowledge-grid" class="space-y-4"></div>
-        </section>
-    </main>
-
-<script>
-let adcChart;
-let rawSignalChart, conditionedSignalChart;
-const V_REF = 5.0;
-
-const knowledgeData = [
-    { question: "A pressure sensor outputs 0-50 mV. Your ADC's range is 0-3.3 V. What are two essential signal conditioning steps?", answer: "1. **Amplification:** To boost the 50 mV signal to better match the 3.3 V range, improving resolution. 2. **Filtering:** To remove high-frequency noise that could corrupt the measurement." },
-    { question: "An 8-bit ADC has a reference voltage of 1V. If the analog input is 0.5V, what is the approximate digital output?", answer: "The digital output is (0.5V / 1.0V) * (2^8 - 1) = 0.5 * 255 = 127.5. The ADC would output a digital value of 127 or 128." },
-    { question: "You need to measure a signal with frequencies up to 200 Hz. What is the minimum sampling rate you should use?", answer: "According to the Nyquist theorem, the sampling rate must be at least twice the highest frequency, so: 2 * 200 Hz = 400 Hz." },
-    { question: "What is a real-world application of a Wheatstone bridge?", answer: "Electronic weighing scales use load cells with strain gauges arranged in a Wheatstone bridge. The change in resistance from the strain is converted into a measurable voltage proportional to the weight." }
-];
-
-const appsData = [
-    { title: "Medical Monitoring", text: "ECG/EEG systems amplify and filter faint biological signals before an ADC converts them for computer analysis.", icon: "❤️" },
-    { title: "Digital Audio", text: "DACs in your phone convert digital music files into an analog signal that is sent to your headphones.", icon: "🎵" },
-    { title: "Weighing Scales", text: "Load cells use Wheatstone bridges to convert the physical strain of weight into a small voltage, which is then amplified and digitized.", icon: "⚖️" },
-    { title: "Digital Cameras", text: "Each pixel on an image sensor is an analog device. ADCs convert the light level from millions of pixels into digital data to create an image.", icon: "📷" },
-];
-
-function initAdcLab() {
-    const ctx = document.getElementById('adc-chart').getContext('2d');
-    adcChart = new Chart(ctx, {
-        type: 'line',
-        data: { datasets: [] },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            scales: {
-                x: { title: { display: true, text: 'Time (ms)' }, min: 0, max: 40 },
-                y: { title: { display: true, text: 'Voltage (V)' }, min: -V_REF/2, max: V_REF/2 }
-            },
-            plugins: { legend: { display: true } }
-        }
-    });
-
-    ['adc-bits-slider', 'sampling-rate-slider', 'signal-freq-slider'].forEach(id => {
-        document.getElementById(id).addEventListener('input', updateAdcLab);
-    });
-    updateAdcLab();
-}
-
-function updateAdcLab() {
-    const bits = parseInt(document.getElementById('adc-bits-slider').value);
-    const samplingRate = parseInt(document.getElementById('sampling-rate-slider').value);
-    const signalFreq = parseInt(document.getElementById('signal-freq-slider').value);
-
-    document.getElementById('adc-bits-value').textContent = `${bits} bits`;
-    document.getElementById('sampling-rate-value').textContent = `${samplingRate} Hz`;
-    document.getElementById('signal-freq-value').textContent = `${signalFreq} Hz`;
-
-    const levels = Math.pow(2, bits);
-    const voltageRes = V_REF / (levels - 1);
-    document.getElementById('voltage-res-display').textContent = `${(voltageRes * 1000).toFixed(2)} mV`;
-
-    // Generate Analog Signal Data
-    const analogData = [];
-    for (let i = 0; i <= 400; i++) {
-        const t = i * 0.1; // time in ms
-        analogData.push({ x: t, y: (V_REF / 2 - 0.1) * Math.sin(2 * Math.PI * signalFreq * t / 1000) });
-    }
-
-    // Generate Sampled and Quantized Data
-    const quantizedData = [];
-    const sampledPoints = [];
-    const samplingInterval = 1000 / samplingRate; // ms
-    for (let t = 0; t <= 40; t += samplingInterval) {
-        const analogValue = (V_REF / 2 - 0.1) * Math.sin(2 * Math.PI * signalFreq * t / 1000);
-        const quantizedValue = Math.round((analogValue + V_REF/2) / voltageRes) * voltageRes - V_REF/2;
-        quantizedData.push({ x: t, y: quantizedValue });
-        sampledPoints.push({ x: t, y: analogValue });
-    }
-    
-    // Nyquist Check
-    const nyquistFreq = samplingRate / 2;
-    const warningDiv = document.getElementById('aliasing-warning');
-    if (signalFreq > nyquistFreq) {
-        warningDiv.classList.remove('hidden');
-        const aliasFreq = Math.abs(signalFreq - samplingRate);
-        document.getElementById('alias-freq-display').textContent = `Alias at ${aliasFreq.toFixed(0)} Hz`;
-    } else {
-        warningDiv.classList.add('hidden');
-    }
-
-    adcChart.data.datasets = [
-        { label: 'Analog Signal', data: analogData, borderColor: 'rgba(5, 150, 105, 0.5)', borderWidth: 2, pointRadius: 0, tension: 0.1 },
-        { label: 'Quantized Signal', data: quantizedData, borderColor: 'rgba(217, 70, 239, 0.8)', borderWidth: 2, pointRadius: 0, stepped: true },
-        { label: 'Sampled Points', data: sampledPoints, backgroundColor: 'rgb(239, 68, 68)', type: 'scatter', pointRadius: 4 }
-    ];
-    adcChart.update();
-}
-
-function initConditioningLab() {
-    const rawCtx = document.getElementById('raw-signal-chart').getContext('2d');
-    const conditionedCtx = document.getElementById('conditioned-signal-chart').getContext('2d');
-    
-    const baseSignal = [];
-    const noisySignal = [];
-    const timeLabels = [];
-
-    for (let i = 0; i < 200; i++) {
-        timeLabels.push(i);
-        const base = Math.sin(i * 0.1);
-        baseSignal.push(base);
-        const noise = (Math.random() - 0.5) * 0.5 + Math.sin(i * 0.8) * 0.3; // Low and high freq noise
-        noisySignal.push(base + noise);
-    }
-    
-    const chartOptions = { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { min: -2, max: 2 } }, plugins: { legend: { display: false } }};
-
-    rawSignalChart = new Chart(rawCtx, { type: 'line', data: { labels: timeLabels, datasets: [{ data: noisySignal, borderColor: '#ef4444', borderWidth: 1, pointRadius: 0 }] }, options: chartOptions });
-    conditionedSignalChart = new Chart(conditionedCtx, { type: 'line', data: { labels: timeLabels, datasets: [{ data: noisySignal, borderColor: '#10b981', borderWidth: 2, pointRadius: 0 }] }, options: chartOptions });
-
-    document.getElementById('amplify-toggle').addEventListener('change', updateConditioningLab);
-    document.getElementById('filter-toggle').addEventListener('change', updateConditioningLab);
-    
-    updateConditioningLab();
-}
-
-function updateConditioningLab() {
-    const doAmplify = document.getElementById('amplify-toggle').checked;
-    const doFilter = document.getElementById('filter-toggle').checked;
-    
-    let processedData = [...rawSignalChart.data.datasets[0].data];
-
-    if (doFilter) {
-        const filtered = [];
-        // Simple moving average filter
-        const windowSize = 5;
-        for (let i = 0; i < processedData.length; i++) {
-            let sum = 0;
-            let count = 0;
-            for (let j = Math.max(0, i - windowSize); j <= i; j++) {
-                sum += processedData[j];
-                count++;
+            if (direction === 'FORWARD' || direction === 'REVERSE') {
+              // Simple linear model: speed proportional to voltage
+              newSpeed = voltage * 20; // Example: 20 RPM/V
+              // Simple linear model: current and torque increase with speed (load)
+              // For simplicity, let's assume a fixed load for current/torque demonstration
+              newCurrent = voltage * 0.1; // Example: 0.1 A/V
+              newTorque = newCurrent * 0.5; // Example: 0.5 Nm/A
             }
-            filtered.push(sum / count);
-        }
-        processedData = filtered;
-    }
-    
-    if (doAmplify) {
-        processedData = processedData.map(v => v * 1.5);
-    }
 
-    conditionedSignalChart.data.datasets[0].data = processedData;
-    conditionedSignalChart.update();
-}
+            setSpeed(newSpeed.toFixed(1));
+            setCurrent(newCurrent.toFixed(2));
+            setTorque(newTorque.toFixed(2));
 
+            if (voltage === 0) {
+                setMessage("Motor is stopped.");
+            } else if (direction === 'FORWARD') {
+                setMessage(`Motor is spinning forward at ${newSpeed.toFixed(1)} RPM.`);
+            } else if (direction === 'REVERSE') {
+                setMessage(`Motor is spinning reverse at ${newSpeed.toFixed(1)} RPM.`);
+            }
+          }, [voltage, direction]);
 
-function initKnowledgeCheck() {
-    const container = document.getElementById('knowledge-grid');
-    container.innerHTML = knowledgeData.map(item => `
-        <div class="question-card bg-white p-6 rounded-lg shadow-md border border-stone-200">
-            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
-            <div class="answer mt-4 p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-800">
-                <p><strong>Answer:</strong> ${item.answer}</p>
+          const handleVoltageChange = (e) => {
+            setVoltage(parseFloat(e.target.value));
+          };
+
+          const handleDirectionChange = (newDirection) => {
+            setDirection(newDirection);
+            if (newDirection === 'STOP') {
+                setVoltage(0); // Stop also means 0 voltage
+            }
+          };
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">DC Motor & H-Bridge Simulator</h2>
+              <p className="text-gray-700 mb-4">
+                Simulate DC motor behavior by adjusting voltage and direction. Observe speed, current, and torque.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Controls */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Motor Control</h3>
+                  <div className="mb-4">
+                    <label htmlFor="voltageInput" className="text-lg font-medium text-gray-700 mb-2">Applied Voltage (V): {voltage}</label>
+                    <input
+                      type="range"
+                      id="voltageInput"
+                      min="0"
+                      max="12"
+                      step="0.1"
+                      value={voltage}
+                      onChange={handleVoltageChange}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                    />
+                  </div>
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => handleDirectionChange('FORWARD')}
+                      className={`py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md flex-1 ${
+                        direction === 'FORWARD' ? 'bg-indigo-700 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                      }`}
+                    >
+                      Forward
+                    </button>
+                    <button
+                      onClick={() => handleDirectionChange('STOP')}
+                      className={`py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md flex-1 ${
+                        direction === 'STOP' ? 'bg-red-700 text-white' : 'bg-red-600 text-white hover:bg-red-700'
+                      }`}
+                    >
+                      Stop
+                    </button>
+                    <button
+                      onClick={() => handleDirectionChange('REVERSE')}
+                      className={`py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md flex-1 ${
+                        direction === 'REVERSE' ? 'bg-indigo-700 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                      }`}
+                    >
+                      Reverse
+                    </button>
+                  </div>
+                </div>
+
+                {/* Motor Output */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Motor Status</h3>
+                  <div className="flex items-center justify-center mb-4 p-4 border border-gray-300 rounded-md bg-white">
+                    <Motor className={`w-12 h-12 transition-transform duration-300 ${direction === 'FORWARD' ? 'rotate-90 text-blue-500' : direction === 'REVERSE' ? '-rotate-90 text-blue-500' : 'text-gray-400'}`} />
+                    <span className="ml-4 text-lg font-medium">Direction: {direction}</span>
+                  </div>
+                  <div className="mb-4 text-center">
+                    <p className="text-lg font-medium">Speed: <span className="text-indigo-700">{speed} RPM</span></p>
+                    <p className="text-lg font-medium">Current: <span className="text-indigo-700">{current} A</span></p>
+                    <p className="text-lg font-medium">Torque: <span className="text-indigo-700">{torque} Nm</span></p>
+                  </div>
+                  <div className="mt-2 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded-md font-semibold">
+                    {message}
+                  </div>
+                </div>
+              </div>
             </div>
-            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 transition-colors text-sm" onclick="toggleAnswer(this)">Reveal Answer</button>
-        </div>
-    `).join('');
-}
+          );
+        };
 
-function initApps() {
-    const container = document.getElementById('apps-grid');
-    container.innerHTML = appsData.map(item => `
-        <div class="card p-6 flex flex-col items-center text-center">
-            <div class="text-5xl mb-4">${item.icon}</div>
-            <h3 class="font-bold text-lg text-stone-800 mb-2">${item.title}</h3>
-            <p class="text-stone-600 text-sm">${item.text}</p>
-        </div>
-    `).join('');
-}
 
-function toggleAnswer(button) {
-    const answerEl = button.previousElementSibling;
-    const isVisible = answerEl.style.display === 'block';
-    answerEl.style.display = isVisible ? 'none' : 'block';
-    button.textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
-}
+        // Practice Problems Component
+        const PracticeProblems = () => {
+          const [activeTab, setActiveTab] = useState('homework');
 
-document.addEventListener('DOMContentLoaded', () => {
-    initAdcLab();
-    initConditioningLab();
-    initKnowledgeCheck();
-    initApps();
+          const homeworkQuestions = [
+            {
+              id: 1,
+              type: 'text',
+              question: 'Distinguish between a sensor and an actuator in a mechatronic system, providing one example of each.',
+              answer: 'A sensor is a device that detects or measures a physical quantity (e.g., temperature, light, position) and converts it into a usable signal, typically an electrical signal. It provides the <span class="font-bold">input</span> information to the control system. Example: A thermistor (measures temperature).\n\nAn actuator is a device that converts an electrical signal (or other energy form) into a physical action or motion. It provides the <span class="font-bold">output</span> action in a mechatronic system, implementing decisions made by the control system. Example: A DC motor (converts electrical energy into rotational motion).',
+              explanation: 'Sensors are the "eyes and ears" of a mechatronic system, providing data from the environment. Actuators are the "muscles" that allow the system to interact with and change the physical world based on that data and control logic.'
+            },
+            {
+              id: 2,
+              type: 'text',
+              question: 'Explain the relationship between voltage and speed in a DC motor, and current and torque in a DC motor.',
+              answer: 'Relationship between Voltage and Speed: The rotational speed of a DC motor is approximately directly proportional to the voltage applied across its terminals. Increasing the voltage generally increases the motor\'s speed, assuming the load remains constant.\n\nRelationship between Current and Torque: The torque produced by a DC motor is approximately directly proportional to the current flowing through its armature windings. Increasing the current generally increases the motor\'s torque output, allowing it to overcome greater loads or accelerate faster.',
+              explanation: 'These are fundamental characteristics of DC motors. Applying more voltage causes the motor to spin faster (higher back-EMF, less current for a given load), while drawing more current allows the motor to produce more rotational force (torque).'
+            },
+            {
+              id: 3,
+              type: 'multiple_choice',
+              question: 'Which of the following describes the primary function of an H-bridge motor driver?',
+              options: [
+                'A) To convert analog signals to digital signals for motor control.',
+                'B) To amplify low-power microcontroller signals to drive higher-power motors bidirectionally.',
+                'C) To measure the speed of a DC motor using Hall-effect sensors.',
+                'D) To convert AC power to DC power for motor operation.'
+              ],
+              correctAnswer: 'B) To amplify low-power microcontroller signals to drive higher-power motors bidirectionally.',
+              explanation: 'Microcontrollers operate at low current and voltage, insufficient for most motors. An H-bridge acts as an interface, using its internal switches (transistors/MOSFETs) to allow higher current/voltage from a separate power supply to flow through the motor in either direction, enabling both direction and speed control (via PWM).'
+            },
+            {
+              id: 4,
+              type: 'text',
+              question: 'You are controlling a DC motor with an H-bridge. If you want the motor to spin in one direction, which two switches in the H-bridge should be activated? What happens if you accidentally activate both switches on the same "leg" of the H-bridge?',
+              answer: 'To make the motor spin in one direction (e.g., forward), you would activate the <span class="font-bold">top-left switch (S1) and the bottom-right switch (S4)</span>. This creates a path for current to flow from the positive supply, through S1, through the motor, through S4, and to ground.\n\nIf you accidentally activate both switches on the same "leg" of the H-bridge (e.g., top-left S1 and bottom-left S3 simultaneously), it creates a <span class="font-bold">short circuit</span> directly across the power supply. This condition, known as "shoot-through," will draw extremely high current, potentially damaging the H-bridge driver (overheating transistors/MOSFETs) or the power supply itself.',
+              explanation: 'Proper H-bridge control involves activating diagonal pairs of switches to allow current to flow through the motor. Activating switches on the same vertical leg bypasses the motor and directly connects the power supply to ground, which is a critical fault condition.'
+            },
+            {
+              id: 5,
+              type: 'text',
+              question: 'A DC motor has a no-load speed of 500 RPM at 10V. If you apply a 5V PWM signal with a 50% duty cycle to its H-bridge driver, what would you expect the approximate speed of the motor to be? (Assume ideal conditions and a linear relationship for simplicity).',
+              answer: 'First, calculate the average voltage supplied by the 5V PWM signal with a 50% duty cycle:\nAverage Voltage = Max Voltage * Duty Cycle = 5V * 0.50 = 2.5V.\n\nNext, use the linear relationship between voltage and speed:\nAt 10V, speed is 500 RPM.\nSo, the speed per volt = 500 RPM / 10V = 50 RPM/V.\n\nApproximate speed at 2.5V = 2.5V * 50 RPM/V = 125 RPM.\n\nTherefore, you would expect the approximate speed of the motor to be 125 RPM.',
+              explanation: 'PWM effectively controls the average voltage supplied to the motor. By calculating this average voltage and using the motor\'s voltage-speed characteristic (assuming linearity), you can estimate the resulting speed. This demonstrates how PWM enables analog-like speed control from a digital signal.'
+            }
+          ];
 
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-});
+          const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
 
-function showSection(sectionId) {
-    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    document.querySelectorAll('.nav-button').forEach(button => {
-        button.classList.remove('active');
-        if (button.getAttribute('onclick').includes(sectionId)) {
-            button.classList.add('active');
-        }
-    });
-    window.scrollTo(0, 0);
-}
+          const handleHomeworkChange = (id, value) => {
+            setHomeworkAnswers(prev => ({
+              ...prev,
+              [id]: value
+            }));
+          };
 
-function closeMenu() {
-    document.getElementById('mobile-menu').classList.add('hidden');
-}
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
 
-</script>
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
+            });
+            setQuizResults(newResults);
+          };
+
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
+
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
+
+              <div className="flex mb-6 space-x-4">
+                <button
+                  onClick={() => setActiveTab('homework')}
+                  className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+                    activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Homework Questions
+                </button>
+              </div>
+
+              {activeTab === 'homework' && (
+                <div>
+                  <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-blue-500"/>
+                    Homework Questions
+                  </h3>
+                  <p className="text-gray-700 mb-4">
+                    Instructions: Show all work and steps clearly.
+                  </p>
+                  {homeworkQuestions.map((q) => (
+                    <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+                      {q.type === 'text' ? (
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                          placeholder="Type your answer here..."
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
+                        ></textarea>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                              />
+                              <span className="ml-2">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
+                        </div>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
+                        </div>
+                      )}
+                      <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                        <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                        <div className="mt-2 text-indigo-700">
+                          <p className="whitespace-pre-wrap">{q.explanation}</p>
+                        </div >
+                      </details>
+                    </div>
+                  ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+
+        // Main App Component
+        const App = () => {
+          const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
+
+          return (
+            <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+              <header className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+                  Mechatronics 1 Study Guide
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 12: DC Motors and Motor Drivers (H-Bridge)</p>
+                <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                    <Home className="w-5 h-5 mr-2" />
+                    Back to Course Hub
+                </a>
+              </header>
+
+              <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+                <button
+                  onClick={() => setActiveSection('review')}
+                  className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+                >
+                  <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Concept Review</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('sandbox')}
+                  className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+                >
+                  <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Interactive Sandbox</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('practice')}
+                  className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Practice Problems</span>
+                </button>
+              </nav>
+
+              <main className="container">
+                {activeSection === 'review' && <ConceptReview />}
+                {activeSection === 'sandbox' && <DCMotorSimulator />}
+                {activeSection === 'practice' && <PracticeProblems />}
+              </main>
+
+              <footer className="text-center text-gray-500 text-sm mt-12">
+                <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+              </footer>
+            </div>
+          );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 </body>
 </html>
