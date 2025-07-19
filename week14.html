@@ -3,365 +3,542 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 14 - Robotic Kinematics & Dynamics</title>
+    <title>Mechatronics 1: Week 14 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chosen Palette: Calm Harmony -->
-    <!-- Application Structure Plan: The application is structured as an interactive dashboard with five tabs: Introduction, Kinematics Lab, Dynamics, Applications, and Knowledge Check. This modular design allows users to explore complex topics in a non-linear way. The core of the experience is the interactive Kinematics Lab. It provides hands-on sliders to demonstrate Forward Kinematics and input fields to challenge the Inverse Kinematics solver. This learn-by-doing approach is more effective for grasping abstract robotics concepts than static diagrams. -->
-    <!-- Visualization & Content Choices: 
-        - Forward/Inverse Kinematics -> Goal: Understand the relationship between joint angles and end-effector position. -> Viz: HTML5 Canvas showing a 2-link robot arm. -> Interaction: Sliders for FK and input boxes for IK dynamically update the canvas visualization and text readouts. Justification: Provides immediate, visual feedback on how joint angles translate to coordinates (FK) and vice-versa (IK), making the core concepts tangible and intuitive.
-        - Dynamics -> Goal: Explain the forces in robot motion. -> Viz: Structured HTML with Tailwind CSS, using icons and styled blocks. -> Interaction: N/A. Static but clear explanation. Justification: Dynamics equations are complex; a clear, well-organized textual explanation is more effective than a potentially confusing visualization for an introductory level.
-        - Knowledge Check -> Goal: Reinforce learning. -> Viz: Interactive cards. -> Interaction: A "Reveal Answer" button toggles visibility. Justification: Promotes active recall and self-assessment.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
-        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
-        .nav-button.active, .nav-button:hover { color: #059669; border-bottom-color: #059669; }
-        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .content-section { display: none; }
-        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-        .slider-label { font-size: 0.875rem; font-weight: 500; color: #57534e; }
-        .slider-value, .output-value { font-family: 'Roboto Mono', monospace; font-size: 0.9rem; background-color: #e7e5e4; padding: 0.1rem 0.5rem; border-radius: 0.25rem; }
-        .output-value { font-size: 1.1rem; padding: 0.25rem 0.75rem; }
-        .input-field { border: 1px solid #d4d4d8; border-radius: 0.375rem; padding: 0.5rem; font-family: 'Roboto Mono', monospace; }
-        canvas { background-color: #fafaf9; border-radius: 0.5rem; border: 1px solid #e7e5e4; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
+        }
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
+        }
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
+        }
+        .nav-button svg {
+          margin-bottom: 0.25rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
+        }
+        .formula-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border-left: 4px solid #38bdf8; /* Blue border on left */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 1rem;
+            color: #0c4a6e; /* Darker blue text */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="antialiased">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 14: Robotics</h1>
-                <nav class="hidden md:flex space-x-4 lg:space-x-6">
-                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
-                    <button class="nav-button" onclick="showSection('lab')">Kinematics Lab</button>
-                    <button class="nav-button" onclick="showSection('dynamics')">Dynamics</button>
-                    <button class="nav-button" onclick="showSection('apps')">Applications</button>
-                    <button class="nav-button" onclick="showSection('knowledge')">Knowledge Check</button>
-                </nav>
-                <button id="menu-btn" class="md:hidden">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Lucide React icons (inline SVGs for direct use in HTML)
+        const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+        const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+        const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+
+        // Icons for Week 14
+        const Wifi = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 18.5V20"/><path d="M2.5 8.5C3.93 6.64 6.2 5.34 8.86 5.01A8.27 8.27 0 0 1 12 4c2.8 0 5.46 1.04 7.66 2.76"/><path d="M10.42 14.5c.98-.98 2.52-.98 3.5 0"/><path d="M7 11.5c1.93-1.93 5.07-1.93 7 0"/><path d="M19.5 8.5c-1.43-1.86-3.7-3.16-6.36-3.49A8.27 8.27 0 0 0 12 4c-2.8 0-5.46 1.04-7.66 2.76"/></svg>;
+        const Cable = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 12s2-2 4-2 4 2 4 2 2-2 4-2 4 2 4 2"/><path d="M2 12s2 2 4 2 4-2 4-2 2 2 4 2 4-2 4-2"/></svg>;
+        const HardDrive = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="22" x2="2" y1="12" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" x2="6.01" y1="16" y2="16"/><line x1="10" x2="10.01" y1="16" y2="16"/></svg>;
+
+
+        // Concept Review Component
+        const ConceptReview = () => {
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 14: Serial Communication Protocols (UART, I2C, SPI)</h2>
+
+              {/* Serial Communication (UART) with Arduino */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Cable className="w-7 h-7 mr-3 text-blue-600"/>
+                    1. Serial Communication (UART) with Arduino
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A method of transmitting data one bit at a time sequentially over a single communication line (or a pair of lines for two-way communication).
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Contrast with Parallel Communication:</span> In parallel communication, multiple bits are sent simultaneously over multiple lines.</li>
+                  <li><span className="font-medium">Advantages:</span> Fewer wires, simpler cabling, longer transmission distances, cheaper.</li>
+                  <li><span className="font-medium">Disadvantages:</span> Slower for transmitting large amounts of data at once.</li>
+                  <li><span className="font-medium">UART (Universal Asynchronous Receiver/Transmitter):</span> A common hardware module for asynchronous serial communication. "Asynchronous" means there's no shared clock signal between devices; instead, both agree on a data rate (baud rate).</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Key Parameters & Arduino Functions:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Baud Rate:</span> The rate at which information is transferred in a serial communication channel, measured in bits per second (bps). Both sender and receiver must use the same baud rate (e.g., 9600, 115200).</li>
+                  <li><span className="font-medium">Arduino `Serial` Library:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li>`Serial.begin(baudRate)`: Initializes serial communication at the specified baud rate. Typically called in `setup()`.</li>
+                      <li>`Serial.print(data)` / `Serial.println(data)`: Sends data to the serial port. `println` adds a newline character.</li>
+                      <li>`Serial.available()`: Returns the number of bytes available to read from the serial buffer.</li>
+                      <li>`Serial.read()`: Reads incoming serial data.</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Serial Monitor:</span> A built-in tool in the Arduino IDE that allows you to send and receive text data to/from your Arduino board, essential for debugging and displaying sensor data.</li>
+                </ul>
+              </section>
+
+              {/* I2C (Inter-Integrated Circuit) Protocol */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Wifi className="w-7 h-7 mr-3 text-green-600"/>
+                    2. I2C (Inter-Integrated Circuit) Protocol
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A synchronous, multi-master, multi-slave, serial communication protocol developed by Philips (now NXP).
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Purpose:</span> Designed for short-distance communication between integrated circuits (ICs) on a circuit board.</li>
+                  <li><span className="font-medium">Architecture: Master-Slave Model:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">Master:</span> Initiates communication, sends clock signals, and addresses slaves (e.g., your Arduino).</li>
+                      <li><span className="font-medium">Slave:</span> Responds to the master when addressed. Each slave has a unique 7-bit or 10-bit address.</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Two Wires:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">SDA (Serial Data Line):</span> Carries the data.</li>
+                      <li><span className="font-medium">SCL (Serial Clock Line):</span> Carries the clock signal generated by the master.</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Pull-up Resistors:</span> Required on both SDA and SCL lines to ensure proper HIGH levels when no device is pulling them LOW.</li>
+                  <li><span className="font-medium">Applications:</span> Connecting multiple sensors (e.g., IMUs, temperature sensors), EEPROMs, real-time clocks, small OLED displays to a single microcontroller.</li>
+                  <li><span className="font-medium">Arduino `Wire` Library:</span> Used for I2C communication.</li>
+                </ul>
+              </section>
+
+              {/* SPI (Serial Peripheral Interface) Protocol */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <HardDrive className="w-7 h-7 mr-3 text-purple-600"/>
+                    3. SPI (Serial Peripheral Interface) Protocol
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A synchronous serial communication interface specification used for short-distance communication, primarily in embedded systems.
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Architecture: Master-Slave Model:</span> Typically one master and one or more slaves.</li>
+                  <li><span className="font-medium">Four Wires (Full-Duplex):</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">SCLK (Serial Clock):</span> Clock signal generated by the master.</li>
+                      <li><span className="font-medium">MOSI (Master Out, Slave In):</span> Data from master to slave.</li>
+                      <li><span className="font-medium">MISO (Master In, Slave Out):</span> Data from slave to master.</li>
+                      <li><span className="font-medium">SS (Slave Select) / CS (Chip Select):</span> Master uses this line to enable a specific slave device. Each slave needs its own SS line.</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Characteristics:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">High Speed:</span> Faster than I2C and UART.</li>
+                      <li><span className="font-medium">Full-Duplex:</span> Master and slave can send/receive data simultaneously.</li>
+                      <li><span className="font-medium">No Addressing:</span> Relies on dedicated Slave Select lines for each device.</li>
+                      <li><span className="font-medium">More Wires:</span> Requires more pins than I2C for multiple devices.</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Applications:</span> SD card readers, LCD displays, Flash memory, shift registers, higher-speed sensors.</li>
+                  <li><span className="font-medium">Arduino `SPI` Library:</span> Used for SPI communication.</li>
+                </ul>
+              </section>
+
+              {/* Choosing the Right Protocol */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-orange-600"/>
+                    4. Choosing the Right Protocol
+                </h3>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">UART:</span> Best for simple, point-to-point communication (e.g., Arduino to PC via Serial Monitor, or Arduino to another module).</li>
+                  <li><span className="font-medium">I2C:</span> Ideal for connecting multiple low-to-medium speed devices (sensors, RTCs, small displays) to a single microcontroller using only two wires.</li>
+                  <li><span className="font-medium">SPI:</span> Preferred for high-speed data transfer to a single or few devices (e.g., SD cards, large displays, fast ADCs/DACs) where more dedicated wiring is acceptable.</li>
+                </ul>
+              </section>
+            </div>
+          );
+        };
+
+        // Serial Communication Simulator Sandbox
+        const SerialCommunicationSimulator = () => {
+          const [baudRate, setBaudRate] = useState(9600);
+          const [messageToSend, setMessageToSend] = useState('');
+          const [receivedMessages, setReceivedMessages] = useState([]);
+          const [deviceType, setDeviceType] = useState('UART'); // 'UART', 'I2C', 'SPI'
+          const serialMonitorRef = useRef(null);
+
+          const simulateSend = () => {
+            if (messageToSend.trim() === '') {
+              alert('Please enter a message to send.');
+              return;
+            }
+            const newMessage = `[PC to Arduino] Sending "${messageToSend}" via ${deviceType} at ${baudRate} bps.`;
+            setReceivedMessages(prev => [...prev, newMessage]);
+            setMessageToSend('');
+            // Simulate Arduino response
+            setTimeout(() => {
+              const response = `[Arduino] Received "${messageToSend}". Processing...`;
+              setReceivedMessages(prev => [...prev, response]);
+            }, 500);
+          };
+
+          useEffect(() => {
+            if (serialMonitorRef.current) {
+              serialMonitorRef.current.scrollTop = serialMonitorRef.current.scrollHeight;
+            }
+          }, [receivedMessages]);
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Serial Communication Simulator</h2>
+              <p className="text-gray-700 mb-4">
+                Simulate sending and receiving data using different serial protocols.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Controls */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Communication Settings</h3>
+                  <div className="mb-4">
+                    <label htmlFor="deviceType" className="text-lg font-medium text-gray-700 mb-2">Protocol:</label>
+                    <select
+                      id="deviceType"
+                      value={deviceType}
+                      onChange={(e) => setDeviceType(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <option value="UART">UART (Serial)</option>
+                      <option value="I2C">I2C</option>
+                      <option value="SPI">SPI</option>
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="baudRateInput" className="text-lg font-medium text-gray-700 mb-2">Baud Rate (bps):</label>
+                    <select
+                      id="baudRateInput"
+                      value={baudRate}
+                      onChange={(e) => setBaudRate(parseInt(e.target.value))}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <option value="9600">9600</option>
+                      <option value="19200">19200</option>
+                      <option value="38400">38400</option>
+                      <option value="57600">57600</option>
+                      <option value="115200">115200</option>
+                    </select>
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="messageInput" className="text-lg font-medium text-gray-700 mb-2">Message to Send:</label>
+                    <input
+                      type="text"
+                      id="messageInput"
+                      value={messageToSend}
+                      onChange={(e) => setMessageToSend(e.target.value)}
+                      placeholder="Enter message..."
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  </div>
+                  <button
+                    onClick={simulateSend}
+                    className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                  >
+                    Send Message
+                  </button>
+                </div>
+
+                {/* Serial Monitor Output */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Simulated Serial Monitor</h3>
+                  <div ref={serialMonitorRef} className="bg-gray-800 text-green-400 p-3 rounded-md h-64 overflow-y-auto font-mono text-sm">
+                    {receivedMessages.length === 0 && <p className="text-gray-500">Messages will appear here...</p>}
+                    {receivedMessages.map((line, index) => (
+                      <p key={index} className="whitespace-pre-wrap">{line}</p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+
+        // Practice Problems Component
+        const PracticeProblems = () => {
+          const [activeTab, setActiveTab] = useState('homework');
+
+          const homeworkQuestions = [
+            {
+              id: 1,
+              type: 'text',
+              question: 'Explain the fundamental difference between serial and parallel communication. What is one advantage and one disadvantage of serial communication?',
+              answer: 'Fundamental Difference:\n  - <span class="font-bold">Serial Communication:</span> Transmits data one bit at a time sequentially over a single line (or a pair of lines for two-way communication).\n  - <span class="font-bold">Parallel Communication:</span> Transmits multiple bits simultaneously over multiple parallel lines.\n\nAdvantage of Serial Communication: Fewer wires, simpler cabling, longer transmission distances, and generally cheaper to implement.\n\nDisadvantage of Serial Communication: Slower for transmitting large amounts of data at once compared to parallel communication.',
+              explanation: 'The trade-off between serial and parallel communication is typically speed versus complexity/cost. Serial communication sacrifices raw speed for simplicity and reduced hardware requirements, which is often preferred in embedded systems.'
+            },
+            {
+              id: 2,
+              type: 'text',
+              question: 'You are connecting an Arduino to a temperature sensor that uses the I2C protocol. What are the two main wires used for I2C communication, and what is the purpose of each? What is the role of pull-up resistors in an I2C bus?',
+              answer: 'The two main wires used for I2C communication are:\n1.  <span class="font-bold">SDA (Serial Data Line):</span> This line carries the actual data being transmitted between the master (Arduino) and the slave (temperature sensor).\n2.  <span class="font-bold">SCL (Serial Clock Line):</span> This line carries the clock signal, which synchronizes the data transfer between the master and slave devices. The master typically generates the clock signal.\n\nRole of Pull-up Resistors: I2C operates using "open-drain" or "open-collector" outputs, meaning devices can only pull the line LOW. They cannot actively drive it HIGH. Pull-up resistors (connected from SDA and SCL to the positive supply voltage, e.g., 5V) are essential to ensure that the lines return to a HIGH state when no device is actively pulling them LOW. Without pull-up resistors, the lines would "float" and communication would fail.',
+              explanation: 'I2C\'s two-wire simplicity relies on the open-drain configuration, which necessitates pull-up resistors to define the HIGH state. This allows multiple devices to share the same bus without contention issues.'
+            },
+            {
+              id: 3,
+              type: 'multiple_choice',
+              question: 'Which serial communication protocol is generally considered the fastest and supports full-duplex communication (simultaneous send and receive)?',
+              options: ['A) UART', 'B) I2C', 'C) SPI', 'D) RS-232'],
+              correctAnswer: 'C) SPI',
+              explanation: 'SPI is known for its high speed and full-duplex capabilities because it uses separate lines for data in (MISO) and data out (MOSI), allowing simultaneous transmission and reception. UART is simpler but slower, and I2C is slower and half-duplex (data flows in one direction at a time).'
+            },
+            {
+              id: 4,
+              type: 'text',
+              question: 'You need to connect an Arduino to three separate SD card modules, each requiring its own dedicated chip select line. Which serial communication protocol would be most appropriate for this setup, and why?',
+              answer: 'The <span class="font-bold">SPI (Serial Peripheral Interface)</span> protocol would be most appropriate for this setup.\n\nReasons:\n1.  <span class="font-bold">High Speed:</span> SD card communication often requires high data transfer rates, for which SPI is well-suited.\n2.  <span class="font-bold">Dedicated Chip Select (SS) Lines:</span> SPI uses a dedicated Slave Select (SS) or Chip Select (CS) line for each slave device. To communicate with a specific SD card, the Arduino simply pulls its corresponding SS line LOW while keeping others HIGH. This allows for easy selection of multiple devices without addressing conflicts.\n3.  <span class="font-bold">Full-Duplex:</span> SPI\'s full-duplex nature (separate MOSI and MISO lines) can also be beneficial for efficient data transfer to/from SD cards.',
+              explanation: 'While I2C can handle multiple devices, its addressing scheme and half-duplex nature make it less ideal for high-speed, multi-device scenarios like multiple SD cards. UART is typically point-to-point. SPI\'s architecture with dedicated SS lines and high speed makes it the clear choice for this application.'
+            },
+            {
+              id: 5,
+              type: 'text',
+              question: 'What is the purpose of the `Serial.begin(baudRate)` function in an Arduino sketch, and where is it typically placed?',
+              answer: 'The purpose of the `Serial.begin(baudRate)` function is to <span class="font-bold">initialize serial communication</span> on the Arduino board. It sets up the serial port (UART hardware) to communicate at a specified data rate, known as the `baudRate` (bits per second).\n\nIt is typically placed in the <span class="font-bold">`setup()` function</span> of an Arduino sketch. This is because `setup()` runs only once when the Arduino board starts or resets, and serial communication only needs to be initialized once at the beginning of the program.',
+              explanation: 'The `Serial.begin()` function is crucial for enabling the Arduino to send and receive data via its serial port. Placing it in `setup()` ensures that the communication is configured correctly from the start of the program, and it avoids unnecessary re-initialization that would occur if placed in `loop()`.'
+            }
+          ];
+
+          const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
+
+          const handleHomeworkChange = (id, value) => {
+            setHomeworkAnswers(prev => ({
+              ...prev,
+              [id]: value
+            }));
+          };
+
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
+
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
+            });
+            setQuizResults(newResults);
+          };
+
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
+
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
+
+              <div className="flex mb-6 space-x-4">
+                <button
+                  onClick={() => setActiveTab('homework')}
+                  className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+                    activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Homework Questions
                 </button>
-            </div>
-             <div id="mobile-menu" class="hidden md:hidden py-2">
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('lab'); closeMenu();">Kinematics Lab</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('dynamics'); closeMenu();">Dynamics</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('apps'); closeMenu();">Applications</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('knowledge'); closeMenu();">Knowledge Check</button>
-            </div>
-        </div>
-    </header>
+              </div>
 
-    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
-        
-        <section id="intro" class="content-section active">
-            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
-                <h2 class="text-3xl font-bold text-stone-800 mb-4">Robotic Kinematics & Dynamics</h2>
-                <p class="text-lg text-stone-600 mb-6">This module introduces the core principles of robotic motion. **Kinematics** describes *how* a robot moves—the geometry of its motion—while **Dynamics** explains *why* it moves—the forces and torques involved. Mastering these concepts is key to designing, programming, and controlling any robotic system. This interactive app is designed to give you a hands-on feel for these fundamental ideas.</p>
-                <div class="mt-6 p-4 bg-emerald-50 border-l-4 border-emerald-500">
-                    <p class="text-emerald-800">Use the tabs above to navigate. The **Kinematics Lab** is the best place to start for interactive learning!</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="lab" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">2-Link Robot Arm Kinematics Lab</h2>
-            <div class="grid lg:grid-cols-2 gap-8 items-start">
-                <div class="card p-6">
-                    <h3 class="text-xl font-bold text-center text-stone-700 mb-4">Live Robot Simulator</h3>
-                    <canvas id="robotCanvas" width="400" height="400" class="mx-auto"></canvas>
-                </div>
-
-                <div class="space-y-8">
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold text-stone-700 mb-4">Forward Kinematics</h3>
-                        <p class="text-sm text-stone-600 mb-4">Control the joint angles to see where the end-effector (hand) moves. The (x, y) coordinates are calculated from your inputs.</p>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="theta1-slider" class="slider-label">Joint 1 Angle (&theta;1): <span id="theta1-value" class="slider-value">45°</span></label>
-                                <input id="theta1-slider" type="range" min="0" max="180" value="45" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                            </div>
-                            <div>
-                                <label for="theta2-slider" class="slider-label">Joint 2 Angle (&theta;2): <span id="theta2-value" class="slider-value">60°</span></label>
-                                <input id="theta2-slider" type="range" min="-180" max="180" value="60" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                            </div>
+              {activeTab === 'homework' && (
+                <div>
+                  <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-blue-500"/>
+                    Homework Questions
+                  </h3>
+                  <p className="text-gray-700 mb-4">
+                    Instructions: Show all work and steps clearly.
+                  </p>
+                  {homeworkQuestions.map((q) => (
+                    <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+                      {q.type === 'text' ? (
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                          placeholder="Type your answer here..."
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
+                        ></textarea>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                              />
+                              <span className="ml-2">{option}</span>
+                            </label>
+                          ))}
                         </div>
-                        <div class="mt-4 text-center">
-                            <p class="text-stone-600">End-Effector Position:</p>
-                            <p class="font-bold text-emerald-700">X: <span id="fk-x-pos" class="output-value">120.7</span>, Y: <span id="fk-y-pos" class="output-value">157.3</span></p>
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
                         </div>
-                    </div>
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold text-stone-700 mb-4">Inverse Kinematics</h3>
-                        <p class="text-sm text-stone-600 mb-4">Enter a target (x, y) position and the simulator will calculate the required joint angles to reach it.</p>
-                        <div class="flex space-x-4 items-center">
-                            <input type="number" id="ik-x-input" placeholder="X" value="100" class="w-full input-field">
-                            <input type="number" id="ik-y-input" placeholder="Y" value="100" class="w-full input-field">
-                            <button class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700" onclick="solveIK()">Solve</button>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
                         </div>
-                        <div id="ik-status" class="mt-2 text-sm text-center text-red-600 h-5"></div>
+                      )}
+                      <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                        <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                        <div className="mt-2 text-indigo-700">
+                          <p className="whitespace-pre-wrap">{q.explanation}</p>
+                        </div >
+                      </details>
                     </div>
+                  ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
                 </div>
+              )}
             </div>
-        </section>
+          );
+        };
 
-        <section id="dynamics" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Understanding Robot Dynamics</h2>
-            <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md border border-stone-200">
-                <p class="text-center text-lg text-stone-600 mb-6">Dynamics explains the relationship between joint torques and the resulting motion, governed by the conceptual equation:</p>
-                <div class="my-4 p-4 text-center bg-stone-100 rounded-lg font-mono text-stone-800 text-sm md:text-base">
-                    &tau; = M(q)&quml; + C(q, q&#775;)q&#775; + G(q)
-                </div>
-                <div class="mt-8 grid md:grid-cols-3 gap-6 text-center">
-                    <div>
-                        <div class="text-4xl">⚙️</div>
-                        <h4 class="font-bold text-lg mt-2">&tau; (Torque)</h4>
-                        <p class="text-sm text-stone-600">The rotational force applied by the motors at each joint.</p>
-                    </div>
-                    <div>
-                        <div class="text-4xl">🏋️</div>
-                        <h4 class="font-bold text-lg mt-2">M(q)&quml; (Inertia)</h4>
-                        <p class="text-sm text-stone-600">Torque needed to accelerate the mass of the robot's links.</p>
-                    </div>
-                    <div>
-                        <div class="text-4xl">🌍</div>
-                        <h4 class="font-bold text-lg mt-2">G(q) (Gravity)</h4>
-                        <p class="text-sm text-stone-600">Torque needed to counteract the force of gravity on the links.</p>
-                    </div>
-                </div>
-                 <p class="text-center text-stone-600 mt-6 text-sm">The term **C(q, q&#775;)q&#775;** represents complex Coriolis and centrifugal forces, which become significant at high speeds.</p>
+
+        // Main App Component
+        const App = () => {
+          const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
+
+          return (
+            <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+              <header className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+                  Mechatronics 1 Study Guide
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 14: Serial Communication Protocols (UART, I2C, SPI)</p>
+                <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                    <Home className="w-5 h-5 mr-2" />
+                    Back to Course Hub
+                </a>
+              </header>
+
+              <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+                <button
+                  onClick={() => setActiveSection('review')}
+                  className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+                >
+                  <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Concept Review</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('sandbox')}
+                  className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+                >
+                  <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Interactive Sandbox</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('practice')}
+                  className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Practice Problems</span>
+                </button>
+              </nav>
+
+              <main className="container">
+                {activeSection === 'review' && <ConceptReview />}
+                {activeSection === 'sandbox' && <SerialCommunicationSimulator />}
+                {activeSection === 'practice' && <PracticeProblems />}
+              </main>
+
+              <footer className="text-center text-gray-500 text-sm mt-12">
+                <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+              </footer>
             </div>
-        </section>
+          );
+        };
 
-        <section id="apps" class="content-section">
-             <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Real-World Applications</h2>
-            <div id="apps-grid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
-        </section>
-
-        <section id="knowledge" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
-            <div id="knowledge-grid" class="space-y-4"></div>
-        </section>
-    </main>
-
-<script>
-const knowledgeData = [
-    { question: "If you know a robot's joint angles and want to find its gripper position, what do you use?", answer: "**Forward Kinematics (FK)**. It calculates the end-effector pose from the joint parameters." },
-    { question: "Why is Inverse Kinematics (IK) often considered the more difficult problem?", answer: "Because it can have multiple solutions (e.g., 'elbow up' vs. 'elbow down'), no solution (if the target is out of reach), and involves solving complex non-linear equations." },
-    { question: "What does the 'G(q)' term in the robot dynamics equation represent?", answer: "It represents the torque required at each joint to counteract the force of **gravity** acting on the robot's links." },
-    { question: "In a high-speed pick-and-place task, why is a robot's dynamic model crucial for accuracy?", answer: "The dynamic model allows the controller to calculate and compensate for forces like inertia, gravity, and Coriolis effects, preventing the robot from overshooting its target or vibrating." }
-];
-
-const appsData = [
-    { title: "Industrial Welding", text: "IK calculates the path for the welder, while dynamics ensures the arm moves smoothly and resists forces during welding.", icon: "🏭" },
-    { title: "Surgical Robots", text: "Extreme precision is required. Kinematics defines the tool's position, and dynamics ensures smooth, vibration-free movement.", icon: "⚕️" },
-    { title: "Film & Animation", text: "Animators often pose a character's hand (IK), and the computer calculates the arm's joint angles automatically.", icon: "🎬" },
-    { title: "Space Exploration", text: "The robotic arms on rovers use kinematics to position instruments and dynamics to manage forces when drilling or sampling.", icon: "🚀" },
-];
-
-class RobotArm {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.width = this.canvas.width;
-        this.height = this.canvas.height;
-        this.l1 = 100; // Length of link 1
-        this.l2 = 80;  // Length of link 2
-        this.originX = this.width / 2;
-        this.originY = this.height - 50;
-        this.target = null;
-    }
-
-    draw(theta1, theta2) {
-        // Convert angles to radians
-        const t1 = theta1 * Math.PI / 180;
-        const t2 = theta2 * Math.PI / 180;
-
-        // FK calculation
-        const x1 = this.originX + this.l1 * Math.cos(t1);
-        const y1 = this.originY - this.l1 * Math.sin(t1);
-        const x2 = x1 + this.l2 * Math.cos(t1 + t2);
-        const y2 = y1 - this.l2 * Math.sin(t1 + t2);
-        
-        // Clear canvas
-        this.ctx.clearRect(0, 0, this.width, this.height);
-        
-        // Draw target if it exists
-        if (this.target) {
-            this.ctx.beginPath();
-            this.ctx.arc(this.target.x, this.target.y, 5, 0, 2 * Math.PI);
-            this.ctx.fillStyle = this.target.reachable ? 'rgba(5, 150, 105, 0.5)' : 'rgba(220, 38, 38, 0.5)';
-            this.ctx.fill();
-        }
-
-        // Draw arm
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.originX, this.originY);
-        this.ctx.lineTo(x1, y1);
-        this.ctx.lineTo(x2, y2);
-        this.ctx.strokeStyle = '#57534e';
-        this.ctx.lineWidth = 8;
-        this.ctx.stroke();
-
-        // Draw joints
-        this.ctx.beginPath();
-        this.ctx.arc(this.originX, this.originY, 8, 0, 2 * Math.PI);
-        this.ctx.fillStyle = '#1c1917';
-        this.ctx.fill();
-
-        this.ctx.beginPath();
-        this.ctx.arc(x1, y1, 8, 0, 2 * Math.PI);
-        this.ctx.fillStyle = '#1c1917';
-        this.ctx.fill();
-
-        // Draw end-effector
-        this.ctx.beginPath();
-        this.ctx.arc(x2, y2, 10, 0, 2 * Math.PI);
-        this.ctx.fillStyle = '#059669';
-        this.ctx.fill();
-        
-        return { x: x2, y: y2 };
-    }
-
-    solveIK(targetX, targetY) {
-        const statusEl = document.getElementById('ik-status');
-        this.target = { x: targetX + this.originX, y: this.originY - targetY, reachable: true };
-
-        const dx = targetX;
-        const dy = targetY;
-        const distSq = dx*dx + dy*dy;
-        const dist = Math.sqrt(distSq);
-
-        if (dist > this.l1 + this.l2 || dist < Math.abs(this.l1 - this.l2)) {
-            statusEl.textContent = "Target is unreachable!";
-            this.target.reachable = false;
-            this.drawFromSliders(); // Redraw in last valid position
-            return;
-        }
-        statusEl.textContent = "";
-
-        const D = (distSq - this.l1*this.l1 - this.l2*this.l2) / (2 * this.l1 * this.l2);
-        let theta2Rad = Math.acos(D); // Elbow down solution
-        
-        // For simplicity, we'll use elbow down solution
-        // theta2Rad = -theta2Rad would be elbow up
-        
-        let theta1Rad = Math.atan2(dy, dx) - Math.atan2(this.l2 * Math.sin(theta2Rad), this.l1 + this.l2 * Math.cos(theta2Rad));
-
-        const theta1Deg = theta1Rad * 180 / Math.PI;
-        const theta2Deg = theta2Rad * 180 / Math.PI;
-        
-        if (theta1Deg >= 0 && theta1Deg <= 180) {
-             // Update sliders and draw
-            document.getElementById('theta1-slider').value = theta1Deg;
-            document.getElementById('theta2-slider').value = theta2Deg;
-            this.drawAndUpdateUI();
-        } else {
-            statusEl.textContent = "Solution out of Joint 1 range!";
-            this.target.reachable = false;
-            this.drawFromSliders();
-        }
-    }
-    
-    updateUI(theta1, theta2, {x, y}) {
-        document.getElementById('theta1-value').textContent = `${Math.round(theta1)}°`;
-        document.getElementById('theta2-value').textContent = `${Math.round(theta2)}°`;
-        document.getElementById('fk-x-pos').textContent = (x - this.originX).toFixed(1);
-        document.getElementById('fk-y-pos').textContent = (this.originY - y).toFixed(1);
-    }
-    
-    drawAndUpdateUI() {
-        const theta1 = parseFloat(document.getElementById('theta1-slider').value);
-        const theta2 = parseFloat(document.getElementById('theta2-slider').value);
-        const endEffectorPos = this.draw(theta1, theta2);
-        this.updateUI(theta1, theta2, endEffectorPos);
-    }
-
-    drawFromSliders() {
-        this.target = null; // Clear IK target when using sliders
-        this.drawAndUpdateUI();
-    }
-}
-
-let robotArm;
-
-function solveIK() {
-    const x = parseFloat(document.getElementById('ik-x-input').value);
-    const y = parseFloat(document.getElementById('ik-y-input').value);
-    if (!isNaN(x) && !isNaN(y)) {
-        robotArm.solveIK(x, y);
-    }
-}
-
-function initKnowledgeCheck() {
-    const container = document.getElementById('knowledge-grid');
-    container.innerHTML = knowledgeData.map(item => `
-        <div class="question-card bg-white p-6 rounded-lg shadow-md border border-stone-200">
-            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
-            <div class="answer" style="display: none; margin-top: 1rem; padding: 1rem; background-color: #f0fdf4; border-left: 4px solid #22c55e; color: #15803d;">
-                <p><strong>Answer:</strong> ${item.answer}</p>
-            </div>
-            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 transition-colors text-sm" onclick="toggleAnswer(this)">Reveal Answer</button>
-        </div>
-    `).join('');
-}
-
-function initApps() {
-    const container = document.getElementById('apps-grid');
-    container.innerHTML = appsData.map(item => `
-        <div class="card p-6 flex flex-col items-center text-center">
-            <div class="text-5xl mb-4">${item.icon}</div>
-            <h3 class="font-bold text-lg text-stone-800 mb-2">${item.title}</h3>
-            <p class="text-stone-600 text-sm">${item.text}</p>
-        </div>
-    `).join('');
-}
-
-function toggleAnswer(button) {
-    const answerEl = button.previousElementSibling;
-    const isVisible = answerEl.style.display === 'block';
-    answerEl.style.display = isVisible ? 'none' : 'block';
-    button.textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    robotArm = new RobotArm('robotCanvas');
-    robotArm.drawFromSliders();
-
-    document.getElementById('theta1-slider').addEventListener('input', () => robotArm.drawFromSliders());
-    document.getElementById('theta2-slider').addEventListener('input', () => robotArm.drawFromSliders());
-
-    initKnowledgeCheck();
-    initApps();
-
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-});
-
-function showSection(sectionId) {
-    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    document.querySelectorAll('.nav-button').forEach(button => {
-        button.classList.remove('active');
-        if (button.getAttribute('onclick').includes(sectionId)) {
-            button.classList.add('active');
-        }
-    });
-    window.scrollTo(0, 0);
-}
-
-function closeMenu() {
-    document.getElementById('mobile-menu').classList.add('hidden');
-}
-
-</script>
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 </body>
 </html>
