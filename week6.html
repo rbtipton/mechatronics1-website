@@ -3,858 +3,606 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 6 - Microcontrollers and Embedded Systems</title>
+    <title>Mechatronics 1: Week 6 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Academic Blue -->
-    <!-- Application Structure Plan: The SPA is structured using a main navigation bar to switch between three core sections: 'Microcontroller Concepts', 'Interactive Sandbox', and 'Practice Problems'. The 'Microcontroller Concepts' section uses a sub-navigation (tabs) for 'Intro & Components', 'MCU vs MPU', 'Architecture & Programming', and 'Peripherals & Applications'. This architecture organizes the content thematically, allowing students to focus on one concept at a time. The 'Interactive Sandbox' provides a simple simulation of microcontroller input/output logic. The user flow is designed for progressive learning: grasp a concept, see it applied interactively, and finally, test knowledge with practice problems. This is more engaging and effective than a static document. -->
-    <!-- Visualization & Content Choices: Concepts/Steps -> Styled text blocks (HTML/Tailwind). Examples -> Interactive step-by-step reveal with a button (JS). Diagrams -> HTML/CSS divs for generic block diagrams (MCU components, architecture). Sandbox Visualization -> Dynamic UI elements (button for input, color-changing div for LED output, pseudo-code display) to illustrate basic I/O control logic. Practice Problems -> Cards with a 'show answer' toggle (JS). This mix of static and interactive content enhances engagement and comprehension. -->
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .tab-active { 
-            border-color: #3b82f6; /* blue-500 */
-            color: #1d4ed8; /* blue-700 */
-            background-color: #eff6ff; /* blue-50 */
-        }
-        .step-content {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .step-content.visible {
-            display: block;
-            opacity: 1;
-        }
-        .solution-box {
-            background-color: #f8fafc;
-            border-left: 4px solid #3b82f6;
-            padding: 1rem;
-            margin-top: 1rem;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-        }
-        .btn {
-            background-color: #3b82f6;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-        .btn:hover { background-color: #2563eb; }
-        .btn-secondary {
-            background-color: #6b7280;
-        }
-        .btn-secondary:hover { background-color: #4b5563; }
-        .hidden { display: none; }
-        .katex-display { display: block; overflow-x: auto; white-space: nowrap; }
-
-        /* Generic Block Diagram Styling for MCU components */
-        .block-diagram {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            padding: 1rem;
-            background-color: #f3f4f6;
-            border: 2px solid #d1d5db;
-            border-radius: 0.5rem;
-            min-height: 200px;
-            align-items: center;
-            justify-items: center;
+        body {
             font-family: 'Inter', sans-serif;
-            margin-bottom: 1rem;
+            background-color: #f3f4f6;
+            color: #1f2937;
         }
-        .block-diagram-item {
-            background-color: #e0f2fe; /* Light blue */
-            border: 1px solid #93c5fd; /* Blue-300 */
-            border-radius: 0.25rem;
-            padding: 0.75rem;
-            text-align: center;
-            font-weight: 500;
-            color: #1d4ed8; /* Blue-700 */
-            width: 100%;
-            box-sizing: border-box;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
         }
-        .mcu-mpu-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
         }
-        .mcu-mpu-table th, .mcu-mpu-table td {
-            border: 1px solid #e5e7eb;
-            padding: 0.75rem;
-            text-align: left;
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
         }
-        .mcu-mpu-table th {
-            background-color: #e0f2fe;
-            font-weight: 600;
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
         }
-        .mcu-mpu-table tr:nth-child(even) {
-            background-color: #f9fafb;
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
         }
-
-        /* Sandbox specific styling */
-        #sim-output-led {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background-color: #ef4444; /* Red for OFF */
-            border: 4px solid #b91c1c;
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
-            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            margin: 2rem auto;
+        .nav-button svg {
+          margin-bottom: 0.25rem;
         }
-        #sim-output-led.on {
-            background-color: #22c55e; /* Green for ON */
-            border-color: #166534;
-            box-shadow: 0 0 25px rgba(34, 197, 94, 0.7);
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
         }
-        #sim-input-button {
-            width: 120px;
-            height: 40px;
-            background-color: #94a3b8; /* Gray for unpressed */
-            border: 2px solid #64748b;
-            border-radius: 0.375rem;
-            font-weight: 600;
-            color: white;
-            text-align: center;
-            line-height: 36px;
-            cursor: pointer;
-            transition: background-color 0.1s ease-in-out, transform 0.1s ease-in-out;
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
         }
-        #sim-input-button.pressed {
-            background-color: #3b82f6; /* Blue when pressed */
-            transform: translateY(2px);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-        }
-        #pseudo-code-display {
-            background-color: #1e293b; /* Dark slate */
-            color: #e2e8f0; /* Light gray */
+        .formula-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border-left: 4px solid #38bdf8; /* Blue border on left */
             padding: 1rem;
             border-radius: 0.5rem;
-            font-family: 'Fira Code', 'Courier New', monospace;
-            white-space: pre-wrap;
-            min-height: 150px;
-            font-size: 0.9rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 1rem;
+            color: #0c4a6e; /* Darker blue text */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="antialiased">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-md sticky top-0 z-10">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-bold text-blue-700">Mechatronics 1: Week 6 - Microcontrollers and Embedded Systems</h1>
-                <div class="flex space-x-4 text-sm font-medium">
-                    <button data-target="concepts" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Microcontroller Concepts</button>
-                    <button data-target="sandbox" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Interactive Sandbox</button>
-                    <button data-target="practice" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Practice Problems</button>
-                </div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Lucide React icons (inline SVGs for direct use in HTML)
+        const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+        const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+        const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+
+        // Icons for Week 6
+        const Cpu = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v4"/><path d="M15 1v4"/><path d="M9 19v4"/><path d="M15 19v4"/><path d="M1 9h4"/><path d="M1 15h4"/><path d="M19 9h4"/><path d="M19 15h4"/></svg>;
+        const LayoutDashboard = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>;
+        const Code = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>;
+        const ToggleLeft = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="8" cy="12" r="3"/></svg>;
+        const Lightbulb = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2C7.8 2 4.1 4.3 2.4 8.7A4.4 4.4 0 0 0 4 15h.3c.7 0 1.4.3 1.8.9l.4.9c1.4 2.3 3.4 3.4 5.4 3.4 2 0 4-.9 5.4-3.4l.4-.9c.4-.6 1.1-.9 1.8-.9H20a4.4 4.4 0 0 0 1.6-6.3C19.9 4.3 16.2 2 12 2z"/></svg>;
+        const Hand = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v11l-3 3-3-3V7a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v10l-3 3"/><path d="M14 10.5V17m4-6.5V17"/></svg>;
+
+
+        // Concept Review Component
+        const ConceptReview = () => {
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 6: Microcontrollers and Arduino Programming Fundamentals</h2>
+
+              {/* Microprocessor vs. Microcontroller */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Cpu className="w-7 h-7 mr-3 text-blue-600"/>
+                    1. Microprocessor vs. Microcontroller
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  While often confused, it's important to understand the key difference:
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Microprocessor (MPU):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Definition:</span> Primarily just the Central Processing Unit (CPU) on a chip. It's the "brain" that performs computations and executes instructions.</li>
+                  <li><span className="font-medium">Characteristics:</span> Requires external memory (RAM, ROM) and external input/output (I/O) control chips to form a complete computer system.</li>
+                  <li><span className="font-medium">Application:</span> Used in general-purpose computing devices like desktop computers, laptops, and smartphones, where flexibility and high processing power are paramount.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Microcontroller (MCU):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Definition:</span> A compact integrated circuit designed to govern a specific operation in an embedded system. It contains a CPU, memory (RAM, Flash/ROM), and I/O peripherals all on a single chip.</li>
+                  <li><span className="font-medium">Characteristics:</span> Self-contained, lower power consumption, typically less powerful than MPUs but highly integrated.</li>
+                  <li><span className="font-medium">Application:</span> Used in embedded systems where dedicated control and real-time operation are needed, such as washing machines, remote controls, automotive systems, and robotics.</li>
+                </ul>
+              </section>
+
+              {/* Basic Architecture (CPU, Memory, I/O Ports) */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <LayoutDashboard className="w-7 h-7 mr-3 text-teal-600"/>
+                    2. Basic Microcontroller Architecture
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  All microcontrollers share fundamental components:
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Central Processing Unit (CPU):</span> The "brain" that executes program instructions and performs calculations.</li>
+                  <li><span className="font-medium">Memory:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">Program Memory (Flash/ROM):</span> Stores the program (sketch) that the microcontroller runs. Non-volatile (retains data when power is off).</li>
+                      <li><span className="font-medium">Data Memory (RAM):</span> Stores temporary data and variables used by the program during execution. Volatile (loses data when power is off).</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">Input/Output (I/O) Ports:</span> Physical pins on the microcontroller chip that allow it to interact with external components (sensors, actuators, other digital devices). These can be configured as inputs (to read signals) or outputs (to send signals).</li>
+                  <li><span className="font-medium">Peripherals:</span> Specialized circuits for common tasks, such as Analog-to-Digital Converters (ADCs), Pulse Width Modulation (PWM) generators, timers, communication interfaces (UART, SPI, I2C).</li>
+                </ul>
+              </section>
+
+              {/* Introduction to the Arduino Platform */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Code className="w-7 h-7 mr-3 text-green-600"/>
+                    3. Introduction to the Arduino Platform
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Arduino is an open-source electronics platform based on easy-to-use hardware and software. It's popular for prototyping and learning mechatronics.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Arduino IDE and Basic Workflow:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Integrated Development Environment (IDE):</span> Software used to write, compile, and upload programs ("sketches") to the Arduino board.</li>
+                  <li><span className="font-medium">Workflow:</span> Write code in the editor, verify (compile) for errors, upload to the board.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Essential Arduino Sketch Structure:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">`void setup()` function:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li>Runs once when the Arduino board starts or resets.</li>
+                      <li>Used for initialization: setting pin modes (INPUT/OUTPUT), starting serial communication, initializing libraries.</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">`void loop()` function:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li>Runs repeatedly forever after `setup()` completes.</li>
+                      <li>Contains the main program logic that continuously reads sensors, processes data, and controls actuators.</li>
+                    </ul>
+                  </li>
+                </ul>
+              </section>
+
+              {/* Arduino Programming Fundamentals: Digital I/O */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <ToggleLeft className="w-7 h-7 mr-3 text-orange-600"/>
+                    4. Arduino Programming Fundamentals: Digital I/O
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Digital I/O pins can be set to either HIGH (5V) or LOW (0V) for outputs, or read as HIGH/LOW for inputs.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Key Functions:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">`pinMode(pin, mode)`:</span> Configures a specified pin to behave either as an input or an output.
+                    <ul className="list-circle list-inside ml-4">
+                      <li>`pin`: The Arduino pin number (e.g., 2, 13).</li>
+                      <li>`mode`: `INPUT`, `OUTPUT`, or `INPUT_PULLUP`.
+                        <ul className="list-circle list-inside ml-4">
+                          <li>`INPUT_PULLUP`: Configures the pin as an input and enables an internal pull-up resistor, useful for buttons (connect button to GND).</li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">`digitalWrite(pin, value)`:</span> Writes a HIGH or a LOW value to a digital pin.
+                    <ul className="list-circle list-inside ml-4">
+                      <li>`pin`: The Arduino pin number.</li>
+                      <li>`value`: `HIGH` (5V) or `LOW` (0V).</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">`digitalRead(pin)`:</span> Reads the value from a specified digital pin, either `HIGH` or `LOW`.
+                    <ul className="list-circle list-inside ml-4">
+                      <li>`pin`: The Arduino pin number.</li>
+                      <li>Returns: `HIGH` or `LOW`.</li>
+                    </ul>
+                  </li>
+                  <li><span className="font-medium">`delay(ms)`:</span> Pauses the program for a specified number of milliseconds.
+                    <ul className="list-circle list-inside ml-4">
+                      <li>`ms`: The number of milliseconds to pause (e.g., `1000` for 1 second).</li>
+                    </ul>
+                  </li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Basic C/C++ Syntax:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Variables:</span> Used to store data (e.g., `int ledPin = 13;`).</li>
+                  <li><span className="font-medium">Data Types:</span> `int` (integers), `float` (decimal numbers), `boolean` (true/false).</li>
+                  <li><span className="font-medium">Operators:</span> Arithmetic ('+', '-', '*', '/'), Comparison ('==', '!=', '&lt;', '&gt;'), Logical ('&amp;&amp;' AND, '||' OR, '!' NOT).</li>
+                  <li><span className="font-medium">Comments:</span> `// single line` or `/* multi-line */`.</li>
+                </ul>
+              </section>
             </div>
-        </nav>
-    </header>
-
-    <main id="app-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Section: Microcontroller Concepts -->
-        <section id="concepts" class="app-section">
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-3xl font-bold mb-4 text-gray-900">Microcontrollers: The Brains of Mechatronic Systems</h2>
-                <p class="text-gray-600 mb-6">This week, we bridge the gap between pure electronics and computational control by diving into microcontrollers. These "computers on a chip" are central to embedded systems, enabling intelligent behavior in everything from smart appliances to complex robots. Select a topic below to explore.</p>
-
-                <!-- Tabs -->
-                <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex flex-wrap" aria-label="Tabs">
-                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="intro_components">Intro & Components</button>
-                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="mcu_mpu">MCU vs MPU</button>
-                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="architecture_programming">Architecture & Programming</button>
-                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="peripherals_applications">Peripherals & Applications</button>
-                    </nav>
-                </div>
-
-                <!-- Content Area for Concepts -->
-                <div id="concept-content" class="mt-6">
-                    <!-- Content will be injected here by JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Section: Interactive Sandbox -->
-        <section id="sandbox" class="app-section hidden">
-             <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-3xl font-bold mb-2 text-gray-900">Interactive Sandbox: Basic I/O Control</h2>
-                <p class="text-gray-600 mb-6">This sandbox demonstrates how a microcontroller takes input and controls an output based on a simple program. Select a program and interact with the input button to see the output change.</p>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4">Control Logic</h3>
-                        <div class="mb-4">
-                            <label for="programSelect" class="font-medium">Select Program:</label>
-                            <select id="programSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                                <option value="button_control">LED follows Button</option>
-                                <option value="blink_led">Blink LED (2Hz)</option>
-                                <option value="inverted_button_control">LED inverted to Button</option>
-                            </select>
-                        </div>
-                        <div class="flex flex-col items-center space-y-4 my-8">
-                            <h4 class="text-lg font-medium">Digital Input (Button)</h4>
-                            <button id="sim-input-button">Press Me</button>
-                            <span id="sim-input-status" class="text-gray-700 text-sm">LOW</span>
-                        </div>
-                        <h4 class="text-lg font-semibold mb-2">Pseudo-Code:</h4>
-                        <div id="pseudo-code-display">
-                            <!-- Pseudo-code will be displayed here -->
-                        </div>
-                        <div class="mt-6 flex justify-center">
-                            <button id="run-simulation-btn" class="btn">Run Simulation</button>
-                            <button id="stop-simulation-btn" class="btn btn-secondary ml-2 hidden">Stop Simulation</button>
-                        </div>
-                    </div>
-                    <div class="flex flex-col items-center justify-center">
-                        <h3 class="text-xl font-semibold mb-4">Digital Output (LED)</h3>
-                        <div id="sim-output-led"></div>
-                        <span id="sim-output-status" class="text-gray-700 text-sm mt-2">OFF</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section: Practice Problems -->
-        <section id="practice" class="app-section hidden">
-            <div class="bg-white p-6 rounded-lg shadow">
-                 <h2 class="text-3xl font-bold mb-4 text-gray-900">Practice Problems</h2>
-                 <p class="text-gray-600 mb-6">Test your understanding with these problems from the course notes. Click "Show Answer" to reveal the detailed solution.</p>
-                 <div id="practice-problems-container" class="space-y-6">
-                    <!-- Practice problems will be injected here -->
-                 </div>
-                 <h2 class="text-3xl font-bold mt-8 mb-4 text-gray-900">Quiz</h2>
-                 <p class="text-gray-600 mb-6">Challenge your knowledge with these multiple-choice questions. Select your answer and click 'Check Answer'.</p>
-                 <div id="quiz-container" class="space-y-6">
-                    <!-- Quiz questions will be injected here -->
-                 </div>
-            </div>
-        </section>
-
-    </main>
-    
-<script>
-const appData = {
-    intro_components: {
-        title: "Introduction to Microcontrollers & Core Components",
-        description: "A microcontroller (MCU) is a compact integrated circuit designed to govern a specific operation in an embedded system. It is essentially a 'computer on a chip', integrating a processor, memory, and I/O peripherals.",
-        steps: [
-            "<strong>What is an Embedded System?</strong> A computer system with a dedicated function within a larger mechanical or electrical system, often with real-time computing constraints.",
-            "<strong>Microcontroller Core Components:</strong>",
-            "&bull; <strong>Central Processing Unit (CPU):</strong> The 'brain' that executes program instructions and performs calculations.",
-            "&bull; <strong>Memory:</strong> Stores program instructions (Flash/ROM, non-volatile) and temporary data (RAM, volatile).",
-            "&bull; <strong>Input/Output (I/O) Ports (GPIO):</strong> Digital pins that can be configured as inputs (to read sensors/switches) or outputs (to control LEDs/motors).",
-            "&bull; <strong>Timers/Counters:</strong> Essential for precise timing, generating delays, or counting events (e.g., motor revolutions).",
-            "&bull; <strong>Oscillator:</strong> Provides the clock signal that synchronizes all operations within the microcontroller.",
-            "Real-Life Application: A modern washing machine uses a microcontroller to manage wash cycles. It reads inputs from buttons (program selection), water level sensors, and temperature sensors. Based on the selected cycle and sensor data, it controls outputs like water valves, detergent dispensers, motor (for agitation/spin), and drain pump, all synchronized by its internal timer."
-        ],
-        example: {
-            problem: "Identify the primary function of the CPU and Memory within a microcontroller in the context of controlling a robotic arm.",
-            circuitHTML: `<div class="block-diagram w-full max-w-sm">
-                            <div class="block-diagram-item col-span-2">Microcontroller</div>
-                            <div class="block-diagram-item">CPU</div>
-                            <div class="block-diagram-item">Memory</div>
-                            <div class="block-diagram-item">I/O Ports</div>
-                            <div class="block-diagram-item">Peripherals</div>
-                        </div>`, 
-            solutionSteps: [
-                {
-                    title: "CPU Function",
-                    content: `In a robotic arm, the CPU executes the control algorithm. This includes processing sensor data (e.g., joint angles from encoders, force from load cells), calculating desired motor movements (kinematics/dynamics), and sending commands to motor drivers. The CPU is constantly performing calculations and making decisions based on the program.`
-                },
-                {
-                    title: "Memory Function",
-                    content: `<strong>Flash/ROM:</strong> Stores the main program (firmware) of the robotic arm, such as motion sequences, safety protocols, and communication routines. This code persists even when the arm is powered off.<br>
-                    <strong>RAM:</strong> Stores temporary data during operation, like the current joint angles, calculated motor torques, temporary variables used in calculations, and buffer data for communication. This data is lost when power is removed.`
-                },
-                {
-                    title: "Analogy",
-                    content: `Think of the CPU as the 'brain' that thinks and decides, and the Memory as its 'long-term memory' (Flash/ROM for skills and knowledge) and 'short-term working memory' (RAM for current thoughts and calculations).`
-                }
-            ]
-        }
-    },
-    mcu_mpu: {
-        title: "Microcontroller (MCU) vs. Microprocessor (MPU)",
-        description: "While both MCUs and MPUs contain a Central Processing Unit (CPU) and are 'integrated circuits', they are designed for different purposes and have distinct characteristics.",
-        steps: [
-            "<strong>Integration:</strong>",
-            "&bull; <strong>Microcontroller (MCU):</strong> Integrates CPU, memory (RAM, ROM/Flash), and various peripherals (I/O, timers, ADC, etc.) onto a *single chip*.",
-            "&bull; <strong>Microprocessor (MPU):</strong> Primarily contains only the CPU. It requires external memory and peripherals to function as a complete computing system.",
-            "<strong>Operating System:</strong>",
-            "&bull; <strong>MCU:</strong> Often runs without a complex OS (bare-metal programming) or a Real-Time Operating System (RTOS) for specific tasks.",
-            "&bull; <strong>MPU:</strong> Typically requires a complex OS like Linux, Windows, or Android to manage its versatile functions and external components.",
-            "<strong>Power Consumption & Cost:</strong>",
-            "&bull; <strong>MCU:</strong> Generally low power, cost-effective, optimized for embedded applications.",
-            "&bull; <strong>MPU:</strong> Higher power consumption, more expensive, designed for general-purpose computing.",
-            "<strong>Applications:</strong>",
-            "&bull; <strong>MCU:</strong> Dedicated, real-time control tasks (e.g., washing machines, remote controls, automotive ECUs, simple IoT devices).",
-            "&bull; <strong>MPU:</strong> General-purpose computing (e.g., personal computers, smartphones, servers, complex industrial controllers).",
-            "Real-Life Application: A smart thermostat (MCU) controls heating/cooling based on temperature readings and user settings. It's a dedicated task, low power. Your smartphone (MPU) runs a complex OS, thousands of apps, manages high-speed communication, and requires significant memory and processing power for general-purpose computing. The smartphone uses a powerful MPU, while the thermostat uses a specialized MCU."
-        ],
-        example: {
-            problem: "Explain why a microcontroller is generally preferred over a microprocessor for an application like controlling a robotic vacuum cleaner.",
-            circuitHTML: ``,
-            solutionSteps: [
-                {
-                    title: "Dedicated Task vs. General Purpose",
-                    content: `A robotic vacuum cleaner performs a highly specific set of tasks: navigation, vacuuming, obstacle avoidance, battery management, and docking. A microcontroller is designed for such dedicated functions.`
-                },
-                {
-                    title: "Integration and Form Factor",
-                    content: `MCUs integrate most necessary components (CPU, memory, I/O) on a single chip, leading to a smaller, more compact design. This is crucial for a small, mobile device like a robotic vacuum where space is limited.`
-                },
-                {
-                    title: "Power Efficiency",
-                    content: `Robotic vacuums are battery-powered, so low power consumption is critical for extended operation. Microcontrollers are inherently more power-efficient than microprocessors, which are built for high performance and typically consume more power.`
-                },
-                {
-                    title: "Cost-Effectiveness",
-                    content: `For mass-produced consumer electronics, cost is a major factor. Microcontrollers are generally much more cost-effective than microprocessors, contributing to a lower final product price.`
-                },
-                {
-                    title: "Real-time Control",
-                    content: `Tasks like obstacle avoidance and motor control require precise, real-time responses. MCUs often excel in real-time performance due to their simpler architecture and direct hardware access, without the overhead of a complex operating system.`
-                },
-                {
-                    title: "Conclusion",
-                    content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">Therefore, the integrated, low-power, and cost-effective nature of an MCU makes it the ideal choice for a robotic vacuum cleaner, rather than the more powerful but less suitable MPU.</div>`
-                }
-            ]
-        }
-    },
-    architecture_programming: {
-        title: "Microcontroller Architecture & Basic Programming",
-        description: "Understanding the internal architecture and how to program microcontrollers is key to bringing your mechatronic designs to life.",
-        steps: [
-            "<strong>Memory Architectures:</strong>",
-            "&bull; <strong>Von Neumann Architecture:</strong> Uses a single address space for both program instructions and data. Simpler to implement but can lead to a 'bottleneck' (e.g., a traditional PC).",
-            "&bull; <strong>Harvard Architecture:</strong> Uses separate memory spaces for instructions and data. Allows simultaneous fetching of instructions and data, leading to faster execution (common in MCUs).",
-            "<strong>Firmware:</strong> The software programmed onto a microcontroller. It's 'embedded' within the hardware and controls its specific functions.",
-            "<strong>Embedded C Programming:</strong> C is the most common language for microcontroller programming due to its efficiency and low-level hardware access. Key concepts include:",
-            "&bull; <strong>Initialization:</strong> Setting up pins as input/output, configuring peripherals (like timers, communication modules).",
-            "&bull; <strong>Digital I/O:</strong> Reading the state of a digital input pin (e.g., `digitalRead(pin)`) and setting the state of a digital output pin (e.g., `digitalWrite(pin, HIGH/LOW)`).",
-            "&bull; <strong>Control Flow:</strong> Using `if/else` statements for decision-making and `for/while` loops for repetitive tasks.",
-            "&bull; <strong>Infinite Loop (`main()`):</strong> Most microcontroller programs run indefinitely within a `while(1)` or `for(;;)` loop after initial setup.",
-            "Real-Life Application: A traffic light controller. The firmware constantly checks traffic sensor inputs (digital inputs), uses internal timers to manage light durations, and changes the state of LED outputs (Red, Yellow, Green) according to programmed sequences and decision logic. The program loops endlessly, ensuring continuous operation."
-        ],
-        example: {
-            problem: "Write pseudo-code for a microcontroller to blink an LED connected to `pin 13` with a 1-second on, 1-second off pattern. Assume `setup()` and `loop()` functions.",
-            circuitHTML: ``,
-            solutionSteps: [
-                {
-                    title: "Step 1: Setup Function",
-                    content: `The \`setup()\` function runs once when the microcontroller starts. Here, we configure \`pin 13\` as an output.<br>
-                    <div class="solution-box">
-                        <pre>function setup() {
-  pinMode(13, OUTPUT); // Configure pin 13 as an output
-}</pre>
-                    </div>`
-                },
-                {
-                    title: "Step 2: Loop Function",
-                    content: `The \`loop()\` function runs repeatedly after \`setup()\` finishes. This is where the blinking logic resides.<br>
-                    <div class="solution-box">
-                        <pre>function loop() {
-  digitalWrite(13, HIGH); // Turn LED ON
-  // Wait for 1000 milliseconds (1 second)
-  digitalWrite(13, LOW);  // Turn LED OFF
-  // Wait for 1000 milliseconds (1 second)
-}</pre>
-                    </div>`
-                },
-                {
-                    title: "Full Pseudo-Code",
-                    content: `Combining both parts:<br>
-                    <div class="solution-box">
-                        <pre>function setup() {
-  pinMode(13, OUTPUT); // Configure pin 13 as an output
-}
-
-function loop() {
-  digitalWrite(13, HIGH); // Turn LED ON
-  // Wait for 1000 milliseconds (1 second)
-  digitalWrite(13, LOW);  // Turn LED OFF
-  // Wait for 1000 milliseconds (1 second)
-}</pre>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-700">This pseudo-code illustrates the fundamental structure of a microcontroller program for repetitive tasks.</p>`
-                }
-            ]
-        }
-    },
-    peripherals_applications: {
-        title: "Microcontroller Peripherals & Advanced Applications",
-        description: "Beyond basic digital I/O, microcontrollers contain specialized hardware modules, known as peripherals, that extend their capabilities for complex tasks.",
-        steps: [
-            "<strong>Common Peripherals:</strong>",
-            "&bull; <strong>Analog-to-Digital Converter (ADC):</strong> Converts continuous analog signals (e.g., voltage from a temperature sensor) into discrete digital values that the MCU can process.",
-            "&bull; <strong>Digital-to-Analog Converter (DAC):</strong> Converts digital values from the MCU into analog voltages or currents (e.g., for controlling motor speed or generating audio).",
-            "&bull; <strong>Pulse Width Modulation (PWM):</strong> Generates a square wave with varying 'on' time (duty cycle). Used for controlling the effective power delivered to devices like LEDs (brightness) and DC motors (speed).",
-            "&bull; <strong>Serial Communication Interfaces:</strong> UART, SPI, I2C are protocols for communicating with other chips, sensors, or modules. Essential for complex systems.",
-            "&bull; <strong>Interrupts:</strong> Hardware mechanisms that allow the MCU to respond immediately to external events (e.g., a button press, a sensor threshold crossing) without constantly checking (polling).",
-            "<strong>Advanced Applications in Mechatronics:</strong>",
-            "&bull; <strong>Automotive Electronics (ECUs):</strong> Engine control, ABS, airbag deployment, infotainment.",
-            "&bull; <strong>Industrial Automation:</strong> Robot control, PLC (Programmable Logic Controller) replacement, machine control, process monitoring.",
-            "&bull; <strong>Medical Devices:</strong> Pacemakers, insulin pumps, diagnostic equipment, prosthetics.",
-            "&bull; <strong>Internet of Things (IoT):</strong> Smart home devices (thermostats, lighting), wearable technology, connected sensors.",
-            "Real-Life Application: A sophisticated robotic arm in a factory. It uses ADCs to read analog signals from force/torque sensors at its joints, PWM to precisely control the speed and position of its DC servo motors, and UART/SPI to communicate with a master control unit and other specialized modules (like vision systems). Interrupts might be used for rapid emergency stop detection."
-        ],
-        example: {
-            problem: "A mechatronics system uses a potentiometer (analog output) to control the brightness of an LED (digital output) and a small DC motor (analog control via PWM). Describe how a microcontroller uses its peripherals to achieve this.",
-            circuitHTML: ``,
-            solutionSteps: [
-                {
-                    title: "Potentiometer to LED Brightness (ADC & PWM)",
-                    content: `1. The **potentiometer** provides a variable analog voltage. <br>
-                    2. The microcontroller's **Analog-to-Digital Converter (ADC)** reads this analog voltage and converts it into a digital number (e.g., 0-1023). <br>
-                    3. The microcontroller then uses this digital number to set the **Pulse Width Modulation (PWM)** duty cycle for the LED. A higher number from the ADC results in a higher PWM duty cycle, making the LED brighter.`
-                },
-                {
-                    title: "Potentiometer to DC Motor Speed (ADC & PWM)",
-                    content: `1. The same **ADC** reading from the potentiometer can be used. <br>
-                    2. This digital value is then mapped to a **PWM** signal that drives the DC motor. A higher PWM duty cycle sends more effective power to the motor, increasing its speed. This is a common method for analog-like control using digital outputs.`
-                },
-                {
-                    title: "Overall Interaction",
-                    content: `The microcontroller continuously samples the potentiometer's analog voltage using its ADC. Based on this single input, it dynamically adjusts the PWM signals for both the LED (brightness) and the DC motor (speed), creating a responsive system where a single analog input controls multiple outputs with varying levels.`
-                }
-            ]
-        }
-    }
-};
-
-const practiceProblems = [
-    {
-        id: 1,
-        title: "Microcontroller Component Identification",
-        problemHTML: `A student is designing a smart plant watering system. They need to read soil moisture (which provides a variable voltage) and control a small pump (which can be turned ON/OFF). What core microcontroller component would be used for each of these tasks?<br>
-        1. Reading soil moisture: ________<br>
-        2. Controlling the pump: ________`,
-        answerHTML: `<b>Solution:</b><br>
-        1. Reading soil moisture: <strong>Analog-to-Digital Converter (ADC)</strong>, because soil moisture sensors typically output a continuous analog voltage.<br>
-        2. Controlling the pump: <strong>General Purpose Input/Output (GPIO) pin configured as an output</strong>, because a pump motor generally requires a simple ON/OFF digital control signal (though a driver circuit would also be needed).<br>
-        <div class="solution-box">ADC, GPIO Output</div>`
-    },
-    {
-        id: 2,
-        title: "MCU vs. MPU Application",
-        problemHTML: `You need to design the control system for a new drone. Which would generally be more suitable for the flight controller (managing motors, sensors, and stability in real-time): a Microcontroller (MCU) or a Microprocessor (MPU)? Justify your answer.`,
-        answerHTML: `<b>Solution:</b><br>
-        For the drone's flight controller, a <strong>Microcontroller (MCU)</strong> would generally be more suitable.<br>
-        <strong>Justification:</strong><br>
-        1.  <strong>Real-time Performance:</strong> Flight control requires precise, deterministic, and fast real-time responses to sensor data (accelerometers, gyroscopes) to maintain stability. MCUs, with their direct hardware access and often simpler architecture (sometimes running RTOS), are excellent for real-time control.<br>
-        2.  <strong>Power Consumption:</strong> Drones are battery-powered, so low power consumption is crucial for flight duration. MCUs are designed for low power.<br>
-        3.  <strong>Cost and Size:</strong> For a compact and cost-effective product, the integrated nature of an MCU (CPU, memory, peripherals on one chip) reduces board space and overall cost compared to an MPU that requires external components.<br>
-        (An MPU might be used for higher-level tasks like complex navigation, video processing, or AI, but the core flight control loop usually relies on an MCU).<br>
-        <div class="solution-box">MCU, due to real-time performance, low power, and integration for dedicated control.</div>`
-    },
-    {
-        id: 3,
-        title: "Basic Programming Logic",
-        problemHTML: `Write pseudo-code for a microcontroller to turn an LED (connected to \`pin 5\`) ON if a push button (connected to \`pin 2\`) is pressed, and OFF if it's not pressed. Assume \`setup()\` and \`loop()\` functions.`,
-        answerHTML: `<b>Solution:</b><br>
-        <div class="solution-box">
-        <pre>function setup() {
-  pinMode(5, OUTPUT); // Configure pin 5 as an output for the LED
-  pinMode(2, INPUT);  // Configure pin 2 as an input for the button
-}
-
-function loop() {
-  if (digitalRead(2) == HIGH) { // Check if the button is pressed (HIGH)
-    digitalWrite(5, HIGH);      // Turn LED ON
-  } else {
-    digitalWrite(5, LOW);       // Turn LED OFF
-  }
-}</pre>
-        </div><br>
-        <div class="solution-box">This code continuously checks the button state and updates the LED accordingly.</div>`
-    }
-];
-
-const quizQuestions = [
-    {
-        id: 1,
-        question: "Which of the following is NOT a core component typically found on a microcontroller chip?",
-        options: ["CPU", "RAM", "I/O Ports", "Hard Disk Drive"],
-        answer: "Hard Disk Drive",
-        explanation: "Hard Disk Drives are large, external storage devices, not integrated into a microcontroller chip. Microcontrollers use Flash/ROM for program storage."
-    },
-    {
-        id: 2,
-        question: "What is the primary difference between Von Neumann and Harvard architectures in microcontrollers?",
-        options: ["Von Neumann uses faster clocks.", "Harvard has separate memory for instructions and data.", "Von Neumann consumes less power.", "Harvard is only for 8-bit MCUs."],
-        answer: "Harvard has separate memory for instructions and data.",
-        explanation: "Harvard architecture utilizes separate memory spaces for instructions and data, allowing for simultaneous access and faster execution, which is common in MCUs."
-    },
-    {
-        id: 3,
-        question: "What is 'firmware' in the context of microcontrollers?",
-        options: ["A type of external hardware device.", "The physical case of the microcontroller.", "The software programmed onto the microcontroller.", "A complex operating system like Windows."],
-        answer: "The software programmed onto the microcontroller.",
-        explanation: "Firmware is the embedded software that controls the specific functions of the microcontroller and the device it's part of."
-    },
-    {
-        id: 4,
-        question: "If you need to control the brightness of an LED using a microcontroller's digital output pin, which peripheral would you likely use?",
-        options: ["ADC", "UART", "PWM", "Timer/Counter (alone)"],
-        answer: "PWM",
-        explanation: "Pulse Width Modulation (PWM) is used to control the effective power delivered to a device, enabling analog-like control (like brightness) from a digital pin."
-    },
-    {
-        id: 5,
-        question: "Which type of device would typically use a Microprocessor (MPU) rather than a Microcontroller (MCU)?",
-        options: ["A washing machine", "A smart thermostat", "A personal computer", "A simple remote control"],
-        answer: "A personal computer",
-        explanation: "Personal computers require powerful processors to run complex operating systems and diverse applications, which is the primary function of an MPU. The other options typically use MCUs for dedicated control tasks."
-    }
-];
-
-
-// --- Global Variables and Setup for Sandbox Simulation ---
-let blinkInterval; // To store the interval ID for blinking LED
-let isSimulationRunning = false; // Flag to track if simulation is active
-
-document.addEventListener('DOMContentLoaded', () => {
-    const navLinks = document.querySelectorAll('.nav-link');
-    const appSections = document.querySelectorAll('.app-section');
-    const conceptTabs = document.querySelectorAll('.concept-tab');
-    const conceptContentContainer = document.getElementById('concept-content');
-    
-    // Main navigation - Sets up the click listeners for the top navigation buttons.
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            const targetId = link.dataset.target;
-            appSections.forEach(section => {
-                section.classList.toggle('hidden', section.id !== targetId);
-            });
-            navLinks.forEach(l => l.classList.remove('font-bold', 'text-blue-600'));
-            link.classList.add('font-bold', 'text-blue-600');
-
-            // Special handling for sandbox section to stop any running simulations
-            if (targetId !== 'sandbox') {
-                stopSimulation();
-            }
-        });
-    });
-
-    // Concept tabs - Sets up the click listeners for the sub-navigation tabs within the 'Concepts' section.
-    conceptTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const conceptId = tab.dataset.concept;
-            conceptTabs.forEach(t => t.classList.remove('tab-active', 'border-blue-500', 'text-blue-600'));
-            tab.classList.add('tab-active', 'border-blue-500', 'text-blue-600');
-            renderConcept(conceptId);
-        });
-    });
-
-    // Function to render content for selected concept tab.
-    function renderConcept(conceptId) {
-        const data = appData[conceptId];
-        if (!data) return;
-
-        let stepsHTML = data.steps.map(step => `<li class="mb-2">${step}</li>`).join('');
-        let exampleStepsHTML = data.example.solutionSteps.map((step, index) => `
-            <div id="step-${index}" class="step-content border-t pt-4 mt-4">
-                <h4 class="font-semibold text-lg text-blue-700">${step.title}</h4>
-                <div class="text-gray-700 mt-2">${step.content}</div>
-            </div>
-        `).join('');
-
-        conceptContentContainer.innerHTML = `
-            <h3 class="text-2xl font-bold text-gray-800">${data.title}</h3>
-            <p class="mt-2 mb-4 text-gray-600">${data.description}</p>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div>
-                    <h4 class="text-xl font-semibold mb-2">Key Concepts & Real-Life Application</h4>
-                    <ul class="list-decimal list-inside text-gray-700 space-y-1">${stepsHTML}</ul>
-                </div>
-                <div>
-                    <h4 class="text-xl font-semibold mb-2">Interactive Example: ${data.example.problem}</h4>
-                    ${data.example.circuitHTML || ''}
-                    <div id="example-steps-container">${exampleStepsHTML}</div>
-                    <div class="mt-4 flex space-x-2">
-                         <button id="next-step-btn" class="btn">Start</button>
-                         <button id="reset-steps-btn" class="btn btn-secondary">Reset</button>
-                    </div>
-                </div>
-            </div>`;
-        
-        setupInteractiveExample();
-    }
-    
-    // --- Interactive Example Logic ---
-    let currentStep = -1; // Tracks the current step in the interactive example for concepts.
-    function setupInteractiveExample() {
-        const nextBtn = document.getElementById('next-step-btn');
-        const resetBtn = document.getElementById('reset-steps-btn');
-        const steps = document.querySelectorAll('.step-content');
-        currentStep = -1; // Reset step counter
-
-        const showNextStep = () => {
-            if (currentStep >= 0) {
-                // Hide the current step before showing the next one
-                steps[currentStep].classList.remove('visible');
-            }
-            currentStep++;
-            if (currentStep < steps.length) {
-                steps[currentStep].classList.add('visible'); // Show the next step
-                nextBtn.textContent = 'Next Step';
-            }
-            if (currentStep >= steps.length - 1) {
-                // If last step is reached, disable the button and change text
-                nextBtn.disabled = true;
-                nextBtn.textContent = 'Finished';
-            }
+          );
         };
 
-        const resetSteps = () => {
-            steps.forEach(step => step.classList.remove('visible')); // Hide all steps
-            currentStep = -1; // Reset step counter
-            nextBtn.disabled = false; // Re-enable next button
-            nextBtn.textContent = 'Start'; // Reset button text
+        // Arduino Digital I/O Simulator Sandbox
+        const ArduinoSimulatorSandbox = () => {
+          const [ledPin, setLedPin] = useState(13);
+          const [buttonPin, setButtonPin] = useState(2);
+          const [ledState, setLedState] = useState('LOW'); // HIGH or LOW
+          const [buttonPressed, setButtonPressed] = useState(false); // true or false
+          const [serialOutput, setSerialOutput] = useState([]);
+          const [simulating, setSimulating] = useState(false);
+          const simulationIntervalRef = useRef(null);
+
+          const simulatePinMode = (pin, mode) => {
+            setSerialOutput(prev => [...prev, `pinMode(${pin}, ${mode});`]);
+          };
+
+          const simulateDigitalWrite = (pin, value) => {
+            setSerialOutput(prev => [...prev, `digitalWrite(${pin}, ${value});`]);
+            if (pin === ledPin) {
+              setLedState(value);
+            }
+          };
+
+          const simulateDigitalRead = (pin) => {
+            const state = (pin === buttonPin) ? (buttonPressed ? 'LOW' : 'HIGH') : 'UNKNOWN'; // Assuming INPUT_PULLUP for button
+            setSerialOutput(prev => [...prev, `digitalRead(${pin}) -> ${state}`]);
+            return state;
+          };
+
+          const simulateDelay = (ms) => {
+            setSerialOutput(prev => [...prev, `delay(${ms});`]);
+          };
+
+          const runSimulatedSketch = () => {
+            setSimulating(true);
+            setSerialOutput([]); // Clear previous output
+            setLedState('LOW'); // Reset LED
+            setButtonPressed(false); // Reset button
+
+            // Simulate setup()
+            simulatePinMode(ledPin, 'OUTPUT');
+            simulatePinMode(buttonPin, 'INPUT_PULLUP');
+            setSerialOutput(prev => [...prev, "--- setup() complete ---"]);
+
+            // Simulate loop() - simplified for demonstration
+            let loopCount = 0;
+            simulationIntervalRef.current = setInterval(() => {
+              if (loopCount >= 5) { // Run loop 5 times for demonstration
+                clearInterval(simulationIntervalRef.current);
+                setSimulating(false);
+                setSerialOutput(prev => [...prev, "--- Simulation Finished ---"]);
+                return;
+              }
+              setSerialOutput(prev => [...prev, `\n--- loop() iteration ${loopCount + 1} ---`]);
+
+              // Example sketch logic (like the button controlled LED)
+              const currentButtonState = simulateDigitalRead(buttonPin);
+              if (currentButtonState === 'LOW') { // Button pressed
+                simulateDigitalWrite(ledPin, 'HIGH');
+              } else {
+                simulateDigitalWrite(ledPin, 'LOW');
+              }
+              simulateDelay(50); // Small delay for readability
+
+              loopCount++;
+            }, 500); // Simulate each loop iteration every 500ms
+          };
+
+          const stopSimulation = () => {
+            clearInterval(simulationIntervalRef.current);
+            setSimulating(false);
+            setSerialOutput(prev => [...prev, "--- Simulation Stopped ---"]);
+          };
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Arduino Digital I/O Simulator</h2>
+              <p className="text-gray-700 mb-4">
+                Simulate basic digital input and output operations on an Arduino.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Controls */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Simulator Controls</h3>
+                  <div className="mb-4">
+                    <label htmlFor="ledPinInput" className="block text-sm font-medium text-gray-700">LED Pin:</label>
+                    <input
+                      type="number"
+                      id="ledPinInput"
+                      value={ledPin}
+                      onChange={(e) => setLedPin(parseInt(e.target.value))}
+                      className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                      disabled={simulating}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="buttonPinInput" className="block text-sm font-medium text-gray-700">Button Pin (INPUT_PULLUP):</label>
+                    <input
+                      type="number"
+                      id="buttonPinInput"
+                      value={buttonPin}
+                      onChange={(e) => setButtonPin(parseInt(e.target.value))}
+                      className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                      disabled={simulating}
+                    />
+                  </div>
+                  <button
+                    onClick={() => setButtonPressed(!buttonPressed)}
+                    className={`py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md mb-4 ${
+                      buttonPressed ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-green-500 text-white hover:bg-green-600'
+                    }`}
+                    disabled={!simulating}
+                  >
+                    {buttonPressed ? 'Release Button' : 'Press Button'}
+                  </button>
+                  <button
+                    onClick={simulating ? stopSimulation : runSimulatedSketch}
+                    className={`py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md ${
+                      simulating ? 'bg-red-700 text-white hover:bg-red-800' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    }`}
+                  >
+                    {simulating ? 'Stop Simulation' : 'Start Simulation'}
+                  </button>
+                </div>
+
+                {/* Simulation Output */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Simulation Output</h3>
+                  <div className="flex items-center justify-center mb-4 p-4 border border-gray-300 rounded-md bg-white">
+                    <Lightbulb className={`w-12 h-12 transition-colors duration-300 ${ledState === 'HIGH' ? 'text-yellow-500 fill-current' : 'text-gray-400'}`} />
+                    <span className="ml-4 text-lg font-medium">LED State: {ledState}</span>
+                  </div>
+                  <div className="bg-gray-800 text-green-400 p-3 rounded-md h-48 overflow-y-auto font-mono text-sm">
+                    {serialOutput.length === 0 && <p className="text-gray-500">Serial Monitor Output will appear here...</p>}
+                    {serialOutput.map((line, index) => (
+                      <p key={index} className="whitespace-pre-wrap">{line}</p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
         };
 
-        nextBtn.addEventListener('click', showNextStep);
-        resetBtn.addEventListener('click', resetSteps);
-    }
-    
-    // --- Practice Problems Rendering ---
-    function renderPracticeProblems() {
-        const container = document.getElementById('practice-problems-container');
-        container.innerHTML = practiceProblems.map(p => `
-            <div class="border rounded-lg p-4">
-                <h4 class="text-lg font-semibold">${p.title}</h4>
-                <p class="mt-2 text-gray-700">${p.problemHTML}</p>
-                <div id="answer-${p.id}" class="mt-4 p-4 bg-blue-50 rounded hidden">
-                   ${p.answerHTML}
-                </div>
-                <button data-answer-id="${p.id}" class="toggle-answer-btn btn mt-4 text-sm">Show Answer</button>
-            </div>
-        `).join('');
 
-        // Add event listeners for "Show Answer" buttons
-        document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const answerId = btn.dataset.answerId;
-                const answerEl = document.getElementById(`answer-${answerId}`);
-                answerEl.classList.toggle('hidden'); // Toggle visibility
-                btn.textContent = answerEl.classList.contains('hidden') ? 'Show Answer' : 'Hide Answer';
+        // Practice Problems Component
+        const PracticeProblems = () => {
+          const [activeTab, setActiveTab] = useState('homework');
+
+          const homeworkQuestions = [
+            {
+              id: 1,
+              type: 'text',
+              question: 'Distinguish between a microprocessor and a microcontroller, providing a key characteristic and a typical application for each.',
+              answer: 'A microprocessor (MPU) is primarily just the CPU on a chip, requiring external memory and I/O. It\'s used in general-purpose computing like laptops. A microcontroller (MCU) integrates CPU, memory, and I/O on a single chip, making it self-contained for embedded systems like washing machines.',
+              explanation: 'The core difference lies in integration. Microprocessors are designed for flexibility and high performance in complex computing tasks, offloading memory and I/O to external chips. Microcontrollers are designed for specific control tasks in embedded systems, where compactness, low power, and real-time operation are priorities, hence the "all-in-one" chip design.'
+            },
+            {
+              id: 2,
+              type: 'text',
+              question: 'Explain the purpose of the `void setup()` and `void loop()` functions in an Arduino sketch, and when each is executed.',
+              answer: '`void setup()`: This function runs once when the Arduino board powers on or resets. Its purpose is for initial configurations, such as setting pin modes (INPUT/OUTPUT), initializing serial communication, or setting up libraries.\n`void loop()`: This function runs repeatedly and continuously after `setup()` has completed. It contains the main program logic, continuously reading sensor data, processing information, and controlling actuators.',
+              explanation: 'The `setup()` function is like the initialization phase, preparing the Arduino for its task. The `loop()` function is the continuous execution phase, where the core functionality of the embedded system resides, running indefinitely to monitor and control its environment.'
+            },
+            {
+              id: 3,
+              type: 'multiple_choice',
+              question: 'Which Arduino function is used to configure a digital pin as an input or an output?',
+              options: ['digitalWrite()', 'digitalRead()', 'pinMode()', 'analogRead()'],
+              correctAnswer: 'pinMode()',
+              explanation: '`pinMode(pin, mode)` is specifically used to set the direction of a pin (INPUT, OUTPUT, or INPUT_PULLUP). `digitalWrite()` writes a value, `digitalRead()` reads a value, and `analogRead()` reads analog values.'
+            },
+            {
+              id: 4,
+              type: 'text',
+              question: 'You want to connect a push button to an Arduino digital pin such that when the button is pressed, the pin reads LOW, and when it\'s not pressed, it reads HIGH. What `pinMode()` configuration should you use, and how would you wire the button?',
+              answer: 'You should use `pinMode(buttonPin, INPUT_PULLUP);`. The button should be wired between the specified digital pin and GND (ground). When the button is open, the internal pull-up resistor pulls the pin HIGH. When the button is pressed, it connects the pin directly to GND, pulling it LOW.',
+              explanation: '`INPUT_PULLUP` activates an internal resistor that pulls the pin voltage up to 5V (HIGH) by default. When a button connected between the pin and ground is pressed, it creates a direct path to ground, overriding the pull-up and making the pin read LOW. This is a common and robust way to connect buttons without needing an external resistor.'
+            },
+            {
+              id: 5,
+              type: 'text',
+              question: 'Write a simple Arduino code snippet for the `loop()` function that blinks an LED connected to pin 13, turning it ON for 1 second and OFF for 1 second repeatedly.',
+              answer: '```cpp\nvoid setup() {\n  pinMode(13, OUTPUT); // Set pin 13 as an output\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH); // Turn the LED ON\n  delay(1000);            // Wait for 1 second (1000 milliseconds)\n  digitalWrite(13, LOW);  // Turn the LED OFF\n  delay(1000);            // Wait for 1 second\n}\n```',
+              explanation: 'This code uses `digitalWrite(13, HIGH)` to turn the LED on and `digitalWrite(13, LOW)` to turn it off. The `delay(1000)` function pauses the program for 1000 milliseconds (1 second) at each state, creating the blinking effect. The `setup()` function is included to properly configure pin 13 as an OUTPUT.'
+            }
+          ];
+
+          const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
+
+          const handleHomeworkChange = (id, value) => {
+            setHomeworkAnswers(prev => ({
+              ...prev,
+              [id]: value
+            }));
+          };
+
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
+
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
             });
-        });
-    }
+            setQuizResults(newResults);
+          };
 
-    // --- Quiz Rendering ---
-    function renderQuiz() {
-        const container = document.getElementById('quiz-container');
-        container.innerHTML = quizQuestions.map((q, index) => `
-            <div class="border rounded-lg p-4">
-                <h4 class="text-lg font-semibold mb-3">Q${index + 1}: ${q.question}</h4>
-                <div class="space-y-2">
-                    ${q.options.map((option, optIndex) => `
-                        <label class="block">
-                            <input type="radio" name="quiz-q${q.id}" value="${option}" class="mr-2">
-                            ${option}
-                        </label>
-                    `).join('')}
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
+
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
+
+              <div className="flex mb-6 space-x-4">
+                <button
+                  onClick={() => setActiveTab('homework')}
+                  className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+                    activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Homework Questions
+                </button>
+              </div>
+
+              {activeTab === 'homework' && (
+                <div>
+                  <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-blue-500"/>
+                    Homework Questions
+                  </h3>
+                  <p className="text-gray-700 mb-4">
+                    Instructions: Show all work and steps clearly.
+                  </p>
+                  {homeworkQuestions.map((q) => (
+                    <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+                      {q.type === 'text' ? (
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                          placeholder="Type your answer here..."
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
+                        ></textarea>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                              />
+                              <span className="ml-2">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
+                        </div>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
+                        </div>
+                      )}
+                      <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                        <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                        <div className="mt-2 text-indigo-700">
+                          <p className="whitespace-pre-wrap">{q.explanation}</p>
+                        </div >
+                      </details>
+                    </div>
+                  ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
                 </div>
-                <button data-question-id="${q.id}" class="check-quiz-btn btn mt-4 text-sm">Check Answer</button>
-                <div id="quiz-feedback-${q.id}" class="mt-3 text-sm font-semibold"></div>
+              )}
             </div>
-        `).join('');
-
-        // Add event listeners for "Check Answer" buttons
-        document.querySelectorAll('.check-quiz-btn').forEach(btn => {
-            btn.addEventListener('click', (event) => {
-                const questionId = btn.dataset.questionId;
-                const selectedOption = document.querySelector(`input[name="quiz-q${questionId}"]:checked`);
-                const feedbackEl = document.getElementById(`quiz-feedback-${questionId}`);
-                const question = quizQuestions.find(q => q.id == questionId); // Find the question data
-
-                if (!selectedOption) {
-                    feedbackEl.innerHTML = `<span class="text-yellow-600">Please select an option.</span>`;
-                    return;
-                }
-
-                if (selectedOption.value === question.answer) {
-                    feedbackEl.innerHTML = `<span class="text-green-600">Correct!</span> ${question.explanation}`;
-                } else {
-                    feedbackEl.innerHTML = `<span class="text-red-600">Incorrect.</span> The correct answer is: <strong>${question.answer}</strong>. ${question.explanation}`;
-                }
-            });
-        });
-    }
-
-    // --- Sandbox Logic for I/O Control Simulation ---
-    const programSelect = document.getElementById('programSelect');
-    const simInputButton = document.getElementById('sim-input-button');
-    const simInputStatus = document.getElementById('sim-input-status');
-    const simOutputLed = document.getElementById('sim-output-led');
-    const simOutputStatus = document.getElementById('sim-output-status');
-    const pseudoCodeDisplay = document.getElementById('pseudo-code-display');
-    const runSimulationBtn = document.getElementById('run-simulation-btn');
-    const stopSimulationBtn = document.getElementById('stop-simulation-btn');
-
-    // Pseudo-code strings for each program
-    const pseudoCode = {
-        button_control: `// Program: LED follows Button
-function setup() {
-  pinMode(INPUT_PIN, INPUT);
-  pinMode(LED_PIN, OUTPUT);
-}
-
-function loop() {
-  if (digitalRead(INPUT_PIN) == HIGH) {
-    digitalWrite(LED_PIN, HIGH); // Turn LED ON
-  } else {
-    digitalWrite(LED_PIN, LOW);  // Turn LED OFF
-  }
-}`,
-        blink_led: `// Program: Blink LED
-function setup() {
-  pinMode(LED_PIN, OUTPUT);
-}
-
-function loop() {
-  digitalWrite(LED_PIN, HIGH); // Turn LED ON
-  // Wait for 500 milliseconds
-  digitalWrite(LED_PIN, LOW);  // Turn LED OFF
-  // Wait for 500 milliseconds
-}`,
-        inverted_button_control: `// Program: LED Inverted to Button
-function setup() {
-  pinMode(INPUT_PIN, INPUT);
-  pinMode(LED_PIN, OUTPUT);
-}
-
-function loop() {
-  if (digitalRead(INPUT_PIN) == HIGH) {
-    digitalWrite(LED_PIN, LOW);  // Turn LED OFF
-  } else {
-    digitalWrite(LED_PIN, HIGH); // Turn LED ON
-  }
-}`
-    };
-
-    // Global variable to hold the state of the input button (0 for LOW, 1 for HIGH)
-    let inputButtonState = 0; 
-
-    // Function to update the LED based on simulation logic
-    function updateLedState(state) {
-        if (state === 1) {
-            simOutputLed.classList.add('on');
-            simOutputStatus.textContent = 'ON';
-        } else {
-            simOutputLed.classList.remove('on');
-            simOutputStatus.textContent = 'OFF';
-        }
-    }
-
-    // Main simulation loop logic
-    function runSimulationLoop() {
-        const selectedProgram = programSelect.value;
-        const currentInput = inputButtonState; // Read the current state of the simulated button
-
-        // Clear any existing interval if a new program is selected or simulation restarts
-        if (blinkInterval) {
-            clearInterval(blinkInterval);
-            blinkInterval = null;
-        }
-
-        // Apply logic based on selected program
-        if (selectedProgram === 'button_control') {
-            updateLedState(currentInput);
-        } else if (selectedProgram === 'inverted_button_control') {
-            updateLedState(1 - currentInput); // Invert the input
-        } else if (selectedProgram === 'blink_led') {
-            let ledOn = false;
-            blinkInterval = setInterval(() => {
-                ledOn = !ledOn;
-                updateLedState(ledOn ? 1 : 0);
-            }, 500); // 500ms on, 500ms off = 1 second period (2Hz)
-        }
-    }
-
-    // Starts the simulation
-    runSimulationBtn.addEventListener('click', () => {
-        if (!isSimulationRunning) {
-            isSimulationRunning = true;
-            runSimulationBtn.classList.add('hidden');
-            stopSimulationBtn.classList.remove('hidden');
-            programSelect.disabled = true; // Disable program selection during run
-            simInputButton.disabled = false; // Enable button interaction if needed
-
-            runSimulationLoop(); // Initial run
-        }
-    });
-
-    // Stops the simulation
-    function stopSimulation() {
-        if (isSimulationRunning) {
-            isSimulationRunning = false;
-            runSimulationBtn.classList.remove('hidden');
-            stopSimulationBtn.classList.add('hidden');
-            programSelect.disabled = false; // Enable program selection
-            simInputButton.disabled = true; // Disable button interaction
-
-            if (blinkInterval) {
-                clearInterval(blinkInterval);
-                blinkInterval = null;
-            }
-            updateLedState(0); // Ensure LED is off when simulation stops
-        }
-    }
-
-    stopSimulationBtn.addEventListener('click', stopSimulation);
-
-    // Event listener for the simulated input button
-    simInputButton.addEventListener('mousedown', () => {
-        if (isSimulationRunning) {
-            inputButtonState = 1; // Button pressed (HIGH)
-            simInputButton.classList.add('pressed');
-            simInputStatus.textContent = 'HIGH';
-            // If not blinking, update LED immediately
-            if (programSelect.value !== 'blink_led') {
-                runSimulationLoop(); 
-            }
-        }
-    });
-
-    simInputButton.addEventListener('mouseup', () => {
-        if (isSimulationRunning) {
-            inputButtonState = 0; // Button released (LOW)
-            simInputButton.classList.remove('pressed');
-            simInputStatus.textContent = 'LOW';
-            // If not blinking, update LED immediately
-            if (programSelect.value !== 'blink_led') {
-                runSimulationLoop();
-            }
-        }
-    });
-
-    // Handle program selection changes (updates pseudo-code, but doesn't start simulation)
-    programSelect.addEventListener('change', () => {
-        pseudoCodeDisplay.textContent = pseudoCode[programSelect.value];
-        stopSimulation(); // Stop any active simulation when program changes
-    });
-
-    // Initial setup: display default pseudo-code and hide stop button
-    pseudoCodeDisplay.textContent = pseudoCode[programSelect.value];
-    stopSimulationBtn.classList.add('hidden');
-    simInputButton.disabled = true; // Disable button until simulation runs
+          );
+        };
 
 
-    // --- Overall Page Initial Setup ---
-    document.querySelector('.nav-link[data-target="concepts"]').click(); // Activate 'Concepts' tab by default
-    document.querySelector('.concept-tab[data-concept="intro_components"]').click(); // Activate first concept tab by default
-    renderPracticeProblems(); // Render practice problems
-    renderQuiz(); // Render quiz questions
-});
-</script>
+        // Main App Component
+        const App = () => {
+          const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
+
+          return (
+            <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+              <header className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+                  Mechatronics 1 Study Guide
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 6: Microcontrollers and Arduino Programming Fundamentals</p>
+                <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                    <Home className="w-5 h-5 mr-2" />
+                    Back to Course Hub
+                </a>
+              </header>
+
+              <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+                <button
+                  onClick={() => setActiveSection('review')}
+                  className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+                >
+                  <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Concept Review</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('sandbox')}
+                  className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+                >
+                  <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Interactive Sandbox</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('practice')}
+                  className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Practice Problems</span>
+                </button>
+              </nav>
+
+              <main className="container">
+                {activeSection === 'review' && <ConceptReview />}
+                {activeSection === 'sandbox' && <ArduinoSimulatorSandbox />}
+                {activeSection === 'practice' && <PracticeProblems />}
+              </main>
+
+              <footer className="text-center text-gray-500 text-sm mt-12">
+                <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+              </footer>
+            </div>
+          );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 </body>
 </html>
