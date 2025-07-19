@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics I: Exam 2 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #1f2937; /* Dark gray text */
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .header-section {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .section-title {
+            font-size: 2.25rem; /* 3xl text */
+            font-weight: 700;
+            color: #1f2937;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .question-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.125rem; /* lg text */
+            color: #374151; /* Gray-700 */
+            margin-bottom: 1rem;
+        }
+        .options-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 1rem;
+        }
+        .options-list li {
+            margin-bottom: 0.5rem;
+            color: #4b5563; /* Gray-600 */
+        }
+        details {
+            background-color: #f9fafb; /* Lightest gray */
+            border: 1px solid #e5e7eb; /* Gray-200 */
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+        details summary {
+            font-weight: 600;
+            color: #4f46e5; /* Indigo-600 */
+            outline: none;
+        }
+        details summary:hover {
+            color: #3730a3; /* Indigo-800 */
+        }
+        details p {
+            margin-top: 0.75rem;
+            color: #374151; /* Gray-700 */
+        }
+        pre {
+            background-color: #e0e7ff; /* Indigo-100 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            color: #1e3a8a; /* Blue-900 */
+            margin-top: 0.75rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            background-color: #6366f1; /* Indigo-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+            text-align: center;
+            width: fit-content;
+        }
+        .back-link:hover {
+            background-color: #4f46e5; /* Indigo-600 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header-section">
+            <h1 class="text-4xl font-extrabold text-indigo-800 mb-2">
+                Mechatronics I: Exam 2 Study Guide
+            </h1>
+            <p class="text-lg text-gray-600">Prepare for your second exam with these practice problems and solutions.</p>
+            <a href="index.html" class="back-link">← Back to Course Hub</a>
+        </header>
+
+        <main>
+            <h2 class="section-title">Section 1: Conceptual Questions</h2>
+
+            <!-- Question 1 -->
+            <div class="question-card">
+                <p class="question-text">
+                    1. In the context of digital electronics, how are logical '1' and '0' states typically represented?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>In digital systems, logical '1' and '0' states are typically represented by two discrete voltage levels, commonly referred to as HIGH and LOW, respectively.</p>
+                </details>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-card">
+                <p class="question-text">
+                    2. A compact integrated circuit that functions as a complete computer system, including a processor, memory, and programmable input/output capabilities, is best described as a:
+                </p>
+                <ul class="options-list">
+                    <li>a) Microprocessor</li>
+                    <li>b) Microcontroller</li>
+                    <li>c) FPGA</li>
+                    <li>d) ASIC</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>b) Microcontroller</b>. Microcontrollers are designed for embedded applications where a compact, self-contained computing solution is needed.</p>
+                </details>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-card">
+                <p class="question-text">
+                    3. What is the primary role of the `setup()` function in an Arduino sketch, and how does it differ from the `loop()` function?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The `setup()` function in an Arduino sketch is used for initialization tasks that need to run only once when the program starts. This includes setting pin modes (INPUT/OUTPUT), initializing serial communication, and setting up initial variable values. The `loop()` function, in contrast, contains the main program logic that runs continuously and repeatedly after `setup()` has completed.</p>
+                </details>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-card">
+                <p class="question-text">
+                    4. An Analog-to-Digital Converter (ADC) serves what fundamental purpose in a mechatronic system?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>An ADC's fundamental purpose is to convert continuous, real-world analog signals (like temperature, pressure, or light intensity) into discrete digital values that a microcontroller or digital system can understand and process.</p>
+                </details>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-card">
+                <p class="question-text">
+                    5. Explain how Pulse Width Modulation (PWM) can be used to achieve an effect similar to an analog output from a digital pin.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>PWM approximates an analog output by rapidly switching a digital signal (e.g., 5V or 0V) ON and OFF at a high frequency. By varying the "duty cycle" (the proportion of ON time to the total period), the average voltage output changes. For example, a 50% duty cycle on a 5V signal will yield an average of 2.5V, effectively simulating an analog voltage.</p>
+                </details>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-card">
+                <p class="question-text">
+                    6. What type of programming construct allows a program to make decisions and execute different blocks of code based on whether certain conditions are met?
+                </p>
+                <ul class="options-list">
+                    <li>a) Loop structures (e.g., `for`, `while`)</li>
+                    <li>b) Function definitions</li>
+                    <li>c) Conditional statements (e.g., `if`, `else if`, `else`)</li>
+                    <li>d) Variable declarations</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>c) Conditional statements (e.g., `if`, `else if`, `else`)</b>. These statements control the flow of execution based on the evaluation of boolean expressions.</p>
+                </details>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-card">
+                <p class="question-text">
+                    7. Which looping construct is most appropriate when you need to ensure a block of code executes at least once, and then continues to repeat as long as a specified condition remains true?
+                </p>
+                <ul class="options-list">
+                    <li>a) `for` loop</li>
+                    <li>b) `while` loop</li>
+                    <li>c) `do-while` loop</li>
+                    <li>d) `switch` statement</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>c) `do-while` loop</b>. The `do-while` loop executes its block of code at least once before checking the condition, making it suitable for scenarios where an initial execution is always required.</p>
+                </details>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="question-card">
+                <p class="question-text">
+                    8. Discuss the advantages of using functions or subroutines in programming for complex mechatronic systems.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Breaking down a large program into smaller, reusable functions offers several advantages:
+                        <br>1.  <b>Modularity:</b> Each function performs a specific task, making the code easier to understand and manage.
+                        <br>2.  <b>Reusability:</b> Functions can be called multiple times from different parts of the program, reducing code duplication.
+                        <br>3.  <b>Readability:</b> Well-named functions make the program's logic clearer.
+                        <br>4.  <b>Debugging:</b> Isolating issues to specific functions simplifies the debugging process.
+                        <br>5.  <b>Collaboration:</b> Multiple developers can work on different functions simultaneously.</p>
+                </details>
+            </div>
+
+            <!-- Question 9 -->
+            <div class="question-card">
+                <p class="question-text">
+                    9. What is the primary function of a Data Acquisition (DAQ) system in an experimental setup?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The primary function of a Data Acquisition (DAQ) system is to collect real-world physical signals (e.g., temperature, pressure, force) from sensors, convert these analog signals into digital data, and then process, analyze, or store this digital information, often for monitoring or control purposes.</p>
+                </details>
+            </div>
+
+            <!-- Question 10 -->
+            <div class="question-card">
+                <p class="question-text">
+                    10. According to the Nyquist-Shannon sampling theorem, if an analog signal has a maximum frequency component of $F_{max}$, what is the minimum sampling rate required to avoid aliasing?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>According to the Nyquist-Shannon sampling theorem, the minimum sampling rate (often called the Nyquist rate) must be at least <b>twice</b> the highest frequency component ($F_{max}$) of the analog signal. So, Sampling Rate $\ge 2 \times F_{max}$.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 11 -->
+            <div class="question-card">
+                <p class="question-text">
+                    11. What is the main difference between a digital signal and an analog signal?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>An <b>analog signal</b> is continuous and can take on any value within a given range, often varying smoothly over time (e.g., temperature, sound waves). A <b>digital signal</b> is discrete, meaning it can only take on a finite number of distinct values, typically represented by binary states (e.g., HIGH/LOW, 1/0).</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 12 -->
+            <div class="question-card">
+                <p class="question-text">
+                    12. Explain the concept of "resolution" in the context of an Analog-to-Digital Converter (ADC).
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The <b>resolution</b> of an ADC refers to the smallest change in the analog input voltage that can be detected and converted into a unique digital output value. It is determined by the number of bits the ADC uses (e.g., an 8-bit ADC has 2<sup>8</sup> = 256 discrete levels). Higher resolution means finer granularity in the conversion.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 13 -->
+            <div class="question-card">
+                <p class="question-text">
+                    13. What is the purpose of a "pull-up" or "pull-down" resistor when connecting a switch to a microcontroller input pin?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Pull-up or pull-down resistors are used to ensure that a microcontroller input pin has a defined logical state (HIGH or LOW) when a switch is open. Without them, the pin would be "floating" and susceptible to electrical noise, leading to unpredictable readings. A pull-up resistor connects the pin to VCC (HIGH), while a pull-down resistor connects it to GND (LOW).</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 14 -->
+            <div class="question-card">
+                <p class="question-text">
+                    14. Describe a scenario where a `while` loop would be more appropriate than a `for` loop in an Arduino program.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A `while` loop is more appropriate when the number of iterations is not known beforehand, and the loop needs to continue as long as a certain condition remains true. For example, reading a sensor until a specific threshold is reached, or waiting for a serial input character. A `for` loop is typically used when the number of iterations is fixed or predetermined.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 15 -->
+            <div class="question-card">
+                <p class="question-text">
+                    15. What is the significance of "baud rate" in serial communication, such as with an Arduino's Serial Monitor?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Baud rate in serial communication refers to the rate at which information is transferred in symbols per second. In simple terms, it's the speed of data transmission. For successful communication between two devices (e.g., Arduino and a computer's Serial Monitor), both must be configured to the same baud rate, otherwise, the data will be corrupted and unreadable.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 16 -->
+            <div class="question-card">
+                <p class="question-text">
+                    16. Explain the concept of "sampling rate" in data acquisition and why it is important.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Sampling rate is the number of samples taken per second from a continuous analog signal to convert it into a discrete digital signal. It is crucial because if the sampling rate is too low (less than twice the highest frequency in the signal, as per Nyquist-Shannon theorem), a phenomenon called "aliasing" occurs, where higher frequencies in the original signal appear as lower, incorrect frequencies in the sampled data, leading to distorted or inaccurate representation.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 17 -->
+            <div class="question-card">
+                <p class="question-text">
+                    17. What is the role of a Digital-to-Analog Converter (DAC) in a mechatronic system, and provide an example of its application.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A Digital-to-Analog Converter (DAC) converts digital signals (e.g., from a microcontroller) back into analog signals (e.g., varying voltage or current). Its role is to provide a continuous, real-world output from digital instructions. An example application is controlling the speed of a DC motor with variable voltage, where the microcontroller outputs digital values that the DAC converts into a smooth analog voltage to drive the motor.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 18 -->
+            <div class="question-card">
+                <p class="question-text">
+                    18. What is a "boolean" data type in programming, and what values can it hold?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A "boolean" data type is a fundamental data type in programming that can represent only two possible truth values: `true` or `false`. It is commonly used for logical operations and conditional statements to control program flow.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 19 -->
+            <div class="question-card">
+                <p class="question-text">
+                    19. Explain the concept of "mapping" or "scaling" in programming, particularly when dealing with sensor inputs and actuator outputs.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>"Mapping" or "scaling" in programming refers to the process of converting a range of input values from one scale to a corresponding range of output values on another scale. This is essential when a sensor (e.g., an analog temperature sensor) outputs values in one range (e.g., 0-1023 from an ADC), but an actuator (e.g., an LED brightness control) requires values in a different range (e.g., 0-255 for PWM). Mapping ensures the sensor's input can effectively control the actuator's behavior.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 20 -->
+            <div class="question-card">
+                <p class="question-text">
+                    20. What is the purpose of comments in programming code, and why are they considered good practice?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Comments are non-executable lines of text within code that are used to explain what the code does, why it does it, and how it works. They are good practice because they improve code readability, making it easier for others (and your future self) to understand, maintain, and debug the program. They do not affect the program's execution or performance.</p>
+                </details>
+            </div>
+
+            <h2 class="section-title">Section 2: Mathematical Problems</h2>
+
+            <!-- Question 21 -->
+            <div class="question-card">
+                <p class="question-text">
+                    21. A 12-bit Analog-to-Digital Converter (ADC) has a reference voltage of 3.3 V. Calculate the voltage resolution (step size) of this ADC.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The number of unique digital steps for an N-bit ADC is 2<sup>N</sup>.
+                    <br>For a 12-bit ADC, Number of Steps = 2<sup>12</sup> = 4096.
+                    <br><br>The voltage resolution (step size) is calculated as:
+                    <pre>Resolution = V<sub>ref</sub> / Number of Steps
+Resolution = 3.3 V / 4096
+Resolution &approx; 0.00080566 V/step or 0.80566 mV/step</pre>
+                    <p>Therefore, the voltage resolution of the 12-bit ADC is approximately <b>0.000806 V/step</b> (or 0.806 mV/step).</p>
+                </details>
+            </div>
+
+            <!-- Question 22 -->
+            <div class="question-card">
+                <p class="question-text">
+                    22. A Pulse Width Modulation (PWM) signal is generated from a 5 V supply. If the desired average DC equivalent voltage output is 3.5 V, what duty cycle percentage should be set for the PWM signal?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The average DC equivalent voltage (V<sub>avg</sub>) for a PWM signal is given by:
+                    <pre>V<sub>avg</sub> = Duty Cycle (%) / 100 * V<sub>supply</sub></pre>
+                    <p>Rearranging to solve for Duty Cycle (%):
+                    <pre>Duty Cycle (%) = (V<sub>avg</sub> / V<sub>supply</sub>) * 100</pre>
+                    <p>Given:
+                    <pre>V<sub>avg</sub> = 3.5 V
+V<sub>supply</sub> = 5 V</pre>
+                    <p>Calculation:
+                    <pre>Duty Cycle (%) = (3.5 V / 5 V) * 100
+Duty Cycle (%) = 0.7 * 100
+Duty Cycle (%) = 70%</pre>
+                    <p>Therefore, the duty cycle should be <b>70%</b>.</p>
+                </details>
+            </div>
+
+            <!-- Question 23 -->
+            <div class="question-card">
+                <p class="question-text">
+                    23. An audio signal has a maximum frequency component of 15 kHz. What is the minimum theoretical sampling rate required to accurately capture this signal for digital processing, according to the Nyquist-Shannon sampling theorem?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>According to the Nyquist-Shannon sampling theorem, the minimum sampling rate (Nyquist rate) must be at least twice the highest frequency component of the signal.
+                    <pre>Minimum Sampling Rate = 2 * F<sub>max</sub></pre>
+                    <p>Given:
+                    <pre>F<sub>max</sub> = 15 kHz = 15,000 Hz</pre>
+                    <p>Calculation:
+                    <pre>Minimum Sampling Rate = 2 * 15,000 Hz
+Minimum Sampling Rate = 30,000 Hz or 30 kHz</pre>
+                    <p>Therefore, the minimum theoretical sampling rate required is <b>30,000 Hz</b> (or 30 kHz).</p>
+                </details>
+            </div>
+
+            <!-- Question 24 -->
+            <div class="question-card">
+                <p class="question-text">
+                    24. How many unique, discrete states can be represented by a 16-bit unsigned digital signal?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The number of unique discrete values that can be represented by an N-bit unsigned digital signal is given by 2<sup>N</sup>.
+                    <pre>Number of Unique States = 2<sup>N</sup></pre>
+                    <p>Given:
+                    <pre>N = 16 bits</pre>
+                    <p>Calculation:
+                    <pre>Number of Unique States = 2<sup>16</sup> = 65,536</pre>
+                    <p>Therefore, a 16-bit unsigned digital signal can represent <b>65,536</b> unique, discrete states.</p>
+                </details>
+            </div>
+
+            <!-- Question 25 -->
+            <div class="question-card">
+                <p class="question-text">
+                    25. A temperature sensor outputs an analog reading from 0 to 1023 (from an Arduino's 10-bit ADC). You want to map this temperature reading to a fan speed control value ranging from 0 (off) to 255 (max speed), with the following conditions:
+                    <br>
+                    - Readings from 0 to 200 map to fan speed 0 (fan off).
+                    <br>
+                    - Readings from 201 to 1023 map linearly to fan speed from 0 to 255.
+                    <br><br>
+                    If the sensor reads a value of 612, what should the mapped fan speed level be?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>First, identify the mapping ranges:
+                    <br>Input range for linear mapping: [201, 1023]
+                    <br>Output range for linear mapping: [0, 255]
+                    <br><br>The length of the input range is 1023 - 201 = 822.
+                    <br>The length of the output range is 255 - 0 = 255.
+                    <br><br>The sensor reading is 612. Since 612 is within the 201-1023 range, we apply linear mapping.
+                    <br><br>The formula for linear mapping from one range to another is:
+                    <pre>Output = (Input - Input<sub>min</sub>) * (Output<sub>max</sub> - Output<sub>min</sub>) / (Input<sub>max</sub> - Input<sub>min</sub>) + Output<sub>min</sub></pre>
+                    <p>In this case:
+                    <pre>Input = 612
+Input<sub>min</sub> = 201
+Input<sub>max</sub> = 1023
+Output<sub>min</sub> = 0
+Output<sub>max</sub> = 255</pre>
+                    <p>Calculation:
+                    <pre>Fan Speed = (612 - 201) * (255 - 0) / (1023 - 201) + 0
+Fan Speed = 411 * 255 / 822
+Fan Speed = 104805 / 822
+Fan Speed &approx; 127.5</pre>
+                    <p>Since fan speed is typically an integer, round to the nearest whole number.
+                    <pre>Fan Speed = 128</pre>
+                    <p>Therefore, if the sensor reads a value of 612, the mapped fan speed level should be <b>128</b>.</p>
+                </details>
+            </div>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="text-center text-gray-500 text-sm mt-12 py-6">
+            <p>&copy; <script>document.write(new Date().getFullYear())</script> Mechatronics 1 Course. All rights reserved.</p>
+            <p>Designed for a World-Class Learning Experience</p>
+        </footer>
+    </div>
+</body>
+</html>
