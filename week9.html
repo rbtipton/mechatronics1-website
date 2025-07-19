@@ -3,341 +3,594 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 9 - Digital Logic</title>
+    <title>Mechatronics 1: Week 9 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chosen Palette: Warm Harmony -->
-    <!-- Application Structure Plan: The SPA uses a tabbed layout for non-linear exploration of the topics from the source notes. The sections are: 'Introduction', 'Logic Gate Sandbox', 'Circuit Explorer', 'MCU Interfacing', and 'Knowledge Check'. This structure transforms the passive notes into an active learning environment. The centerpiece is the 'Logic Gate Sandbox,' which allows hands-on experimentation with basic gates. The 'Circuit Explorer' provides interactive cards for combinational/sequential circuits. 'MCU Interfacing' uses CSS diagrams to visualize practical connections. 'Knowledge Check' converts the static homework/quiz into an interactive self-assessment. This design prioritizes user engagement and intuitive understanding over a simple text presentation. -->
-    <!-- Visualization & Content Choices: 
-        - Logic Gates -> Goal: Understand gate functions -> Viz: Interactive Sandbox (HTML/CSS/JS) -> Interaction: User selects a gate and toggles inputs; a diagram and truth table update in real-time. Justification: Provides immediate, tangible feedback, which is crucial for understanding abstract logic rules.
-        - Boolean Algebra -> Goal: Illustrate simplification -> Viz: Guided Interactive Example -> Interaction: User sees the expression F = A.B' + A.B and clicks a "Simplify" button to see the step-by-step reduction to F = A. Justification: Reinforces the concept from the homework in a more engaging way than static text.
-        - Combinational/Sequential Circuits -> Goal: Explain function -> Viz: Interactive Cards (HTML/CSS/JS) -> Interaction: For a MUX, users toggle select lines to see the output change. For a D Flip-Flop, users toggle an input and a "Clock" button to see the output latch. Justification: Clearly demonstrates the core difference between memory-less and memory-based circuits.
-        - MCU Interfacing -> Goal: Show practical application -> Viz: CSS-based diagram -> Interaction: User clicks a "Press Button" toggle, which updates the diagram to show a pin going LOW and an LED turning ON. Justification: Connects the digital logic concepts to physical microcontroller behavior.
-        - Quiz/Homework -> Goal: Assess knowledge -> Viz: Interactive Q&A Cards -> Interaction: "Reveal Answer" toggle. Justification: Encourages active recall and self-paced learning.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
-        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
-        .nav-button.active, .nav-button:hover { color: #2563eb; border-bottom-color: #2563eb; }
-        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .content-section { display: none; }
-        .content-section.active { display: block; }
-        .question-card .answer { display: none; }
-        .logic-input { cursor: pointer; border: 2px solid; transition: all 0.2s; }
-        .logic-input.high { background-color: #bfdbfe; border-color: #3b82f6; }
-        .logic-input.low { background-color: #e7e5e4; border-color: #a8a29e; }
-        .logic-output.high { background-color: #a7f3d0; }
-        .logic-output.low { background-color: #fecaca; }
-        .truth-table-row.highlight { background-color: #fef9c3; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
+        }
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
+        }
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
+        }
+        .nav-button svg {
+          margin-bottom: 0.25rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
+        }
+        .formula-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border-left: 4px solid #38bdf8; /* Blue border on left */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 1rem;
+            color: #0c4a6e; /* Darker blue text */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body class="antialiased">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 1: Digital Logic</h1>
-                <nav class="hidden md:flex space-x-4 lg:space-x-6">
-                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
-                    <button class="nav-button" onclick="showSection('sandbox')">Logic Gate Sandbox</button>
-                    <button class="nav-button" onclick="showSection('explorer')">Circuit Explorer</button>
-                    <button class="nav-button" onclick="showSection('interfacing')">MCU Interfacing</button>
-                    <button class="nav-button" onclick="showSection('knowledge')">Knowledge Check</button>
-                </nav>
-                <button id="menu-btn" class="md:hidden">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </div>
-             <div id="mobile-menu" class="hidden md:hidden py-2">
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('sandbox'); closeMenu();">Logic Gate Sandbox</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('explorer'); closeMenu();">Circuit Explorer</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('interfacing'); closeMenu();">MCU Interfacing</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('knowledge'); closeMenu();">Knowledge Check</button>
-            </div>
-        </div>
-    </header>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
-        
-        <section id="intro" class="content-section active">
-            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
-                <h2 class="text-3xl font-bold text-stone-800 mb-4">Welcome to Digital Logic & Interfacing</h2>
-                <p class="text-lg text-stone-600 mb-6">This module introduces the foundational principles of digital logic, the language of computers and microcontrollers. Unlike continuous analog signals, digital logic uses discrete binary values (0s and 1s) to process information. Understanding this is essential for designing control systems and interfacing with sensors and actuators. In this interactive guide, you will explore the building blocks of digital circuits, from simple logic gates to complex sequential circuits and communication protocols.</p>
-                <h3 class="text-2xl font-bold text-stone-800 mb-3">Learning Objectives</h3>
-                <ul class="list-disc list-inside space-y-2 text-stone-700">
-                    <li>Identify and describe the functionality of common logic gates.</li>
-                    <li>Apply Boolean algebra to simplify logic expressions.</li>
-                    <li>Differentiate between combinational and sequential logic circuits.</li>
-                    <li>Understand how microcontrollers use digital I/O and communication protocols.</li>
+        // Lucide React icons (inline SVGs for direct use in HTML)
+        const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+        const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+        const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+
+        // Icons for Week 9
+        const Compass = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>;
+        const RotateCcw = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.76 2.75L3 8"/><path d="M3 3v5h5"/></svg>;
+        const Magnet = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 15v3a3 3 0 1 0 6 0v-3"/><path d="M12 15v3a3 3 0 1 0 6 0v-3"/><path d="M6 15h-.5A3.5 3.5 0 0 1 2 11.5V6A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 6v5.5A3.5 3.5 0 0 1 18.5 15H18"/><path d="M12 9v6"/></svg>;
+        const Square = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>;
+
+
+        // Concept Review Component
+        const ConceptReview = () => {
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 9: Position and Motion Sensors</h2>
+
+              {/* Potentiometers: Simple Position Sensing */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Compass className="w-7 h-7 mr-3 text-blue-600"/>
+                    1. Potentiometers: Simple Position Sensing
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A variable resistor with three terminals, used as a voltage divider to measure linear or angular position.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Principle of Operation:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>As a wiper moves along a resistive track, it changes the resistance ratio between the two parts of the track.</li>
+                  <li>When connected across a voltage supply (e.g., 5V to GND), the voltage at the wiper becomes proportional to its physical position.</li>
                 </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Types:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Rotary Potentiometers:</span> Used for angular position (e.g., knobs, joystick axes).</li>
+                  <li><span className="font-medium">Linear Potentiometers:</span> Used for linear displacement.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Characteristics:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Absolute Position:</span> Provides an absolute position reading (even after power cycling, it returns to the same value for the same position).</li>
+                  <li><span className="font-medium">Simple to Interface:</span> Connects directly to an Arduino analog input.</li>
+                  <li><span className="font-medium">Limitations:</span> Limited range of motion, mechanical wear, noise from wiper contact, not ideal for continuous rotation beyond a certain angle (for rotary pots).</li>
+                </ul>
+              </section>
+
+              {/* Optical Encoders (Incremental) */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <RotateCcw className="w-7 h-7 mr-3 text-green-600"/>
+                    2. Optical Encoders (Incremental)
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A sensor that converts angular or linear motion into a digital code, typically pulses. Incremental encoders provide information about motion (speed, distance, direction) but not absolute position.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Principle of Operation:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Consists of a light source, a rotating disk with transparent and opaque patterns (or a linear strip), and a photodetector.</li>
+                  <li>As the disk/strip moves, the light beam is interrupted, generating a series of ON/OFF (HIGH/LOW) pulses.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Quadrature Output (A and B Channels):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Most incremental encoders have two output channels, A and B, which are 90 degrees out of phase.</li>
+                  <li><span className="font-medium">Direction Sensing:</span> By observing which channel goes HIGH or LOW first, the microcontroller can determine the direction of rotation.</li>
+                  <li><span className="font-medium">Increased Resolution:</span> Can detect changes on both rising and falling edges of both A and B signals, effectively quadrupling the resolution (4X decoding).</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Characteristics:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Relative Position:</span> Provides changes in position (counts pulses), not absolute position. Requires a reference point or homing sequence.</li>
+                  <li><span className="font-medium">High Precision & Accuracy:</span> Can offer very high resolution for measuring movement.</li>
+                  <li><span className="font-medium">Robust:</span> Less susceptible to electrical noise than potentiometers for continuous motion.</li>
+                  <li><span className="font-medium">Interfacing:</span> Requires interrupt pins on the microcontroller for accurate pulse counting, especially at high speeds.</li>
+                </ul>
+              </section>
+
+              {/* Hall-Effect Sensors */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Magnet className="w-7 h-7 mr-3 text-red-600"/>
+                    3. Hall-Effect Sensors
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A sensor that detects the presence and strength of a magnetic field.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Principle of Operation (Hall Effect):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>When a current-carrying conductor is placed in a magnetic field, a voltage (Hall voltage) is generated perpendicular to both the current and the magnetic field.</li>
+                  <li>Hall-effect sensors integrate this principle to provide a digital (ON/OFF) or analog (proportional voltage) output.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Types & Applications:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Digital (Switching) Hall-Effect Sensors:</span> Output a HIGH or LOW signal when a magnetic field is detected (e.g., for counting rotations, limit sensing, detecting open/closed states).</li>
+                  <li><span className="font-medium">Analog (Linear) Hall-Effect Sensors:</span> Output a voltage proportional to the magnetic field strength (e.g., for current sensing, precise position sensing with a magnet).</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Characteristics:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Non-Contact Operation:</span> No physical wear and tear, leading to long lifespan and high reliability.</li>
+                  <li><span className="font-medium">Immune to Environmental Factors:</span> Less affected by dust, dirt, moisture compared to mechanical switches or optical sensors.</li>
+                  <li><span className="font-medium">Fast Response Time:</span> Can detect changes quickly.</li>
+                  <li><span className="font-medium">Requires Magnet:</span> Needs a permanent magnet as the target for detection.</li>
+                </ul>
+              </section>
             </div>
-        </section>
-
-        <section id="sandbox" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Logic Gate Sandbox</h2>
-            <div class="card p-6">
-                <div class="flex flex-col md:flex-row gap-8">
-                    <div class="md:w-1/3">
-                        <label for="gate-select" class="block font-medium text-stone-700">Select a Gate:</label>
-                        <select id="gate-select" class="mt-1 block w-full border border-stone-300 rounded-md p-2">
-                            <option value="AND">AND</option><option value="OR">OR</option><option value="NOT">NOT</option><option value="NAND">NAND</option><option value="NOR">NOR</option><option value="XOR">XOR</option><option value="XNOR">XNOR</option>
-                        </select>
-                        <div class="mt-6 space-y-4">
-                            <div class="flex items-center gap-4">
-                                <span class="font-bold text-lg">A:</span>
-                                <div id="input-a" data-value="0" class="logic-input low w-16 h-10 rounded flex items-center justify-center text-xl font-mono">0</div>
-                            </div>
-                            <div id="input-b-control" class="flex items-center gap-4">
-                                <span class="font-bold text-lg">B:</span>
-                                <div id="input-b" data-value="0" class="logic-input low w-16 h-10 rounded flex items-center justify-center text-xl font-mono">0</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-lg font-semibold text-center mb-2">Live Truth Table</h3>
-                        <div id="truth-table-container" class="overflow-x-auto"></div>
-                    </div>
-                </div>
-                <div class="mt-6 border-t pt-6">
-                     <p class="text-center font-semibold text-lg">Output (Y) = <span id="logic-expression" class="font-mono text-blue-600">A · B</span></p>
-                    <div class="w-24 h-16 mx-auto mt-2 rounded flex items-center justify-center text-2xl font-bold logic-output low" id="logic-output">0</div>
-                </div>
-            </div>
-        </section>
-
-        <section id="explorer" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Circuit Explorer</h2>
-            <div class="grid md:grid-cols-2 gap-8">
-                 <div class="card p-6">
-                    <h3 class="text-xl font-bold mb-2">Boolean Algebra Simplifier</h3>
-                    <p class="text-stone-600 mb-4">Boolean algebra helps reduce complex circuits. Let's simplify the expression from the homework:</p>
-                    <p class="text-center font-mono text-lg bg-stone-100 p-2 rounded">F = (A · B) + (A · B')</p>
-                    <div class="text-center mt-4">
-                        <button id="simplify-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Simplify</button>
-                    </div>
-                    <p id="simplified-result" class="text-center font-mono text-lg mt-4 h-8"></p>
-                 </div>
-                 <div class="card p-6">
-                    <h3 class="text-xl font-bold mb-2">Sequential Logic: D Flip-Flop</h3>
-                    <p class="text-stone-600 mb-4">A D Flip-Flop stores the value of input 'D' when the 'Clock' transitions. It "remembers" the state.</p>
-                    <div class="flex justify-around items-center mt-6">
-                        <div>
-                            <p class="text-center font-semibold">Input D</p>
-                            <div id="d-flip-flop-d" data-value="0" class="logic-input low w-20 h-12 rounded flex items-center justify-center text-xl font-mono mx-auto">0</div>
-                        </div>
-                         <button id="d-flip-flop-clk" class="px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700">Clock Pulse</button>
-                        <div>
-                            <p class="text-center font-semibold">Output Q</p>
-                            <div id="d-flip-flop-q" data-value="0" class="w-20 h-12 rounded flex items-center justify-center text-xl font-mono mx-auto logic-output low">0</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <section id="interfacing" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Microcontroller Interfacing</h2>
-            <div class="card p-6">
-                <h3 class="text-xl font-bold mb-2 text-center">Digital Input/Output Example</h3>
-                <p class="text-stone-600 mb-6 text-center">This simulates reading a button press (digital input) and turning on an LED (digital output) with a microcontroller.</p>
-                <div class="grid md:grid-cols-2 gap-8 items-center">
-                    <div>
-                        <h4 class="font-semibold text-lg text-center mb-4">Control</h4>
-                        <div class="flex items-center justify-center gap-4">
-                            <span class="font-medium">Button:</span>
-                            <label for="mcu-button-toggle" class="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" value="" id="mcu-button-toggle" class="sr-only peer">
-                              <div class="w-14 h-7 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
-                              <span id="button-state-text" class="ml-3 text-sm font-medium text-stone-900">Not Pressed</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="bg-stone-100 p-4 rounded-lg border">
-                        <div class="flex justify-between items-center text-sm font-mono">
-                           <span>3.3V --[ R ]--+-- MCU Pin (Input)</span>
-                           <span id="mcu-pin-state" class="font-bold text-red-600">HIGH</span>
-                        </div>
-                        <div class="text-sm font-mono mt-2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| </div>
-                        <div class="text-sm font-mono mt-2"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Switch]-- GND</div>
-                        <hr class="my-4">
-                         <div class="flex justify-between items-center text-sm font-mono">
-                           <span>MCU Pin (Output) --|>|--[ R ]-- GND</span>
-                           <div class="flex items-center gap-2">
-                               <span>LED:</span>
-                               <div id="mcu-led" class="w-5 h-5 rounded-full bg-stone-400 transition-colors"></div>
-                           </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="knowledge" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
-            <div id="knowledge-grid" class="space-y-4"></div>
-        </section>
-    </main>
-
-<script>
-const gates = {
-    AND:  { expr: "A · B", func: (a, b) => a && b },
-    OR:   { expr: "A + B", func: (a, b) => a || b },
-    NOT:  { expr: "A'", func: (a) => !a },
-    NAND: { expr: "(A · B)'", func: (a, b) => !(a && b) },
-    NOR:  { expr: "(A + B)'", func: (a, b) => !(a || b) },
-    XOR:  { expr: "A ⊕ B", func: (a, b) => a !== b },
-    XNOR: { expr: "(A ⊕ B)'", func: (a, b) => a === b },
-};
-
-const knowledgeData = [
-    { question: "Draw the logic gate diagram and create the truth table for the Boolean expression Y = (A · B) + C'.", answer: "The diagram has an AND gate for A and B, and a NOT gate for C. The outputs of these two gates feed into an OR gate to produce Y. The truth table would show Y is HIGH if (A AND B are HIGH) OR if C is LOW." },
-    { question: "Simplify the Boolean expression F = A · B' + A · B.", answer: "F = A · (B' + B)  (Distributive Law) -> F = A · 1 (Complementary Law) -> F = A (Identity Law)." },
-    { question: "What is the fundamental difference between combinational and sequential logic?", answer: "Combinational logic output depends only on current inputs (no memory). Sequential logic output depends on current inputs AND previous states (has memory, usually via flip-flops)." },
-    { question: "You connect a button to an MCU pin. When pressed, it connects the pin to ground. What component is needed and why?", answer: "A pull-up resistor. It connects the pin to the supply voltage, ensuring the pin is in a defined HIGH state when the button isn't pressed, preventing a 'floating' input." },
-];
-
-let inputA = 0;
-let inputB = 0;
-
-function updateLogicSandbox() {
-    const selectedGate = document.getElementById('gate-select').value;
-    const gate = gates[selectedGate];
-    const isUnary = selectedGate === 'NOT';
-
-    document.getElementById('input-b-control').style.display = isUnary ? 'none' : 'flex';
-
-    const result = gate.func(inputA, isUnary ? undefined : inputB);
-    const outputEl = document.getElementById('logic-output');
-    outputEl.textContent = result ? 1 : 0;
-    outputEl.className = 'w-24 h-16 mx-auto mt-2 rounded flex items-center justify-center text-2xl font-bold logic-output ' + (result ? 'high' : 'low');
-    
-    document.getElementById('logic-expression').innerHTML = gate.expr.replace('B', isUnary ? '' : 'B').replace('·', '· ').replace('+', ' + ');
-    
-    generateTruthTable(selectedGate);
-}
-
-function generateTruthTable(gateName) {
-    const tableContainer = document.getElementById('truth-table-container');
-    const gate = gates[gateName];
-    const isUnary = gateName === 'NOT';
-
-    let tableHTML = '<table class="w-full text-center table-auto"><thead><tr>';
-    tableHTML += '<th>A</th>';
-    if (!isUnary) tableHTML += '<th>B</th>';
-    tableHTML += '<th class="border-l-2 border-stone-300">Y</th></tr></thead><tbody>';
-
-    const rows = isUnary ? 2 : 4;
-    for (let i = 0; i < rows; i++) {
-        let a = isUnary ? i : Math.floor(i / 2);
-        let b = isUnary ? 0 : i % 2;
-        let output = gate.func(a, b);
-
-        let currentInputMatch = isUnary ? (a === inputA) : (a === inputA && b === inputB);
-        let highlightClass = currentInputMatch ? 'highlight' : '';
-        
-        tableHTML += `<tr class="border-t ${highlightClass}">`;
-        tableHTML += `<td>${a}</td>`;
-        if (!isUnary) tableHTML += `<td>${b}</td>`;
-        tableHTML += `<td class="border-l-2 border-stone-300 font-bold ${output ? 'text-green-600' : 'text-red-600'}">${output ? 1 : 0}</td>`;
-        tableHTML += '</tr>';
-    }
-
-    tableHTML += '</tbody></table>';
-    tableContainer.innerHTML = tableHTML;
-}
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    function setupToggle(elementId, callback) {
-        const el = document.getElementById(elementId);
-        el.addEventListener('click', () => {
-            const oldValue = parseInt(el.dataset.value);
-            const newValue = 1 - oldValue;
-            el.dataset.value = newValue;
-            el.textContent = newValue;
-            el.className = 'logic-input w-16 h-10 rounded flex items-center justify-center text-xl font-mono ' + (newValue ? 'high' : 'low');
-            if (callback) callback(newValue);
-        });
-    }
-
-    setupToggle('input-a', (val) => { inputA = val; updateLogicSandbox(); });
-    setupToggle('input-b', (val) => { inputB = val; updateLogicSandbox(); });
-    document.getElementById('gate-select').addEventListener('change', updateLogicSandbox);
-    
-    const dFlipD = document.getElementById('d-flip-flop-d');
-    const dFlipQ = document.getElementById('d-flip-flop-q');
-    dFlipD.addEventListener('click', () => {
-        const newValue = 1 - parseInt(dFlipD.dataset.value);
-        dFlipD.dataset.value = newValue;
-        dFlipD.textContent = newValue;
-        dFlipD.className = 'logic-input w-20 h-12 rounded flex items-center justify-center text-xl font-mono mx-auto ' + (newValue ? 'high' : 'low');
-    });
-    
-    document.getElementById('d-flip-flop-clk').addEventListener('click', () => {
-        const dValue = parseInt(dFlipD.dataset.value);
-        dFlipQ.dataset.value = dValue;
-        dFlipQ.textContent = dValue;
-        dFlipQ.className = 'w-20 h-12 rounded flex items-center justify-center text-xl font-mono mx-auto logic-output ' + (dValue ? 'high' : 'low');
-    });
-
-    document.getElementById('simplify-btn').addEventListener('click', () => {
-        const resultEl = document.getElementById('simplified-result');
-        resultEl.textContent = '...  F = A · (B + B\')';
-        setTimeout(() => { resultEl.textContent = '...  F = A · 1'; }, 1000);
-        setTimeout(() => { resultEl.textContent = 'F = A'; }, 2000);
-    });
-    
-    document.getElementById('mcu-button-toggle').addEventListener('change', (e) => {
-        const isPressed = e.target.checked;
-        document.getElementById('button-state-text').textContent = isPressed ? 'Pressed' : 'Not Pressed';
-        document.getElementById('mcu-pin-state').textContent = isPressed ? 'LOW' : 'HIGH';
-        document.getElementById('mcu-pin-state').className = 'font-bold ' + (isPressed ? 'text-green-600' : 'text-red-600');
-        document.getElementById('mcu-led').className = 'w-5 h-5 rounded-full transition-colors ' + (isPressed ? 'bg-yellow-300 shadow-lg' : 'bg-stone-400');
-    });
-
-    const knowledgeContainer = document.getElementById('knowledge-grid');
-    knowledgeData.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'question-card bg-white p-6 rounded-lg shadow-md border border-stone-200';
-        card.innerHTML = `
-            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
-            <div class="answer mt-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-800">
-                <p><strong>Answer:</strong> ${item.answer}</p>
-            </div>
-            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 transition-colors text-sm">Reveal Answer</button>
-        `;
-        card.querySelector('button').onclick = () => {
-            const answer = card.querySelector('.answer');
-            const isVisible = answer.style.display === 'block';
-            answer.style.display = isVisible ? 'none' : 'block';
-            card.querySelector('button').textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
+          );
         };
-        knowledgeContainer.appendChild(card);
-    });
 
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        // Encoder Simulator Sandbox
+        const EncoderSimulatorSandbox = () => {
+          const [position, setPosition] = useState(0);
+          const [direction, setDirection] = useState('Stopped');
+          const [aChannel, setAChannel] = useState(0); // 0 or 1
+          const [bChannel, setBChannel] = useState(0); // 0 or 1
+          const [lastA, setLastA] = useState(0);
+          const [lastB, setLastB] = useState(0);
+          const [serialOutput, setSerialOutput] = useState([]);
+          const [simulating, setSimulating] = useState(false);
+          const simulationIntervalRef = useRef(null);
+          const encoderSpeedRef = useRef(100); // ms per step
 
-    updateLogicSandbox();
-});
+          const simulateEncoderStep = (stepDirection) => {
+            let newA = aChannel;
+            let newB = bChannel;
 
-function showSection(sectionId) {
-    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    document.querySelectorAll('.nav-button').forEach(button => {
-        button.classList.remove('active');
-        if (button.getAttribute('onclick').includes(sectionId)) button.classList.add('active');
-    });
-}
-function closeMenu() {
-    document.getElementById('mobile-menu').classList.add('hidden');
-}
-</script>
+            if (stepDirection === 'clockwise') {
+              // Simulate quadrature for clockwise rotation (e.g., A leads B)
+              if (newA === 0 && newB === 0) { newA = 1; }
+              else if (newA === 1 && newB === 0) { newB = 1; }
+              else if (newA === 1 && newB === 1) { newA = 0; }
+              else if (newA === 0 && newB === 1) { newB = 0; }
+            } else if (stepDirection === 'counter-clockwise') {
+              // Simulate quadrature for counter-clockwise rotation (e.g., B leads A)
+              if (newA === 0 && newB === 0) { newB = 1; }
+              else if (newA === 0 && newB === 1) { newA = 1; }
+              else if (newA === 1 && newB === 1) { newB = 0; }
+              else if (newA === 1 && newB === 0) { newA = 0; }
+            }
+
+            setLastA(aChannel);
+            setLastB(bChannel);
+            setAChannel(newA);
+            setBChannel(newB);
+
+            // Logic to update position and direction based on quadrature
+            // This is a simplified version, real encoder libraries use interrupts
+            const prevA = aChannel;
+            const prevB = bChannel;
+
+            let currentDirection = direction;
+            let currentPosition = position;
+
+            if (prevA === 0 && newA === 1) { // A rising edge
+                if (newB === 0) { // B is low, clockwise
+                    currentPosition++;
+                    currentDirection = 'Clockwise';
+                } else { // B is high, counter-clockwise
+                    currentPosition--;
+                    currentDirection = 'Counter-Clockwise';
+                }
+            } else if (prevB === 0 && newB === 1) { // B rising edge
+                if (newA === 1) { // A is high, clockwise
+                    currentPosition++;
+                    currentDirection = 'Clockwise';
+                } else { // A is low, counter-clockwise
+                    currentPosition--;
+                    currentDirection = 'Counter-Clockwise';
+                }
+            }
+            // Add similar logic for falling edges if 4X decoding is desired.
+            // For simplicity, we'll stick to rising edges here.
+
+            setPosition(currentPosition);
+            setDirection(currentDirection);
+            setSerialOutput(prev => [...prev, `A:${newA}, B:${newB} -> Pos: ${currentPosition}, Dir: ${currentDirection}`]);
+          };
+
+          const startSimulation = (simDir) => {
+            if (simulating) stopSimulation();
+            setSimulating(true);
+            setSerialOutput([]);
+            setDirection(simDir === 'clockwise' ? 'Clockwise' : 'Counter-Clockwise');
+            simulationIntervalRef.current = setInterval(() => {
+              simulateEncoderStep(simDir);
+            }, encoderSpeedRef.current);
+          };
+
+          const stopSimulation = () => {
+            clearInterval(simulationIntervalRef.current);
+            setSimulating(false);
+            setDirection('Stopped');
+            setSerialOutput(prev => [...prev, "--- Simulation Stopped ---"]);
+          };
+
+          const resetSimulation = () => {
+            stopSimulation();
+            setPosition(0);
+            setAChannel(0);
+            setBChannel(0);
+            setLastA(0);
+            setLastB(0);
+            setSerialOutput([]);
+            setDirection('Stopped');
+          };
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Incremental Encoder Simulator</h2>
+              <p className="text-gray-700 mb-4">
+                Simulate an incremental encoder's A/B channel output and observe position/direction updates.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Controls */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Simulator Controls</h3>
+                  <div className="flex justify-center gap-4 mb-4">
+                    <button
+                      onClick={() => startSimulation('clockwise')}
+                      className={`py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md flex-1 ${
+                        simulating && direction === 'Clockwise' ? 'bg-indigo-700 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                      }`}
+                      disabled={simulating && direction === 'Clockwise'}
+                    >
+                      Start Clockwise
+                    </button>
+                    <button
+                      onClick={() => startSimulation('counter-clockwise')}
+                      className={`py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md flex-1 ${
+                        simulating && direction === 'Counter-Clockwise' ? 'bg-indigo-700 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                      }`}
+                      disabled={simulating && direction === 'Counter-Clockwise'}
+                    >
+                      Start Counter-Clockwise
+                    </button>
+                  </div>
+                  <button
+                    onClick={stopSimulation}
+                    className="py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md mb-4 bg-red-600 text-white hover:bg-red-700"
+                    disabled={!simulating}
+                  >
+                    Stop Simulation
+                  </button>
+                  <button
+                    onClick={resetSimulation}
+                    className="py-2 px-4 rounded-md font-semibold transition duration-300 ease-in-out shadow-md bg-gray-300 text-gray-800 hover:bg-gray-400"
+                  >
+                    Reset Position
+                  </button>
+                </div>
+
+                {/* Simulation Output */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Encoder State</h3>
+                  <div className="flex items-center justify-around mb-4 p-4 border border-gray-300 rounded-md bg-white">
+                    <div className="text-center">
+                      <Square className={`w-10 h-10 ${aChannel === 1 ? 'text-green-500 fill-current' : 'text-gray-400'}`} />
+                      <span className="block text-sm font-medium mt-1">A Channel: {aChannel}</span>
+                    </div>
+                    <div className="text-center">
+                      <Square className={`w-10 h-10 ${bChannel === 1 ? 'text-green-500 fill-current' : 'text-gray-400'}`} />
+                      <span className="block text-sm font-medium mt-1">B Channel: {bChannel}</span>
+                    </div>
+                  </div>
+                  <div className="mb-4 text-center">
+                    <p className="text-lg font-medium">Current Position: <span className="text-indigo-700">{position}</span></p>
+                    <p className="text-lg font-medium">Direction: <span className="text-indigo-700">{direction}</span></p>
+                  </div>
+                  <div className="bg-gray-800 text-green-400 p-3 rounded-md h-48 overflow-y-auto font-mono text-sm">
+                    {serialOutput.length === 0 && <p className="text-gray-500">Encoder output will appear here...</p>}
+                    {serialOutput.map((line, index) => (
+                      <p key={index} className="whitespace-pre-wrap">{line}</p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+
+        // Practice Problems Component
+        const PracticeProblems = () => {
+          const [activeTab, setActiveTab] = useState('homework');
+
+          const homeworkQuestions = [
+            {
+              id: 1,
+              type: 'text',
+              question: 'Compare and contrast potentiometers and incremental optical encoders as position sensors. What is a key advantage of each?',
+              answer: 'Potentiometers: Provide absolute position, simple to interface (analogRead), but have limited range, mechanical wear, and can be noisy. Key advantage: Absolute position (retains position after power loss).\n\nIncremental Optical Encoders: Provide relative position (change in position), high precision, and are robust. They use A/B quadrature signals for direction and higher resolution. Key advantage: High precision and accuracy, ideal for measuring speed and distance traveled, non-contact operation for optical types.',
+              explanation: 'Potentiometers are simpler for basic position sensing, especially for knobs or sliders. Encoders, especially incremental ones with quadrature, are preferred for applications requiring high precision, speed measurement, and robust operation over continuous rotation, but they require a "homing" sequence to establish an absolute reference.'
+            },
+            {
+              id: 2,
+              type: 'text',
+              question: 'Explain how an incremental optical encoder determines the direction of rotation using its A and B channels. Why is this important?',
+              answer: 'An incremental optical encoder determines direction by observing the phase relationship between its two output channels, A and B. These channels are typically 90 degrees out of phase. If channel A goes HIGH before channel B during a transition, it indicates one direction (e.g., clockwise). If channel B goes HIGH before channel A, it indicates the opposite direction (e.g., counter-clockwise).\n\nThis is important because simply counting pulses would only tell you the magnitude of movement, not the direction. For many control systems (e.g., robotic arms, motor control), knowing the direction of movement is critical for accurate positioning and feedback control.',
+              explanation: 'The quadrature output is the key to directional sensing. By monitoring the sequence of transitions on both channels, the microcontroller can deduce whether the encoder is rotating clockwise or counter-clockwise. This information is vital for closed-loop control systems to accurately move to a target position or maintain a specific velocity.'
+            },
+            {
+              id: 3,
+              type: 'multiple_choice',
+              question: 'What is a significant advantage of Hall-effect sensors over mechanical limit switches?',
+              options: ['A) They are cheaper to manufacture.', 'B) They require less power.', 'C) They offer non-contact operation, reducing wear and tear.', 'D) They can measure temperature more accurately.'],
+              correctAnswer: 'C) They offer non-contact operation, reducing wear and tear.',
+              explanation: 'Hall-effect sensors detect magnetic fields without physical contact. This non-contact nature means there are no moving parts to wear out, leading to a much longer lifespan and higher reliability compared to mechanical switches which involve physical contact and friction. Options A, B, and D are not their primary advantages or are incorrect.'
+            },
+            {
+              id: 4,
+              type: 'text',
+              question: 'Describe a practical application where a digital Hall-effect sensor would be a better choice than a potentiometer for position sensing.',
+              answer: 'A digital Hall-effect sensor would be a better choice than a potentiometer for detecting the presence or absence of an object, or for counting rotations in a harsh environment. For example, in a factory automation setting, a Hall-effect sensor could reliably detect when a metal part passes a specific point on an assembly line, or count rotations of a motor shaft by attaching a magnet to it. Unlike a potentiometer, it offers non-contact operation, is immune to dust/dirt, and has a much longer lifespan for repetitive triggering.',
+              explanation: 'Potentiometers are great for continuous, absolute position over a limited range. Hall-effect sensors excel at discrete detection (ON/OFF) and counting in environments where mechanical wear, dust, or moisture would degrade a potentiometer or mechanical switch. Their non-contact nature is a major benefit.'
+            },
+            {
+              id: 5,
+              type: 'text',
+              question: 'If an incremental encoder has 100 pulses per revolution (PPR) on its A channel, and you are using 4X decoding (counting both rising and falling edges of both A and B channels), what is the effective resolution per revolution?',
+              answer: 'With 100 pulses per revolution (PPR) on its A channel, and using 4X decoding (counting both rising and falling edges of both A and B channels), the effective resolution per revolution is:\nResolution = PPR * 4 = 100 * 4 = 400 counts per revolution.\nThis means for every full rotation, the encoder will generate 400 distinct counts, allowing for finer measurement of angular position.',
+              explanation: '4X decoding means that for every full cycle of the A and B signals, four distinct transitions are detected (A rising, A falling, B rising, B falling). If a single channel provides 100 pulses, then 4X decoding multiplies that by 4, significantly increasing the precision of the angular measurement.'
+            }
+          ];
+
+          const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
+
+          const handleHomeworkChange = (id, value) => {
+            setHomeworkAnswers(prev => ({
+              ...prev,
+              [id]: value
+            }));
+          };
+
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
+
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
+            });
+            setQuizResults(newResults);
+          };
+
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
+
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
+
+              <div className="flex mb-6 space-x-4">
+                <button
+                  onClick={() => setActiveTab('homework')}
+                  className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+                    activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Homework Questions
+                </button>
+              </div>
+
+              {activeTab === 'homework' && (
+                <div>
+                  <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-blue-500"/>
+                    Homework Questions
+                  </h3>
+                  <p className="text-gray-700 mb-4">
+                    Instructions: Show all work and steps clearly.
+                  </p>
+                  {homeworkQuestions.map((q) => (
+                    <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+                      {q.type === 'text' ? (
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                          placeholder="Type your answer here..."
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
+                        ></textarea>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                              />
+                              <span className="ml-2">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
+                        </div>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
+                        </div>
+                      )}
+                      <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                        <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                        <div className="mt-2 text-indigo-700">
+                          <p className="whitespace-pre-wrap">{q.explanation}</p>
+                        </div >
+                      </details>
+                    </div>
+                  ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+
+        // Main App Component
+        const App = () => {
+          const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
+
+          return (
+            <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+              <header className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+                  Mechatronics 1 Study Guide
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 9: Position and Motion Sensors</p>
+                <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                    <Home className="w-5 h-5 mr-2" />
+                    Back to Course Hub
+                </a>
+              </header>
+
+              <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+                <button
+                  onClick={() => setActiveSection('review')}
+                  className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+                >
+                  <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Concept Review</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('sandbox')}
+                  className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+                >
+                  <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Interactive Sandbox</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('practice')}
+                  className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Practice Problems</span>
+                </button>
+              </nav>
+
+              <main className="container">
+                {activeSection === 'review' && <ConceptReview />}
+                {activeSection === 'sandbox' && <EncoderSimulatorSandbox />}
+                {activeSection === 'practice' && <PracticeProblems />}
+              </main>
+
+              <footer className="text-center text-gray-500 text-sm mt-12">
+                <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+              </footer>
+            </div>
+          );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 </body>
 </html>
+
