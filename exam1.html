@@ -353,12 +353,232 @@
                 </details>
             </div>
 
-            <h2 class="section-title">Section 2: Mathematical Problems</h2>
-
-            <!-- Question 21 -->
+            <!-- New Conceptual Question 21 -->
             <div class="question-card">
                 <p class="question-text">
-                    21. Calculate the equivalent resistance (R<sub>eq</sub>) for the following circuit:
+                    21. What is the primary role of a power supply in an electronic circuit?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The primary role of a power supply is to provide a stable and regulated source of electrical energy (voltage and current) to the components within an electronic circuit, ensuring they operate within their specified parameters.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 22 -->
+            <div class="question-card">
+                <p class="question-text">
+                    22. Describe the difference between a series circuit and a parallel circuit in terms of current flow and voltage drops.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>In a <b>series circuit</b>, current is the same through all components, but the voltage drops across each component add up to the total supply voltage. In a <b>parallel circuit</b>, the voltage is the same across all parallel branches, but the total current from the source is divided among the branches.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 23 -->
+            <div class="question-card">
+                <p class="question-text">
+                    23. What is the significance of the "time constant" in an RC (Resistor-Capacitor) circuit?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The time constant ($\tau = RC$) in an RC circuit represents the time it takes for the capacitor voltage (or current) to reach approximately 63.2% of its final value during charging, or to decay to 36.8% of its initial value during discharging. It indicates how quickly the circuit responds to changes in voltage.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 24 -->
+            <div class="question-card">
+                <p class="question-text">
+                    24. Explain why inductors are often used in power supply filtering applications.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Inductors are used in power supply filtering (often in conjunction with capacitors to form LC filters) because they oppose changes in current. This property allows them to smooth out pulsating DC voltages (ripples) by resisting rapid current variations, thereby providing a more stable DC output.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 25 -->
+            <div class="question-card">
+                <p class="question-text">
+                    25. What is the main function of a Zener diode in a circuit?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The main function of a Zener diode is voltage regulation. When reverse-biased and the voltage across it reaches its "Zener voltage," it maintains a nearly constant voltage across its terminals, even if the current through it changes significantly. This makes it useful for creating stable reference voltages.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 26 -->
+            <div class="question-card">
+                <p class="question-text">
+                    26. Describe the concept of "virtual short" in an ideal Op-Amp circuit configured with negative feedback.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The "virtual short" concept states that in an ideal Op-Amp with negative feedback, the voltage difference between its inverting and non-inverting input terminals is approximately zero. This is due to the Op-Amp's extremely high open-loop gain; any tiny voltage difference at the inputs would cause a huge output, which the negative feedback then corrects by forcing the input voltages to be nearly equal.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 27 -->
+            <div class="question-card">
+                <p class="question-text">
+                    27. What is the difference between "resolution" and "range" in a measurement instrument?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>Resolution</b> refers to the smallest increment that an instrument can detect or display. <b>Range</b> refers to the minimum and maximum values that the instrument is designed to measure.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 28 -->
+            <div class="question-card">
+                <p class="question-text">
+                    28. Why is calibration important for measurement systems?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Calibration is important for measurement systems to ensure their accuracy. It involves comparing the instrument's readings against a known standard and adjusting the instrument to minimize any deviations, thereby ensuring that it provides reliable and correct measurements.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 29 -->
+            <div class="question-card">
+                <p class="question-text">
+                    29. What is the role of a transducer in a mechatronic system? Provide an example.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A transducer is a device that converts energy from one form to another. In mechatronic systems, they typically convert a physical quantity (e.g., temperature, pressure, light) into an electrical signal, or vice-versa. An example is a microphone (sound to electrical) or a loudspeaker (electrical to sound), or a thermistor (temperature to electrical resistance).</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 30 -->
+            <div class="question-card">
+                <p class="question-text">
+                    30. Explain the concept of "bandwidth" in the context of a measurement system's dynamic characteristics.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Bandwidth in a measurement system refers to the range of frequencies over which the system can accurately measure or respond to changes in the input signal. A wider bandwidth means the system can respond to faster changes in the measured quantity without significant distortion or attenuation.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 31 -->
+            <div class="question-card">
+                <p class="question-text">
+                    31. What is a "pull-up" resistor, and why is it commonly used with push-button switches connected to microcontrollers?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A "pull-up" resistor connects an input pin to the positive voltage supply (e.g., 5V). It's used with push-button switches to ensure the pin has a defined HIGH state when the button is not pressed. Without it, the pin would be "floating" and susceptible to noise, leading to erratic readings. When the button is pressed, it connects the pin to ground, pulling it LOW.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 32 -->
+            <div class="question-card">
+                <p class="question-text">
+                    32. Describe the operation of a simple LED circuit, including the role of the current-limiting resistor.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>An LED (Light Emitting Diode) is a diode that emits light when current flows through it in the forward direction. It requires a specific forward voltage to turn on and must have its current limited to prevent damage. A current-limiting resistor is placed in series with the LED to drop the excess voltage from the power supply and control the current flowing through the LED, protecting it from burning out.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 33 -->
+            <div class="question-card">
+                <p class="question-text">
+                    33. What is the difference between a passive and an active electronic component? Provide an example of each.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A <b>passive component</b> is one that cannot generate power but can only dissipate, store, or absorb it (e.g., resistors, capacitors, inductors). An <b>active component</b> is one that can control current flow and can amplify or switch electrical signals, often requiring an external power source to operate (e.g., transistors, operational amplifiers, diodes, microcontrollers).</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 34 -->
+            <div class="question-card">
+                <p class="question-text">
+                    34. Explain the concept of "gain" in an amplifier circuit.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Gain in an amplifier circuit is a measure of its ability to increase the power or amplitude of a signal. It is typically defined as the ratio of the output signal power or amplitude to the input signal power or amplitude. For voltage amplifiers, it's the ratio of output voltage to input voltage (V<sub>out</sub>/V<sub>in</sub>).</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 35 -->
+            <div class="question-card">
+                <p class="question-text">
+                    35. What is the purpose of a decoupling capacitor (bypass capacitor) in a digital circuit?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A decoupling capacitor is placed close to the power pins of integrated circuits (ICs) in digital circuits. Its purpose is to provide a local reservoir of charge to supply instantaneous current demands from the IC during rapid switching operations and to filter out high-frequency noise on the power supply lines, thereby ensuring stable power delivery and preventing glitches.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 36 -->
+            <div class="question-card">
+                <p class="question-text">
+                    36. Describe the function of a voltage divider circuit.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A voltage divider circuit is a simple passive linear circuit that produces an output voltage that is a fraction of its input voltage. It consists of two series resistors (or other components with impedance) across which the input voltage is applied, and the output voltage is taken across one of the resistors. It's used to scale down a voltage to a desired level.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 37 -->
+            <div class="question-card">
+                <p class="question-text">
+                    37. What is the difference between a "short circuit" and an "open circuit"?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A <b>short circuit</b> is an unintended low-resistance connection across two points in a circuit, allowing a very large current to flow, often causing damage. An <b>open circuit</b> is a break in a circuit that prevents current from flowing, resulting in infinite resistance.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 38 -->
+            <div class="question-card">
+                <p class="question-text">
+                    38. Explain the concept of "ground" in an electrical circuit.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>"Ground" in an electrical circuit serves as a common reference point for voltage, typically considered 0V. It provides a return path for current to the power source and helps to stabilize voltage levels throughout the circuit. It can also serve as a safety measure, providing a path for fault currents to safely dissipate.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 39 -->
+            <div class="question-card">
+                <p class="question-text">
+                    39. What is the purpose of a fuse or circuit breaker in an electrical system?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The purpose of a fuse or circuit breaker is to protect electrical circuits from overcurrent conditions (e.g., short circuits or overloads) that could damage components or cause fires. They act as sacrificial devices (fuses) or resettable switches (circuit breakers) that automatically interrupt the current flow when it exceeds a safe level.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 40 -->
+            <div class="question-card">
+                <p class="question-text">
+                    40. Describe the main characteristic of an ideal voltage source and an ideal current source.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>An <b>ideal voltage source</b> provides a constant voltage across its terminals regardless of the current drawn from it (it has zero internal resistance). An <b>ideal current source</b> provides a constant current regardless of the voltage across its terminals (it has infinite internal resistance).</p>
+                </details>
+            </div>
+
+            <h2 class="section-title">Section 2: Mathematical Problems</h2>
+
+            <!-- Question 41 -->
+            <div class="question-card">
+                <p class="question-text">
+                    41. Calculate the equivalent resistance (R<sub>eq</sub>) for the following circuit:
                     Resistors R<sub>1</sub> = 60 &Omega; and R<sub>2</sub> = 90 &Omega; are connected in parallel.
                     This parallel combination is then connected in series with R<sub>3</sub> = 30 &Omega;.
                 </p>
@@ -376,10 +596,10 @@ R<sub>eq</sub> = 36 &Omega; + 30 &Omega; = 66 &Omega;</pre>
                 </details>
             </div>
 
-            <!-- Question 22 -->
+            <!-- Question 42 -->
             <div class="question-card">
                 <p class="question-text">
-                    22. A simple series circuit contains a 24 V DC source and two resistors, R<sub>A</sub> = 3.0 k&Omega; and R<sub>B</sub> = 5.0 k&Omega;.
+                    42. A simple series circuit contains a 24 V DC source and two resistors, R<sub>A</sub> = 3.0 k&Omega; and R<sub>B</sub> = 5.0 k&Omega;.
                     <br><br>
                     a) Determine the voltage drop across R<sub>A</sub>.
                     <br>
@@ -406,10 +626,10 @@ P<sub>RB</sub> = 0.045 W = 45 mW</pre>
                 </details>
             </div>
 
-            <!-- Question 23 -->
+            <!-- Question 43 -->
             <div class="question-card">
                 <p class="question-text">
-                    23. An uncharged 68 &mu;F capacitor is charged by a constant current source of 0.08 A. How long will it take for the voltage across the capacitor to reach 100 V?
+                    43. An uncharged 68 &mu;F capacitor is charged by a constant current source of 0.08 A. How long will it take for the voltage across the capacitor to reach 100 V?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
@@ -433,10 +653,10 @@ t = 0.085 s</pre>
                 </details>
             </div>
 
-            <!-- Question 24 -->
+            <!-- Question 44 -->
             <div class="question-card">
                 <p class="question-text">
-                    24. If a voltage of 7.5 V is induced across a 30 mH inductor, at what rate is the current through the inductor changing?
+                    44. If a voltage of 7.5 V is induced across a 30 mH inductor, at what rate is the current through the inductor changing?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
@@ -455,10 +675,10 @@ dI/dt = 250 A/s</pre>
                 </details>
             </div>
 
-            <!-- Question 25 -->
+            <!-- Question 45 -->
             <div class="question-card">
                 <p class="question-text">
-                    25. A series circuit consists of a 6V DC power supply, a 470 &Omega; resistor, and a light-emitting diode (LED) with a forward voltage drop of 2.2 V.
+                    45. A series circuit consists of a 6V DC power supply, a 470 &Omega; resistor, and a light-emitting diode (LED) with a forward voltage drop of 2.2 V.
                     <br><br>
                     a) Calculate the current flowing through the resistor and the LED.
                     <br>
@@ -486,10 +706,10 @@ P<sub>LED</sub> &approx; 0.017787 W or 17.787 mW</pre>
                 </details>
             </div>
 
-            <!-- New Math Problem 26 -->
+            <!-- New Math Problem 46 -->
             <div class="question-card">
                 <p class="question-text">
-                    26. A parallel circuit consists of three resistors: R<sub>A</sub> = 100 &Omega;, R<sub>B</sub> = 200 &Omega;, and R<sub>C</sub> = 50 &Omega;. If a 10 V DC source is connected across this parallel combination:
+                    46. A parallel circuit consists of three resistors: R<sub>A</sub> = 100 &Omega;, R<sub>B</sub> = 200 &Omega;, and R<sub>C</sub> = 50 &Omega;. If a 10 V DC source is connected across this parallel combination:
                     <br><br>
                     a) Calculate the equivalent resistance of the parallel circuit.
                     <br>
@@ -511,10 +731,10 @@ I<sub>total</sub> = 10 V / 28.57 &Omega; &approx; 0.35 A or 350 mA</pre>
                 </details>
             </div>
 
-            <!-- New Math Problem 27 -->
+            <!-- New Math Problem 47 -->
             <div class="question-card">
                 <p class="question-text">
-                    27. A 10 mH inductor is part of a circuit where the current changes from 0.5 A to 1.5 A in 20 ms.
+                    47. A 10 mH inductor is part of a circuit where the current changes from 0.5 A to 1.5 A in 20 ms.
                     <br><br>
                     a) What is the average rate of change of current (dI/dt)?
                     <br>
@@ -535,42 +755,42 @@ V = 0.5 V</pre>
                 </details>
             </div>
 
-            <!-- New Math Problem 28 -->
+            <!-- New Math Problem 48 -->
             <div class="question-card">
                 <p class="question-text">
-                    28. A 100 &mu;F capacitor is initially charged to 50 V. It is then discharged through a resistor. If the capacitor fully discharges in 0.5 seconds with an average discharge current of 0.01 A, what was the initial charge stored in the capacitor?
+                    48. A 100 &mu;F capacitor is initially charged to 50 V. It is then discharged through a resistor. If the capacitor fully discharges in 0.5 seconds with an average discharge current of 0.01 A, what was the initial charge stored in the capacitor?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>The initial charge stored in a capacitor can be calculated using the formula:</p>
+                    <p>The initial charge stored in a capacitor can be calculated using the formula:
                     <pre>Q = C * V</pre>
-                    <p>Given:</p>
+                    <p>Given:
                     <pre>C = 100 &mu;F = 100 * 10<sup>-6</sup> F
 V = 50 V</pre>
-                    <p>Calculation:</p>
+                    <p>Calculation:
                     <pre>Q = (100 * 10<sup>-6</sup> F) * (50 V)
 Q = 5000 * 10<sup>-6</sup> C = 0.005 C</pre>
-                    <p>Alternatively, using the average current and time:</p>
+                    <p>Alternatively, using the average current and time:
                     <pre>Q = I<sub>avg</sub> * t
 Q = 0.01 A * 0.5 s = 0.005 C</pre>
                     <p>Therefore, the initial charge stored in the capacitor was <b>0.005 C</b>.</p>
                 </details>
             </div>
 
-            <!-- New Math Problem 29 -->
+            <!-- New Math Problem 49 -->
             <div class="question-card">
                 <p class="question-text">
-                    29. An Op-Amp is configured as an inverting amplifier with an input resistor (R<sub>in</sub>) of 10 k&Omega; and a feedback resistor (R<sub>f</sub>) of 100 k&Omega;. If the input voltage (V<sub>in</sub>) is 0.2 V, what is the output voltage (V<sub>out</sub>)?
+                    49. An Op-Amp is configured as an inverting amplifier with an input resistor (R<sub>in</sub>) of 10 k&Omega; and a feedback resistor (R<sub>f</sub>) of 100 k&Omega;. If the input voltage (V<sub>in</sub>) is 0.2 V, what is the output voltage (V<sub>out</sub>)?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>For an ideal inverting Op-Amp configuration, the output voltage is given by the formula:</p>
+                    <p>For an ideal inverting Op-Amp configuration, the output voltage is given by the formula:
                     <pre>V<sub>out</sub> = - (R<sub>f</sub> / R<sub>in</sub>) * V<sub>in</sub></pre>
-                    <p>Given:</p>
+                    <p>Given:
                     <pre>R<sub>in</sub> = 10 k&Omega;
 R<sub>f</sub> = 100 k&Omega;
 V<sub>in</sub> = 0.2 V</pre>
-                    <p>Calculation:</p>
+                    <p>Calculation:
                     <pre>V<sub>out</sub> = - (100 k&Omega; / 10 k&Omega;) * 0.2 V
 V<sub>out</sub> = -10 * 0.2 V
 V<sub>out</sub> = -2 V</pre>
@@ -578,29 +798,113 @@ V<sub>out</sub> = -2 V</pre>
                 </details>
             </div>
 
-            <!-- New Math Problem 30 -->
+            <!-- New Math Problem 50 -->
             <div class="question-card">
                 <p class="question-text">
-                    30. A series circuit contains a 9V battery, a 1.5 k&Omega; resistor, and a Zener diode used for voltage regulation. If the Zener diode has a breakdown voltage of 5.6 V and is operating in its breakdown region, what is the current flowing through the resistor?
+                    50. A series circuit contains a 9V battery, a 1.5 k&Omega; resistor, and a Zener diode used for voltage regulation. If the Zener diode has a breakdown voltage of 5.6 V and is operating in its breakdown region, what is the current flowing through the resistor?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>When a Zener diode is operating in its breakdown region, it maintains a constant voltage across itself (the Zener voltage). In this series circuit, the voltage across the resistor will be the supply voltage minus the Zener voltage:</p>
+                    <p>When a Zener diode is operating in its breakdown region, it maintains a constant voltage across itself (the Zener voltage). In this series circuit, the voltage across the resistor will be the supply voltage minus the Zener voltage:
                     <pre>V<sub>R</sub> = V<sub>supply</sub> - V<sub>Zener</sub>
 V<sub>R</sub> = 9 V - 5.6 V
 V<sub>R</sub> = 3.4 V</pre>
-                    <p>Now, use Ohm's Law to find the current flowing through the resistor:</p>
+                    <p>Now, use Ohm's Law to find the current flowing through the resistor:
                     <pre>I = V<sub>R</sub> / R
 I = 3.4 V / 1.5 k&Omega; = 3.4 V / 1500 &Omega;
 I &approx; 0.002267 A or 2.267 mA</pre>
                     <p>Therefore, the current flowing through the resistor is approximately <b>2.267 mA</b>.</p>
                 </details>
             </div>
+
+            <!-- New Math Problem 51 -->
+            <div class="question-card">
+                <p class="question-text">
+                    51. A voltage divider circuit uses a 15 V power supply. If R<sub>top</sub> = 5 k&Omega; and R<sub>bottom</sub> = 10 k&Omega;, what is the voltage across R<sub>bottom</sub>?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Total Resistance (R<sub>total</sub>) = R<sub>top</sub> + R<sub>bottom</sub> = 5 k&Omega; + 10 k&Omega; = 15 k&Omega;
+                    <pre>V<sub>bottom</sub> = V<sub>supply</sub> * (R<sub>bottom</sub> / R<sub>total</sub>)
+V<sub>bottom</sub> = 15 V * (10 k&Omega; / 15 k&Omega;)
+V<sub>bottom</sub> = 15 V * (10 / 15)
+V<sub>bottom</sub> = 15 V * (2 / 3)
+V<sub>bottom</sub> = 10 V</pre>
+                    <p>Therefore, the voltage across R<sub>bottom</sub> is <b>10 V</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 52 -->
+            <div class="question-card">
+                <p class="question-text">
+                    52. A 10 &mu;F capacitor is charged from 0 V to 5 V in 20 ms. Calculate the average charging current.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Charge (Q) = C * V
+                    <pre>Q = 10 * 10<sup>-6</sup> F * 5 V = 50 * 10<sup>-6</sup> C = 50 &mu;C</pre>
+                    <p>Average Current (I) = Q / t
+                    <pre>I = 50 * 10<sup>-6</sup> C / (20 * 10<sup>-3</sup> s)
+I = 50 / 20 * 10<sup>-3</sup> A
+I = 2.5 * 10<sup>-3</sup> A = 2.5 mA</pre>
+                    <p>Therefore, the average charging current is <b>2.5 mA</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 53 -->
+            <div class="question-card">
+                <p class="question-text">
+                    53. An inductor has an inductance of 50 mH. If the voltage induced across it is 10 V, what is the rate of change of current (dI/dt) through the inductor?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <pre>V = L * (dI/dt)
+dI/dt = V / L
+dI/dt = 10 V / (50 * 10<sup>-3</sup> H)
+dI/dt = 10 / 0.05 A/s
+dI/dt = 200 A/s</pre>
+                    <p>Therefore, the rate of change of current is <b>200 A/s</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 54 -->
+            <div class="question-card">
+                <p class="question-text">
+                    54. A non-inverting Op-Amp amplifier has an input resistor (R<sub>1</sub>) of 2 k&Omega; and a feedback resistor (R<sub>f</sub>) of 18 k&Omega;. If the input voltage (V<sub>in</sub>) is 0.5 V, what is the output voltage (V<sub>out</sub>)?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>For an ideal non-inverting Op-Amp configuration, the output voltage is given by the formula:
+                    <pre>V<sub>out</sub> = V<sub>in</sub> * (1 + R<sub>f</sub> / R<sub>1</sub>)
+V<sub>out</sub> = 0.5 V * (1 + 18 k&Omega; / 2 k&Omega;)
+V<sub>out</sub> = 0.5 V * (1 + 9)
+V<sub>out</sub> = 0.5 V * 10
+V<sub>out</sub> = 5 V</pre>
+                    <p>Therefore, the output voltage is <b>5 V</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 55 -->
+            <div class="question-card">
+                <p class="question-text">
+                    55. A sensor outputs a voltage from 0 V to 3.3 V. If this sensor is connected to a 10-bit ADC with a 3.3 V reference, what is the digital reading when the sensor outputs 1.65 V?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Number of Steps = 2<sup>10</sup> = 1024
+                    <br>Resolution = V<sub>ref</sub> / Number of Steps = 3.3 V / 1024 &approx; 0.0032226 V/step
+                    <pre>Digital Reading = Analog Voltage / Resolution
+Digital Reading = 1.65 V / (3.3 V / 1024)
+Digital Reading = 1.65 * 1024 / 3.3
+Digital Reading = 512</pre>
+                    <p>Therefore, the digital reading is <b>512</b>.</p>
+                </details>
+            </div>
         </main>
 
         <!-- Footer Section -->
         <footer class="text-center text-gray-500 text-sm mt-12 py-6">
-            <p>&copy; <script>document.write(new Date().getFullYear())</script> Mechatronics 1 Course. All rights reserved.</p>
+            <p>&copy; <script>document.write(new Date().getFullYear())</script> Dr. Roger Tipton. All rights reserved.</p>
             <p>Designed for a World-Class Learning Experience</p>
         </footer>
     </div>
