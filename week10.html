@@ -3,411 +3,493 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 10 - Intro to AC Circuits</title>
+    <title>Mechatronics 1: Week 10 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chosen Palette: Calm Harmony -->
-    <!-- Application Structure Plan: The SPA is designed as a multi-section interactive dashboard, navigated by tabs: 'Introduction', 'Waveform Visualizer', 'Circuit Simulator', 'AC Power', and 'Knowledge Check'. This structure transforms the linear notes into a non-linear, exploratory learning tool. The goal is to build intuition. The 'Waveform Visualizer' lets users see how parameters affect a sine wave. The 'Circuit Simulator' allows hands-on experimentation with R, L, and C values to understand impedance dynamically. The 'AC Power' section uses an interactive power triangle. This task-oriented design is more engaging for students than passively reading text, encouraging active participation to understand complex concepts. -->
-    <!-- Visualization & Content Choices: 
-        - Sinusoid Characteristics -> Goal: Understand AC waveform parameters -> Viz: Interactive Line Chart (Chart.js) -> Interaction: Sliders for amplitude, frequency, and phase update the chart in real time. Justification: Provides immediate visual feedback, making abstract formula parameters tangible.
-        - Impedance/Reactance -> Goal: Understand how R, L, C behave in AC circuits -> Viz: Interactive Simulator with numeric outputs and an Impedance Vector chart (Chart.js scatter plot) -> Interaction: Sliders for R, L, C, and frequency update calculated values for Xc, Xl, and total Z (polar and rectangular forms), and redraw the impedance vector. Justification: This is the most effective way to demonstrate the complex relationship between components and frequency, directly tying into the core of AC analysis.
-        - AC Power -> Goal: Explain the Power Triangle (P, Q, S) -> Viz: Interactive Power Triangle visualization (Chart.js bar chart) -> Interaction: Sliders for RMS Voltage/Current and Power Factor update the triangle and calculated P, Q, and S values. Justification: Visually decodes the abstract concepts of real, reactive, and apparent power, clarifying their relationship.
-        - Quiz/Homework -> Goal: Assess knowledge -> Viz: Interactive Q&A Cards -> Interaction: "Reveal Answer" toggle. Justification: Promotes active recall and self-assessment in a more engaging format than static questions.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
-        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
-        .nav-button.active, .nav-button:hover { color: #2563eb; border-bottom-color: #2563eb; }
-        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .content-section { display: none; }
-        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-        .question-card .answer { display: none; }
-        .slider-label { font-size: 0.875rem; font-weight: 500; color: #57534e; }
-        .slider-value { font-family: monospace; font-size: 0.9rem; background-color: #e7e5e4; padding: 0.1rem 0.5rem; border-radius: 0.25rem; }
-        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 40vh; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
+        }
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
+        }
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
+        }
+        .nav-button svg {
+          margin-bottom: 0.25rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
+        }
+        .formula-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border-left: 4px solid #38bdf8; /* Blue border on left */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 1rem;
+            color: #0c4a6e; /* Darker blue text */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="antialiased">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 1: AC Circuits</h1>
-                <nav class="hidden md:flex space-x-4 lg:space-x-6">
-                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
-                    <button class="nav-button" onclick="showSection('visualizer')">Waveform Visualizer</button>
-                    <button class="nav-button" onclick="showSection('simulator')">Circuit Simulator</button>
-                    <button class="nav-button" onclick="showSection('power')">AC Power</button>
-                    <button class="nav-button" onclick="showSection('knowledge')">Knowledge Check</button>
-                </nav>
-                <button id="menu-btn" class="md:hidden">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </div>
-             <div id="mobile-menu" class="hidden md:hidden py-2">
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('visualizer'); closeMenu();">Waveform Visualizer</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('simulator'); closeMenu();">Circuit Simulator</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('power'); closeMenu();">AC Power</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('knowledge'); closeMenu();">Knowledge Check</button>
-            </div>
-        </div>
-    </header>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
-        
-        <section id="intro" class="content-section active">
-            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
-                <h2 class="text-3xl font-bold text-stone-800 mb-4">Welcome to AC Circuits</h2>
-                <p class="text-lg text-stone-600 mb-6">This module explores Alternating Current (AC) circuits, where voltage and current periodically reverse direction. Understanding AC is crucial for analyzing power systems, communications, and many mechatronic applications. Here, you'll interact with concepts like phasors, impedance, and AC power, transforming complex theory into tangible insights through hands-on visualization and simulation.</p>
-                <h3 class="text-2xl font-bold text-stone-800 mb-3">Learning Objectives</h3>
-                <ul class="list-disc list-inside space-y-2 text-stone-700">
-                    <li>Describe the characteristics of sinusoidal waveforms.</li>
-                    <li>Calculate reactance and impedance for R, L, and C components.</li>
-                    <li>Analyze AC circuits using phasors.</li>
-                    <li>Differentiate between real, reactive, and apparent power.</li>
+        // Lucide React icons (inline SVGs for direct use in HTML)
+        const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+        const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+        const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+
+        // Icons for Week 10
+        const Scale = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/></svg>;
+        const Droplet = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.32 0z"/></svg>;
+        const Wind = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 12 7H2"/><path d="M12.6 19.4A2 2 0 1 0 15 17H2"/></svg>;
+
+
+        // Concept Review Component
+        const ConceptReview = () => {
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 10: Force, Pressure & Flow Sensors</h2>
+
+              {/* Force and Pressure Sensors */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Scale className="w-7 h-7 mr-3 text-blue-600"/>
+                    1. Force and Pressure Sensors
+                </h3>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Strain Gauges: Sensing Deformation</h4>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A sensor whose electrical resistance changes when it is stretched or compressed (strained).
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Principle of Operation:</span> A thin, metallic foil or wire patterned into a grid is bonded to an object. When the object deforms, the gauge deforms, changing its resistance.</li>
+                  <li><span className="font-medium">Gauge Factor (GF):</span> Measures the sensitivity of the strain gauge: GF = (ΔR / R) / (ΔL / L) where ΔR / R is the fractional change in resistance and ΔL / L is the strain.</li>
+                  <li><span className="font-medium">Wheatstone Bridge:</span> Commonly used circuit to convert the small resistance changes of strain gauges into a measurable voltage change.</li>
                 </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Load Cells: Packaged Force Transducers</h4>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A transducer that converts a force into an electrical signal. Most load cells use strain gauges bonded to a precisely machined metal element (flexure).
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Operation:</span> Force applied to the load cell causes the flexure to deform, which strains the bonded strain gauges. The change in resistance is then measured, typically with a Wheatstone bridge.</li>
+                  <li><span className="font-medium">Applications:</span> Weighing scales, industrial process control, robotics (force feedback).</li>
+                  <li><span className="font-medium">Output:</span> Often a very small voltage (mV range), requiring amplification (e.g., with an instrumentation amplifier) before being read by an ADC.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">C. Piezoelectric Sensors: Self-Generating Sensors</h4>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A sensor that generates an electrical charge or voltage when mechanical stress (force, pressure, vibration) is applied.
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Principle (Piezoelectric Effect):</span> Certain materials (e.g., quartz, ceramics) produce an electric potential when subjected to mechanical stress.</li>
+                  <li><span className="font-medium">Characteristics:</span> Self-generating (no external power needed), high output impedance, ideal for dynamic measurements (impact, vibration) but not for static force.</li>
+                  <li><span className="font-medium">Interfacing:</span> Requires a high input impedance amplifier (e.g., charge amplifier or Op-Amp with very high input impedance) to prevent charge leakage and accurately measure the voltage.</li>
+                </ul>
+              </section>
+
+              {/* Pressure Sensors */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Droplet className="w-7 h-7 mr-3 text-teal-600"/>
+                    2. Pressure Sensors
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> A sensor that measures the force exerted by a fluid (liquid or gas) per unit area.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Types of Pressure Measurement:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Absolute Pressure:</span> Measured relative to a perfect vacuum (0 PSI absolute).</li>
+                  <li><span className="font-medium">Gauge Pressure:</span> Measured relative to the surrounding atmospheric pressure (0 PSI gauge at sea level).</li>
+                  <li><span className="font-medium">Differential Pressure:</span> Measures the difference between two pressures.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Principle of Operation (Common Types):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Diaphragm-Based Sensors:</span> Many pressure sensors work by having a flexible diaphragm that deforms under pressure. Strain gauges are often bonded to this diaphragm, and their resistance change is measured.</li>
+                  <li><span className="font-medium">Capacitive Pressure Sensors:</span> Pressure changes the distance between capacitor plates, altering capacitance.</li>
+                </ul>
+              </section>
+
+              {/* Flow Sensors */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Wind className="w-7 h-7 mr-3 text-orange-600"/>
+                    3. Flow Sensors
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Definition:</span> Devices that measure the rate of fluid (liquid or gas) movement.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Paddlewheel Flow Sensors:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Principle:</span> A small paddlewheel or turbine rotates as fluid flows past it. A sensor (e.g., Hall-effect or optical) detects the rotation and generates pulses.</li>
+                  <li><span className="font-medium">Output:</span> A series of digital pulses, where the frequency of pulses is proportional to the flow rate.</li>
+                  <li><span className="font-medium">Applications:</span> Measuring water flow in irrigation systems, beverage dispensers.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Hot-Wire Anemometers (Conceptual):</h4>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  <span className="font-medium">Principle:</span> Measures fluid velocity by detecting the cooling effect of the fluid flow on a heated wire.
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Operation:</span> A thin wire is heated to a constant temperature. As air flows past it, the wire cools. The amount of electrical power required to maintain the wire's constant temperature is proportional to the mass flow rate or velocity of the fluid.</li>
+                  <li><span className="font-medium">Characteristics:</span> Very fast response time, suitable for measuring rapidly changing flows, can be fragile.</li>
+                  <li><span className="font-medium">Applications:</span> Airflow measurement in HVAC, automotive engine air intake, wind speed measurement.</li>
+                </ul>
+              </section>
             </div>
-        </section>
-
-        <section id="visualizer" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-2 text-center">AC Waveform Visualizer</h2>
-            <p class="text-stone-600 mb-6 text-center">Adjust the sliders to see how each parameter affects the sine wave: $v(t) = V_m \sin(2\pi f t + \phi)$.</p>
-            <div class="card p-6">
-                <div class="grid md:grid-cols-3 gap-6 mb-6">
-                    <div>
-                        <label for="amplitude-slider" class="slider-label">Amplitude (Vm): <span id="amplitude-value" class="slider-value">10 V</span></label>
-                        <input id="amplitude-slider" type="range" min="1" max="20" value="10" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <label for="frequency-slider" class="slider-label">Frequency (f): <span id="frequency-value" class="slider-value">1 Hz</span></label>
-                        <input id="frequency-slider" type="range" min="1" max="10" value="1" step="0.5" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                    <div>
-                        <label for="phase-slider" class="slider-label">Phase (φ): <span id="phase-value" class="slider-value">0°</span></label>
-                        <input id="phase-slider" type="range" min="-180" max="180" value="0" step="15" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                </div>
-                <div class="chart-container"><canvas id="waveform-chart"></canvas></div>
-            </div>
-        </section>
-
-        <section id="simulator" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-2 text-center">Series RLC Circuit Simulator</h2>
-            <p class="text-stone-600 mb-6 text-center">Adjust component and frequency values to see their effect on total impedance.</p>
-            <div class="card p-6">
-                <div class="grid lg:grid-cols-2 gap-8">
-                    <div class="space-y-4">
-                        <h3 class="text-lg font-semibold text-stone-700">Circuit Parameters</h3>
-                        <div>
-                            <label for="sim-resistance" class="slider-label">Resistance (R): <span id="sim-resistance-val" class="slider-value">50 Ω</span></label>
-                            <input id="sim-resistance" type="range" min="0" max="200" value="50" step="5" class="w-full">
-                        </div>
-                        <div>
-                            <label for="sim-inductance" class="slider-label">Inductance (L): <span id="sim-inductance-val" class="slider-value">150 mH</span></label>
-                            <input id="sim-inductance" type="range" min="0" max="500" value="150" step="10" class="w-full">
-                        </div>
-                        <div>
-                            <label for="sim-capacitance" class="slider-label">Capacitance (C): <span id="sim-capacitance-val" class="slider-value">200 µF</span></label>
-                            <input id="sim-capacitance" type="range" min="0" max="500" value="200" step="10" class="w-full">
-                        </div>
-                        <div>
-                            <label for="sim-frequency" class="slider-label">Frequency (f): <span id="sim-frequency-val" class="slider-value">60 Hz</span></label>
-                            <input id="sim-frequency" type="range" min="1" max="120" value="60" class="w-full">
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-stone-700">Calculated Results</h3>
-                        <div class="bg-stone-100 p-4 rounded-lg space-y-2 font-mono text-sm">
-                            <p>XL = <span id="res-xl" class="font-bold">...</span></p>
-                            <p>XC = <span id="res-xc" class="font-bold">...</span></p>
-                            <p class="border-t pt-2 mt-2">Z (Rect) = <span id="res-z-rect" class="font-bold">...</span></p>
-                            <p>Z (Polar) = <span id="res-z-polar" class="font-bold">...</span></p>
-                        </div>
-                        <div class="chart-container" style="height: 200px; max-height: 200px; margin-top: 1rem;"><canvas id="impedance-chart"></canvas></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="power" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-2 text-center">AC Power Explorer</h2>
-            <p class="text-stone-600 mb-6 text-center">See how the Power Factor relates Real, Reactive, and Apparent Power.</p>
-            <div class="card p-6">
-                <div class="grid lg:grid-cols-2 gap-8">
-                    <div class="space-y-4">
-                        <h3 class="text-lg font-semibold text-stone-700">Load Parameters</h3>
-                        <div>
-                            <label for="power-vrms" class="slider-label">Voltage (Vrms): <span id="power-vrms-val" class="slider-value">240 V</span></label>
-                            <input id="power-vrms" type="range" min="10" max="480" value="240" step="10" class="w-full">
-                        </div>
-                        <div>
-                            <label for="power-irms" class="slider-label">Current (Irms): <span id="power-irms-val" class="slider-value">10 A</span></label>
-                            <input id="power-irms" type="range" min="1" max="50" value="10" class="w-full">
-                        </div>
-                        <div>
-                            <label for="power-pf" class="slider-label">Power Factor (cos θ): <span id="power-pf-val" class="slider-value">0.80 Lag</span></label>
-                            <input id="power-pf" type="range" min="-1" max="1" value="0.8" step="0.05" class="w-full">
-                        </div>
-                    </div>
-                    <div>
-                         <h3 class="text-lg font-semibold text-stone-700">Power Triangle</h3>
-                         <div class="bg-stone-100 p-4 rounded-lg space-y-2 font-mono text-sm mb-4">
-                            <p>Apparent (S) = <span id="power-s" class="font-bold text-blue-600">...</span></p>
-                            <p>Real (P) = <span id="power-p" class="font-bold text-green-600">...</span></p>
-                            <p>Reactive (Q) = <span id="power-q" class="font-bold text-orange-600">...</span></p>
-                        </div>
-                        <div class="chart-container" style="height: 200px; max-height: 200px;"><canvas id="power-chart"></canvas></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="knowledge" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
-            <div id="knowledge-grid" class="space-y-4"></div>
-        </section>
-    </main>
-
-<script>
-let waveformChart, impedanceChart, powerChart;
-
-const knowledgeData = [
-    { question: "A voltage is given by v(t) = 170 sin(377t + 30°). What is its frequency (f) and its phasor representation (assuming a cosine reference)?", answer: "The angular frequency ω is 377 rad/s, so f = ω / (2π) ≈ 60 Hz. To convert to a cosine reference for the phasor, we subtract 90° from the phase: 30° - 90° = -60°. The phasor is V = 170∠-60° V." },
-    { question: "Which component's impedance decreases as AC frequency increases?", answer: "Capacitor. The formula for capacitive reactance is Xc = 1 / (2πfC). As frequency (f) increases, the denominator gets larger, so Xc decreases." },
-    { question: "An industrial load has a 'lagging' power factor. Is the load primarily inductive or capacitive?", answer: "Inductive. A lagging power factor means the current waveform lags behind the voltage waveform, a characteristic of inductive loads." },
-    { question: "Why is Apparent Power (S) usually greater than Real Power (P) in an AC circuit?", answer: "Because Apparent Power (measured in VA) is the vector sum of Real Power (W) and Reactive Power (VAR). Unless the circuit is purely resistive (Power Factor = 1), there will be some reactive power, making the hypotenuse (S) longer than the adjacent side (P) of the power triangle." }
-];
-
-function initWaveformVisualizer() {
-    const ctx = document.getElementById('waveform-chart').getContext('2d');
-    waveformChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Voltage (v)',
-                data: [],
-                borderColor: '#2563eb',
-                borderWidth: 2,
-                tension: 0.1,
-                pointRadius: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: false, title: { display: true, text: 'Voltage (V)' } },
-                x: { title: { display: true, text: 'Time (s)' } }
-            }
-        }
-    });
-
-    const sliders = ['amplitude', 'frequency', 'phase'];
-    sliders.forEach(id => {
-        document.getElementById(`${id}-slider`).addEventListener('input', updateWaveformChart);
-    });
-    updateWaveformChart();
-}
-
-function updateWaveformChart() {
-    const Vm = parseFloat(document.getElementById('amplitude-slider').value);
-    const f = parseFloat(document.getElementById('frequency-slider').value);
-    const phi = parseFloat(document.getElementById('phase-slider').value) * (Math.PI / 180);
-
-    document.getElementById('amplitude-value').textContent = `${Vm.toFixed(1)} V`;
-    document.getElementById('frequency-value').textContent = `${f.toFixed(1)} Hz`;
-    document.getElementById('phase-value').textContent = `${(phi * 180 / Math.PI).toFixed(0)}°`;
-
-    const labels = [];
-    const data = [];
-    const period = 1 / f;
-    const points = 200;
-
-    for (let i = 0; i <= points; i++) {
-        const t = (i / points) * period * 2; // Show 2 cycles
-        labels.push(t.toFixed(3));
-        data.push(Vm * Math.sin(2 * Math.PI * f * t + phi));
-    }
-    waveformChart.data.labels = labels;
-    waveformChart.data.datasets[0].data = data;
-    waveformChart.options.scales.y.max = Vm * 1.1;
-    waveformChart.options.scales.y.min = -Vm * 1.1;
-    waveformChart.update('none');
-}
-
-function initCircuitSimulator() {
-    const ctx = document.getElementById('impedance-chart').getContext('2d');
-    impedanceChart = new Chart(ctx, {
-        type: 'scatter',
-        data: {
-            datasets: [{
-                label: 'Impedance Vector (Z)',
-                data: [{x:0, y:0}, {x:0, y:0}],
-                borderColor: '#dc2626',
-                backgroundColor: '#dc2626',
-                borderWidth: 2,
-                showLine: true,
-                pointRadius: [0, 5],
-                pointBackgroundColor: ['transparent', '#dc2626']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { type: 'linear', position: 'bottom', title: { display: true, text: 'Resistance (R)' } },
-                y: { type: 'linear', position: 'left', title: { display: true, text: 'Reactance (X)' } }
-            },
-            plugins: { legend: { display: false } }
-        }
-    });
-    
-    const sliders = ['sim-resistance', 'sim-inductance', 'sim-capacitance', 'sim-frequency'];
-    sliders.forEach(id => {
-        document.getElementById(id).addEventListener('input', updateCircuitSimulator);
-    });
-    updateCircuitSimulator();
-}
-
-function updateCircuitSimulator() {
-    const R = parseFloat(document.getElementById('sim-resistance').value);
-    const L = parseFloat(document.getElementById('sim-inductance').value) / 1000; // mH to H
-    const C = parseFloat(document.getElementById('sim-capacitance').value) / 1e6; // µF to F
-    const f = parseFloat(document.getElementById('sim-frequency').value);
-
-    document.getElementById('sim-resistance-val').textContent = `${R} Ω`;
-    document.getElementById('sim-inductance-val').textContent = `${L*1000} mH`;
-    document.getElementById('sim-capacitance-val').textContent = `${C*1e6} µF`;
-    document.getElementById('sim-frequency-val').textContent = `${f} Hz`;
-
-    const omega = 2 * Math.PI * f;
-    const Xl = omega * L;
-    const Xc = C > 0 ? 1 / (omega * C) : Infinity;
-    const X = Xl - Xc;
-    
-    const Z_mag = Math.sqrt(R*R + X*X);
-    const Z_angle = (180 / Math.PI) * Math.atan2(X, R);
-
-    document.getElementById('res-xl').textContent = `${Xl.toFixed(2)} Ω`;
-    document.getElementById('res-xc').textContent = `${Xc.toFixed(2)} Ω`;
-    document.getElementById('res-z-rect').textContent = `${R.toFixed(1)} + j(${X.toFixed(1)}) Ω`;
-    document.getElementById('res-z-polar').textContent = `${Z_mag.toFixed(1)} Ω ∠ ${Z_angle.toFixed(1)}°`;
-
-    impedanceChart.data.datasets[0].data = [{x:0, y:0}, {x: R, y: X}];
-    impedanceChart.update('none');
-}
-
-function initPowerExplorer() {
-    const ctx = document.getElementById('power-chart').getContext('2d');
-    powerChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Power'],
-            datasets: [
-                { label: 'Real (P)', data: [0], backgroundColor: 'rgba(22, 163, 74, 0.7)' },
-                { label: 'Reactive (Q)', data: [0], backgroundColor: 'rgba(234, 88, 12, 0.7)' }
-            ]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { stacked: false, title: {display: true, text: 'Power (W or VAR)'} },
-                y: { stacked: true, display: false }
-            },
-            plugins: {
-                tooltip: { enabled: false }
-            }
-        }
-    });
-
-    const sliders = ['power-vrms', 'power-irms', 'power-pf'];
-    sliders.forEach(id => {
-        document.getElementById(id).addEventListener('input', updatePowerExplorer);
-    });
-    updatePowerExplorer();
-}
-
-function updatePowerExplorer() {
-    const Vrms = parseFloat(document.getElementById('power-vrms').value);
-    const Irms = parseFloat(document.getElementById('power-irms').value);
-    const pf = parseFloat(document.getElementById('power-pf').value);
-
-    document.getElementById('power-vrms-val').textContent = `${Vrms} V`;
-    document.getElementById('power-irms-val').textContent = `${Irms} A`;
-    const pf_type = pf >= 0 ? 'Lag' : 'Lead';
-    document.getElementById('power-pf-val').textContent = `${Math.abs(pf).toFixed(2)} ${pf_type}`;
-    
-    const S = Vrms * Irms;
-    const P = S * Math.abs(pf);
-    const theta = Math.acos(Math.abs(pf));
-    const Q = S * Math.sin(theta) * (pf >= 0 ? 1 : -1);
-
-    document.getElementById('power-s').textContent = `${S.toFixed(0)} VA`;
-    document.getElementById('power-p').textContent = `${P.toFixed(0)} W`;
-    document.getElementById('power-q').textContent = `${Q.toFixed(0)} VAR`;
-    
-    powerChart.data.datasets[0].data[0] = P;
-    powerChart.data.datasets[1].data[0] = Q;
-    powerChart.update('none');
-}
-
-
-function initKnowledgeCheck() {
-    const knowledgeContainer = document.getElementById('knowledge-grid');
-    knowledgeData.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'question-card bg-white p-6 rounded-lg shadow-md border border-stone-200';
-        card.innerHTML = `
-            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
-            <div class="answer mt-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-800">
-                <p><strong>Answer:</strong> ${item.answer}</p>
-            </div>
-            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 transition-colors text-sm">Reveal Answer</button>
-        `;
-        card.querySelector('button').onclick = () => {
-            const answer = card.querySelector('.answer');
-            const isVisible = answer.style.display === 'block';
-            answer.style.display = isVisible ? 'none' : 'block';
-            card.querySelector('button').textContent = isVisible ? 'Hide Answer' : 'Reveal Answer';
+          );
         };
-        knowledgeContainer.appendChild(card);
-    });
-}
+
+        // Sensor Reading Simulator Sandbox
+        const SensorReadingSimulator = () => {
+          const [force, setForce] = useState(0);
+          const [pressure, setPressure] = useState(0);
+          const [flow, setFlow] = useState(0);
+          const [sensorOutput, setSensorOutput] = useState('');
+
+          useEffect(() => {
+            updateSensorOutput();
+          }, [force, pressure, flow]);
+
+          const updateSensorOutput = () => {
+            let output = "Sensor Readings:\n";
+            output += `  - Applied Force: ${force} N (Simulated Load Cell Output: ${force * 0.1} mV)\n`;
+            output += `  - Pressure: ${pressure} kPa (Simulated Pressure Sensor Output: ${pressure * 0.05} V)\n`;
+            output += `  - Flow Rate: ${flow} L/min (Simulated Paddlewheel Frequency: ${flow * 10} Hz)\n`;
+            setSensorOutput(output);
+          };
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Force, Pressure & Flow Sensor Simulator</h2>
+              <p className="text-gray-700 mb-4">
+                Adjust the sliders to simulate changes in force, pressure, and flow, and observe the conceptual sensor outputs.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="forceInput" className="text-lg font-medium text-gray-700 mb-2">Force (N): {force}</label>
+                  <input
+                    type="range"
+                    id="forceInput"
+                    min="0"
+                    max="100"
+                    value={force}
+                    onChange={(e) => setForce(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="pressureInput" className="text-lg font-medium text-gray-700 mb-2">Pressure (kPa): {pressure}</label>
+                  <input
+                    type="range"
+                    id="pressureInput"
+                    min="0"
+                    max="200"
+                    value={pressure}
+                    onChange={(e) => setPressure(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="flowInput" className="text-lg font-medium text-gray-700 mb-2">Flow Rate (L/min): {flow}</label>
+                  <input
+                    type="range"
+                    id="flowInput"
+                    min="0"
+                    max="50"
+                    value={flow}
+                    onChange={(e) => setFlow(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-md font-semibold whitespace-pre-wrap">
+                {sensorOutput}
+              </div>
+            </div>
+          );
+        };
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    initWaveformVisualizer();
-    initCircuitSimulator();
-    initPowerExplorer();
-    initKnowledgeCheck();
+        // Practice Problems Component
+        const PracticeProblems = () => {
+          const [activeTab, setActiveTab] = useState('homework');
 
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-});
+          const homeworkQuestions = [
+            {
+              id: 1,
+              type: 'text',
+              question: 'A strain gauge has a nominal resistance of 120 Ω and a Gauge Factor (GF) of 2.0. If it experiences a strain (ΔL / L) of 0.001, what is the change in its resistance (ΔR)?',
+              answer: 'Using the Gauge Factor formula: GF = (ΔR / R) / (ΔL / L)\nRearranging for ΔR: ΔR = GF * R * (ΔL / L)\nGiven: GF = 2.0, R = 120 Ω, ΔL / L = 0.001\nΔR = 2.0 * 120 Ω * 0.001 = 0.24 Ω\nSo, the change in resistance is 0.24 Ω.',
+              explanation: 'The Gauge Factor relates the fractional change in resistance to the applied strain. This calculation demonstrates how a small strain can lead to a measurable change in resistance, which is then typically converted to voltage using a Wheatstone bridge.'
+            },
+            {
+              id: 2,
+              type: 'text',
+              question: 'Why do load cells typically require an amplifier (e.g., an instrumentation amplifier) before their signal can be accurately read by a microcontroller\'s ADC?',
+              answer: 'Load cells, which use strain gauges, produce a very small output voltage (often in the millivolt, mV, range) even when subjected to significant force. Microcontroller ADCs (like those on Arduino) typically have a 0-5V input range and a resolution that would make these small millivolt changes indistinguishable from noise or too small to accurately measure. An amplifier boosts this small signal to a larger voltage range that matches the ADC\'s input range, allowing for accurate and precise measurement.',
+              explanation: 'The raw output of a load cell is too weak for direct ADC conversion. Amplification increases the signal-to-noise ratio and scales the signal to the full range of the ADC, maximizing the resolution and accuracy of the measurement.'
+            },
+            {
+              id: 3,
+              type: 'multiple_choice',
+              question: 'Which type of sensor is self-generating (does not require an external power source to produce a signal) and is best suited for dynamic measurements like impacts or vibrations?',
+              options: ['A) Strain Gauge', 'B) Load Cell', 'C) Piezoelectric Sensor', 'D) Potentiometer'],
+              correctAnswer: 'C) Piezoelectric Sensor',
+              explanation: 'Piezoelectric sensors leverage the piezoelectric effect to generate a charge or voltage directly when mechanical stress is applied, making them self-generating. They are particularly good for dynamic events due to their fast response and charge generation upon rapid changes in force, unlike strain gauges or load cells which require excitation voltage, or potentiometers which are passive resistive sensors.'
+            },
+            {
+              id: 4,
+              type: 'text',
+              question: 'A paddlewheel flow sensor outputs 10 pulses per liter. If the sensor detects a flow rate that generates 500 pulses in one minute, what is the flow rate in Liters per minute (L/min)?',
+              answer: 'Given: 10 pulses per liter.\nDetected pulses in one minute = 500 pulses.\nFlow rate = Total pulses / Pulses per liter = 500 pulses / 10 pulses/liter = 50 Liters.\nSince this occurred in one minute, the flow rate is 50 L/min.',
+              explanation: 'This is a direct conversion based on the sensor\'s calibration. By dividing the total number of pulses by the pulses-per-unit-volume, you get the total volume, and since the time is given as one minute, it directly translates to L/min.'
+            },
+            {
+              id: 5,
+              type: 'text',
+              question: 'Describe the basic principle behind a hot-wire anemometer and explain why it is effective for detecting sudden, brief gusts of air.',
+              answer: 'A hot-wire anemometer measures fluid velocity by detecting the cooling effect of the fluid flow on a thin, electrically heated wire. The wire is kept at a constant temperature, and as air flows faster past it, more heat is dissipated, requiring more electrical power to maintain its temperature. The power required is proportional to the airflow velocity.\n\nIt is effective for detecting sudden, brief gusts because the thin wire has a very low thermal inertia, meaning it can heat up and cool down extremely rapidly. This allows the sensor to respond almost instantaneously to quick changes and fluctuations in airflow, providing a fast response time crucial for detecting transient phenomena like gusts.',
+              explanation: 'The core principle relies on heat transfer. Faster airflow means more convective cooling, requiring more power to maintain the wire\'s temperature. The low thermal mass of the thin wire is what gives hot-wire anemometers their characteristic fast response, making them suitable for dynamic flow measurements.'
+            }
+          ];
 
-function showSection(sectionId) {
-    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    document.querySelectorAll('.nav-button').forEach(button => {
-        button.classList.remove('active');
-        if (button.getAttribute('onclick').includes(sectionId)) button.classList.add('active');
-    });
-}
-function closeMenu() {
-    document.getElementById('mobile-menu').classList.add('hidden');
-}
+          const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
 
-</script>
+          const handleHomeworkChange = (id, value) => {
+            setHomeworkAnswers(prev => ({
+              ...prev,
+              [id]: value
+            }));
+          };
+
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
+
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
+            });
+            setQuizResults(newResults);
+          };
+
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
+
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
+
+              <div className="flex mb-6 space-x-4">
+                <button
+                  onClick={() => setActiveTab('homework')}
+                  className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+                    activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Homework Questions
+                </button>
+              </div>
+
+              {activeTab === 'homework' && (
+                <div>
+                  <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-blue-500"/>
+                    Homework Questions
+                  </h3>
+                  <p className="text-gray-700 mb-4">
+                    Instructions: Show all work and steps clearly.
+                  </p>
+                  {homeworkQuestions.map((q) => (
+                    <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+                      {q.type === 'text' ? (
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                          placeholder="Type your answer here..."
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
+                        ></textarea>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                              />
+                              <span className="ml-2">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
+                        </div>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
+                        </div>
+                      )}
+                      <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                        <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                        <div className="mt-2 text-indigo-700">
+                          <p className="whitespace-pre-wrap">{q.explanation}</p>
+                        </div >
+                      </details>
+                    </div>
+                  ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+
+        // Main App Component
+        const App = () => {
+          const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
+
+          return (
+            <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+              <header className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+                  Mechatronics 1 Study Guide
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 10: Force, Pressure & Flow Sensors</p>
+                <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                    <Home className="w-5 h-5 mr-2" />
+                    Back to Course Hub
+                </a>
+              </header>
+
+              <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+                <button
+                  onClick={() => setActiveSection('review')}
+                  className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+                >
+                  <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Concept Review</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('sandbox')}
+                  className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+                >
+                  <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Interactive Sandbox</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('practice')}
+                  className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Practice Problems</span>
+                </button>
+              </nav>
+
+              <main className="container">
+                {activeSection === 'review' && <ConceptReview />}
+                {activeSection === 'sandbox' && <SensorReadingSimulator />}
+                {activeSection === 'practice' && <PracticeProblems />}
+              </main>
+
+              <footer className="text-center text-gray-500 text-sm mt-12">
+                <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+              </footer>
+            </div>
+          );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 </body>
 </html>
