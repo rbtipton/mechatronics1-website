@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechatronics I: Final Exam Study Guide</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #1f2937; /* Dark gray text */
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .header-section {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .section-title {
+            font-size: 2.25rem; /* 3xl text */
+            font-weight: 700;
+            color: #1f2937;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .question-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .question-text {
+            font-weight: 600;
+            font-size: 1.125rem; /* lg text */
+            color: #374151; /* Gray-700 */
+            margin-bottom: 1rem;
+        }
+        .options-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 1rem;
+        }
+        .options-list li {
+            margin-bottom: 0.5rem;
+            color: #4b5563; /* Gray-600 */
+        }
+        details {
+            background-color: #f9fafb; /* Lightest gray */
+            border: 1px solid #e5e7eb; /* Gray-200 */
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+        details summary {
+            font-weight: 600;
+            color: #4f46e5; /* Indigo-600 */
+            outline: none;
+        }
+        details summary:hover {
+            color: #3730a3; /* Indigo-800 */
+        }
+        details p {
+            margin-top: 0.75rem;
+            color: #374151; /* Gray-700 */
+        }
+        pre {
+            background-color: #e0e7ff; /* Indigo-100 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            color: #1e3a8a; /* Blue-900 */
+            margin-top: 0.75rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            background-color: #6366f1; /* Indigo-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+            text-align: center;
+            width: fit-content;
+        }
+        .back-link:hover {
+            background-color: #4f46e5; /* Indigo-600 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header-section">
+            <h1 class="text-4xl font-extrabold text-indigo-800 mb-2">
+                Mechatronics I: Final Exam Study Guide
+            </h1>
+            <p class="text-lg text-gray-600">Prepare for your final exam with these practice problems and solutions.</p>
+            <a href="index.html" class="back-link">← Back to Course Hub</a>
+        </header>
+
+        <main>
+            <h2 class="section-title">Section 1: Conceptual Questions</h2>
+
+            <!-- Question 1 -->
+            <div class="question-card">
+                <p class="question-text">
+                    1. Mechatronics is best described as the synergistic integration of which three primary engineering disciplines?
+                </p>
+                <ul class="options-list">
+                    <li>a) Biology, Chemistry, Civil Engineering</li>
+                    <li>b) Mechanical, Electrical, Computer Control</li>
+                    <li>c) Thermodynamics, Fluid Mechanics, Materials Science</li>
+                    <li>d) Aerodynamics, Astrophysics, Geology</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>b) Mechanical, Electrical, Computer Control</b>. Mechatronics is fundamentally defined by the integration of these three fields.</p>
+                </details>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-card">
+                <p class="question-text">
+                    2. True or False: A "systems approach" in mechatronics encourages engineers to design and analyze components in isolation to prevent integration issues.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>False</b>. A systems approach emphasizes considering the interactions between components to optimize the overall system, not isolating them.</p>
+                </details>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-card">
+                <p class="question-text">
+                    3. When two resistors are connected in parallel, their equivalent resistance will always be ________ than the smallest individual resistor.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>less / smaller</b>. Connecting resistors in parallel provides multiple paths for current, effectively reducing the total resistance.</p>
+                </details>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-card">
+                <p class="question-text">
+                    4. In a steady-state DC circuit, a fully charged capacitor behaves like an:
+                </p>
+                <ul class="options-list">
+                    <li>a) Short circuit</li>
+                    <li>b) Open circuit</li>
+                    <li>c) Current source</li>
+                    <li>d) Voltage source</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>b) Open circuit</b>. Once fully charged, a capacitor blocks the flow of DC current.</p>
+                </details>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-card">
+                <p class="question-text">
+                    5. An inductor's primary function is to store energy in a magnetic field and to ________ changes in current flowing through it.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>oppose / resist</b>. Inductors resist changes in current, which is why they store energy in a magnetic field.</p>
+                </details>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-card">
+                <p class="question-text">
+                    6. For a silicon P-N junction diode to conduct current easily, it must be:
+                </p>
+                <ul class="options-list">
+                    <li>a) Reverse biased below breakdown voltage</li>
+                    <li>b) Forward biased</li>
+                    <li>c) Operating at cryogenic temperatures</li>
+                    <li>d) Connected to an AC source only</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>b) Forward biased</b>. Forward biasing reduces the depletion region, allowing current to flow.</p>
+                </details>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-card">
+                <p class="question-text">
+                    7. Which of the following is NOT an ideal characteristic of an Operational Amplifier (Op-Amp)?
+                </p>
+                <ul class="options-list">
+                    <li>a) Infinite input impedance</li>
+                    <li>b) Zero output impedance</li>
+                    <li>c) Finite bandwidth</li>
+                    <li>d) Infinite open-loop gain</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>c) Finite bandwidth</b>. Ideal Op-Amps are assumed to have infinite bandwidth, meaning they can amplify all frequencies equally.</p>
+                </details>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="question-card">
+                <p class="question-text">
+                    8. The term that describes the closeness of a measurement to the true value is _________, while the term describing the reproducibility of repeated measurements is ___________.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>accuracy, precision</b>. Accuracy is about correctness, and precision is about consistency.</p>
+                </details>
+            </div>
+
+            <!-- Question 9 -->
+            <div class="question-card">
+                <p class="question-text">
+                    9. True or False: A microcontroller is a self-contained computer system on a single chip, whereas a microprocessor is primarily just the Central Processing Unit (CPU).
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>True</b>. Microcontrollers integrate CPU, memory, and I/O peripherals, making them suitable for embedded applications, while microprocessors are more general-purpose CPUs.</p>
+                </details>
+            </div>
+
+            <!-- Question 10 -->
+            <div class="question-card">
+                <p class="question-text">
+                    10. In an Arduino sketch, code placed in the `setup()` function executes only once at the beginning, while code in the `loop()` function executes continuously.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>True</b>. This describes the fundamental execution flow of an Arduino program.</p>
+                </details>
+            </div>
+
+            <!-- Question 11 -->
+            <div class="question-card">
+                <p class="question-text">
+                    11. True or False: An Analog-to-Digital Converter (ADC) produces a continuous output signal from a discrete input.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>False</b>. An ADC converts a continuous (analog) input into a discrete (digital) output. A Digital-to-Analog Converter (DAC) performs the opposite function.</p>
+                </details>
+            </div>
+
+            <!-- Question 12 -->
+            <div class="question-card">
+                <p class="question-text">
+                    12. Pulse Width Modulation (PWM) is used to achieve an average analog output by varying the:
+                </p>
+                <ul class="options-list">
+                    <li>a) Frequency of a square wave</li>
+                    <li>b) Amplitude of a sinusoidal wave</li>
+                    <li>c) Duty cycle of a square wave</li>
+                    <li>d) Phase angle of a triangle wave</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>c) Duty cycle of a square wave</b>. By changing the proportion of ON time, the average voltage can be controlled.</p>
+                </details>
+            </div>
+
+            <!-- Question 13 -->
+            <div class="question-card">
+                <p class="question-text">
+                    13. Which programming construct is best suited for executing a block of code a known, fixed number of times?
+                </p>
+                <ul class="options-list">
+                    <li>a) `if-else` statement</li>
+                    <li>b) `while` loop</li>
+                    <li>c) `for` loop</li>
+                    <li>d) `switch-case` statement</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>c) `for` loop</b>. `for` loops are ideal for definite iteration where the number of repetitions is known beforehand.</p>
+                </details>
+            </div>
+
+            <!-- Question 14 -->
+            <div class="question-card">
+                <p class="question-text">
+                    14. The Nyquist-Shannon sampling theorem states that the sampling rate must be at least ________ the highest frequency component of the signal to prevent aliasing.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>twice / double</b>. This ensures that enough data points are captured to accurately reconstruct the original signal.</p>
+                </details>
+            </div>
+
+            <!-- Question 15 -->
+            <div class="question-card">
+                <p class="question-text">
+                    15. What is the main characteristic that distinguishes an open-loop control system from a closed-loop control system?
+                </p>
+                <ul class="options-list">
+                    <li>a) The type of power supply used.</li>
+                    <li>b) The presence or absence of feedback from the system's output.</li>
+                    <li>c) The use of a microcontroller.</li>
+                    <li>d) The speed of operation.</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>b) The presence or absence of feedback from the system's output</b>. Closed-loop systems use feedback to adjust their output, while open-loop systems do not.</p>
+                </details>
+            </div>
+
+            <!-- Question 16 -->
+            <div class="question-card">
+                <p class="question-text">
+                    16. A potentiometer is typically used to measure:
+                </p>
+                <ul class="options-list">
+                    <li>a) Temperature</li>
+                    <li>b) Rotational or linear position/displacement</li>
+                    <li>c) Magnetic field strength</li>
+                    <li>d) Light intensity</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>b) Rotational or linear position/displacement</b>. Potentiometers are variable resistors whose resistance changes with physical movement.</p>
+                </details>
+            </div>
+
+            <!-- Question 17 -->
+            <div class="question-card">
+                <p class="question-text">
+                    17. True or False: An incremental optical encoder directly provides information about the absolute position of a shaft from power-up without needing to be homed.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>False</b>. Incremental encoders provide relative position changes (pulses) and require a homing procedure to establish an absolute reference. Absolute encoders provide absolute position immediately upon power-up.</p>
+                </details>
+            </div>
+
+            <!-- Question 18 -->
+            <div class="question-card">
+                <p class="question-text">
+                    18. Hall-effect sensors are primarily used to detect:
+                </p>
+                <ul class="options-list">
+                    <li>a) Pressure</li>
+                    <li>b) Temperature</li>
+                    <li>c) Magnetic fields</li>
+                    <li>d) Humidity</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>c) Magnetic fields</b>. Hall-effect sensors produce a voltage proportional to the strength of a magnetic field perpendicular to the sensor.</p>
+                </details>
+            </div>
+
+            <!-- Question 19 -->
+            <div class="question-card">
+                <p class="question-text">
+                    19. _________ are transducers that convert mechanical force or strain into an electrical signal, commonly used in load cells.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>Strain gauges</b>. Strain gauges change their electrical resistance in response to applied mechanical strain.</p>
+                </details>
+            </div>
+
+            <!-- Question 20 -->
+            <div class="question-card">
+                <p class="question-text">
+                    20. Which type of sensor generates a voltage directly in response to mechanical stress or pressure?
+                </p>
+                <ul class="options-list">
+                    <li>a) Thermistor</li>
+                    <li>b) Photoresistor</li>
+                    <li>c) Piezoelectric sensor</li>
+                    <li>d) Hall-effect sensor</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>c) Piezoelectric sensor</b>. Piezoelectric materials produce an electric charge when mechanical stress is applied.</p>
+                </details>
+            </div>
+
+            <!-- Question 21 -->
+            <div class="question-card">
+                <p class="question-text">
+                    21. True or False: A Thermocouple measures temperature based on the change in its electrical resistance.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>False</b>. Thermocouples measure temperature based on the Seebeck effect, which generates a voltage difference between two dissimilar metals at different temperatures. Resistance Temperature Detectors (RTDs) and thermistors measure temperature based on resistance changes.</p>
+                </details>
+            </div>
+
+            <!-- Question 22 -->
+            <div class="question-card">
+                <p class="question-text">
+                    22. Which component is typically used as a switch to control a high-power AC appliance with a low-power DC signal from a microcontroller?
+                </p>
+                <ul class="options-list">
+                    <li>a) Diode</li>
+                    <li>b) Resistor</li>
+                    <li>c) Relay</li>
+                    <li>d) Capacitor</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>c) Relay</b>. Relays are electromechanical switches that allow a small current to control a much larger current, often used to interface low-power control circuits with high-power loads.</p>
+                </details>
+            </div>
+
+            <!-- Question 23 -->
+            <div class="question-card">
+                <p class="question-text">
+                    23. Stepper motors are generally preferred over DC motors when the application requires precise _________ position control without continuous feedback.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>open-loop</b>. Stepper motors move in discrete steps and can achieve precise positioning in open-loop systems as long as the load does not cause them to lose steps.</p>
+                </details>
+            </div>
+
+            <!-- Question 24 -->
+            <div class="question-card">
+                <p class="question-text">
+                    24. Servomotors are known for their:
+                </p>
+                <ul class="options-list">
+                    <li>a) Continuous, uncontrolled rotation</li>
+                    <li>b) Precise closed-loop position control</li>
+                    <li>c) High torque at very high speeds only</li>
+                    <li>d) Simple ON/OFF switching</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>b) Precise closed-loop position control</b>. Servomotors use feedback (e.g., from an encoder) to accurately control their position, velocity, or torque.</p>
+                </details>
+            </div>
+
+            <!-- Question 25 -->
+            <div class="question-card">
+                <p class="question-text">
+                    25. I2C (Inter-Integrated Circuit) protocol requires how many signal wires for data transmission (excluding power and ground)?
+                </p>
+                <ul class="options-list">
+                    <li>a) 1</li>
+                    <li>b) 2</li>
+                    <li>c) 3</li>
+                    <li>d) 4</li>
+                </ul>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The correct answer is <b>b) 2</b>. I2C uses two signal lines: SDA (Serial Data Line) and SCL (Serial Clock Line).</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 26 -->
+            <div class="question-card">
+                <p class="question-text">
+                    26. What is the primary advantage of using a microcontroller in a mechatronic system compared to traditional analog or mechanical control?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The primary advantage is the flexibility and programmability it offers. Microcontrollers allow for complex control algorithms, adaptive behavior, easy modification of system logic (via software updates), and integration of multiple sensors and actuators, leading to more sophisticated and versatile systems.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 27 -->
+            <div class="question-card">
+                <p class="question-text">
+                    27. Briefly explain the concept of "aliasing" in digital signal processing and how it can be avoided.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Aliasing occurs when an analog signal is sampled at a rate lower than twice its highest frequency component (Nyquist rate). This causes higher frequencies in the original signal to appear as lower, incorrect frequencies in the digitized signal, leading to distortion. It can be avoided by ensuring the sampling rate is at least twice the maximum frequency of interest, often by using an anti-aliasing filter before the ADC to remove frequencies above half the sampling rate.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 28 -->
+            <div class="question-card">
+                <p class="question-text">
+                    28. What is the main function of an H-bridge circuit, and why is it essential for controlling DC motors in many mechatronic applications?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The main function of an H-bridge circuit is to allow a DC motor to be driven in both forward and reverse directions, and often to control its speed using PWM. It is essential because DC motors require a change in voltage polarity to reverse direction, and an H-bridge provides this capability using electronic switches, enabling precise and flexible motor control from a microcontroller.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 29 -->
+            <div class="question-card">
+                <p class="question-text">
+                    29. Differentiate between a sensor and a transducer, providing an example for each.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A <b>sensor</b> is a device that detects or measures a physical quantity (e.g., temperature, light, pressure) and responds to it. An example is a thermistor that changes resistance with temperature.
+                    <br>A <b>transducer</b> is a device that converts energy from one form to another. While all sensors are transducers (converting physical phenomena into electrical signals), not all transducers are sensors. An example of a transducer that is also a sensor is a microphone (converts sound energy to electrical energy). An example of a transducer that is not typically considered a sensor is a loudspeaker (converts electrical energy to sound energy).</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 30 -->
+            <div class="question-card">
+                <p class="question-text">
+                    30. Explain the concept of "feedback" in a control system and why it is fundamental to achieving precise control in mechatronics.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Feedback in a control system involves measuring the actual output of the system and comparing it to the desired input (setpoint). The difference (error) is then used by the controller to adjust the system's input, thereby reducing the error and bringing the output closer to the desired value. It is fundamental to achieving precise control because it allows the system to self-correct for disturbances, uncertainties, and variations, ensuring accuracy and stability that open-loop systems cannot provide.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 31 -->
+            <div class="question-card">
+                <p class="question-text">
+                    31. What is the role of a filter in signal conditioning, and why might it be necessary in a mechatronic system?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A filter in signal conditioning is used to selectively pass or block certain frequencies from a signal. It is necessary in mechatronic systems to remove unwanted noise (e.g., high-frequency electrical interference) or to isolate specific frequency components of interest from a sensor signal, ensuring that the signal processed by the microcontroller is clean and accurate.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 32 -->
+            <div class="question-card">
+                <p class="question-text">
+                    32. Describe the difference between a digital input and an analog input on a microcontroller like an Arduino.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A <b>digital input</b> can only read two states: HIGH (typically 5V or 3.3V) or LOW (0V). It's used for binary signals like buttons (pressed/not pressed) or switches (on/off). An <b>analog input</b> can read a continuous range of voltage values (e.g., 0V to 5V) and convert them into discrete numerical values (e.g., 0-1023 for a 10-bit ADC). It's used for sensors that provide varying outputs like temperature, light, or potentiometer readings.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 33 -->
+            <div class="question-card">
+                <p class="question-text">
+                    33. What is the purpose of a "baud rate" setting in serial communication, and why must it match between communicating devices?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The baud rate defines the rate at which data is transferred over a serial communication line, measured in bits per second (bps). It must match between communicating devices (e.g., microcontroller and computer) so that both devices interpret the incoming data bits at the same speed. If the baud rates don't match, the receiving device will sample the data at the wrong times, leading to corrupted or unintelligible data.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 34 -->
+            <div class="question-card">
+                <p class="question-text">
+                    34. Explain the difference between a "pull-up" and a "pull-down" resistor in a digital input circuit.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A <b>pull-up resistor</b> connects an input pin to the positive supply voltage (VCC), ensuring the pin is HIGH when a switch is open. When the switch closes, it connects the pin to ground (LOW). A <b>pull-down resistor</b> connects an input pin to ground (GND), ensuring the pin is LOW when a switch is open. When the switch closes, it connects the pin to VCC (HIGH). Both prevent the input pin from "floating" and picking up electrical noise.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 35 -->
+            <div class="question-card">
+                <p class="question-text">
+                    35. What is the function of a PID (Proportional-Integral-Derivative) controller in a closed-loop system?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A PID controller is a widely used feedback control loop mechanism that calculates an "error" value as the difference between a desired setpoint and a measured process variable. It then attempts to minimize this error by adjusting the process control inputs based on three components:
+                        <br><b>Proportional (P):</b> Reacts to the current error.
+                        <br><b>Integral (I):</b> Accounts for past errors, helping to eliminate steady-state errors.
+                        <br><b>Derivative (D):</b> Predicts future errors based on the rate of change of the current error, providing damping.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 36 -->
+            <div class="question-card">
+                <p class="question-text">
+                    36. What is the primary purpose of an actuator in a mechatronic system? Provide two examples of common actuators.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The primary purpose of an actuator is to convert an electrical signal (or other control signal) into a physical action or motion. It is the component that performs the work in a mechatronic system.
+                    <br>Examples: DC motor, stepper motor, servomotor, solenoid, pneumatic cylinder, hydraulic cylinder, voice coil motor.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 37 -->
+            <div class="question-card">
+                <p class="question-text">
+                    37. Explain the difference between a normally open (NO) and a normally closed (NC) switch.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A <b>normally open (NO)</b> switch has contacts that are open (no current flow) when the switch is in its default, unactuated state. When actuated, the contacts close, allowing current to flow.
+                    <br>A <b>normally closed (NC)</b> switch has contacts that are closed (allowing current flow) when the switch is in its default, unactuated state. When actuated, the contacts open, breaking the circuit and stopping current flow.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 38 -->
+            <div class="question-card">
+                <p class="question-text">
+                    38. What is a "dead zone" in a sensor or control system, and how can it affect system performance?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A "dead zone" (or deadband) refers to a range of input values for which a sensor or control system produces no output or response. This can lead to a lack of sensitivity around a certain operating point, causing the system to be unresponsive to small changes, potentially leading to oscillations or poor control accuracy.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 39 -->
+            <div class="question-card">
+                <p class="question-text">
+                    39. Describe the function of a "debounce" routine in microcontroller programming when reading mechanical switches. Why is it necessary?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A debounce routine is a software or hardware technique used to eliminate false readings from mechanical switches. When a mechanical switch is pressed or released, its contacts "bounce" for a short period, creating multiple rapid ON/OFF transitions instead of a single clean transition. Debouncing ensures that the microcontroller registers only one stable press or release event, preventing erratic behavior. It's necessary because microcontrollers are fast enough to detect these rapid bounces, which would be misinterpreted as multiple presses.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 40 -->
+            <div class="question-card">
+                <p class="question-text">
+                    40. What is the fundamental difference between sequential logic and combinational logic in digital circuits?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>Combinational logic</b> circuits produce an output that depends solely on the current input values. They have no memory.
+                    <br><b>Sequential logic</b> circuits produce an output that depends on both the current input values and the past sequence of inputs (i.e., they have memory). Flip-flops and registers are examples of sequential logic elements.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 41 -->
+            <div class="question-card">
+                <p class="question-text">
+                    41. Explain the concept of "hysteresis" in a sensor or measurement system.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Hysteresis occurs when the output of a system depends not only on the current input but also on the history of the input. In sensors, it means the output reading for a given input value is different depending on whether the input was increasing or decreasing to reach that value. This can lead to inaccuracies and non-repeatability in measurements.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 42 -->
+            <div class="question-card">
+                <p class="question-text">
+                    42. What is the purpose of a voltage regulator in an electronic circuit?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A voltage regulator is an electronic circuit that maintains a constant output voltage regardless of variations in the input voltage or changes in the load current. This is crucial for sensitive electronic components that require a stable power supply to function correctly.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 43 -->
+            <div class="question-card">
+                <p class="question-text">
+                    43. Briefly describe how a photoresistor (LDR) works and what physical quantity it senses.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A photoresistor (Light Dependent Resistor or LDR) is a passive component whose resistance decreases with increasing light intensity. It works based on the photoconductive effect, where light energy causes electrons in the semiconductor material to move into the conduction band, increasing conductivity. It senses <b>light intensity</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 44 -->
+            <div class="question-card">
+                <p class="question-text">
+                    44. What is the main advantage of using a servomotor over a stepper motor for applications requiring smooth, continuous rotation and high torque at varying speeds?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The main advantage of a servomotor is its ability to provide smooth, continuous rotation, precise speed control, and high torque across a wide range of speeds, especially under varying loads, due to its closed-loop feedback system. Stepper motors are better for precise step-by-step positioning but can lose steps under load and typically offer less smooth motion at high speeds.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 45 -->
+            <div class="question-card">
+                <p class="question-text">
+                    45. Explain the concept of "pull-up" resistors in the context of I2C communication lines (SDA and SCL).
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>In I2C communication, both the SDA (Serial Data) and SCL (Serial Clock) lines are "open-drain" or "open-collector" outputs, meaning they can only pull the line LOW. To ensure the lines return to a HIGH state when no device is actively pulling them LOW, pull-up resistors are required. These resistors connect the SDA and SCL lines to the positive supply voltage (VCC), providing a default HIGH state and allowing devices to release the line to go HIGH.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 46 -->
+            <div class="question-card">
+                <p class="question-text">
+                    46. What is the purpose of a "checksum" or "CRC" (Cyclic Redundancy Check) in digital communication?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The purpose of a checksum or CRC in digital communication is to detect errors that may occur during data transmission. A calculated value (checksum/CRC) is appended to the data packet by the sender. The receiver then performs the same calculation on the received data. If the calculated checksum/CRC matches the received one, it indicates that the data was likely transmitted without error. If they don't match, it signals data corruption.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 47 -->
+            <div class="question-card">
+                <p class="question-text">
+                    47. Describe one advantage and one disadvantage of using pneumatic actuators (e.g., air cylinders) in mechatronic systems.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>Advantage:</b> Pneumatic actuators are generally fast, clean (no oil leaks like hydraulics), relatively inexpensive, and safe to operate (air is non-flammable). They are good for high-speed, repetitive tasks.
+                    <br><b>Disadvantage:</b> They are difficult to achieve precise position control without complex additional components (due to air compressibility), can be noisy, and require a constant supply of compressed air, which can be inefficient.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 48 -->
+            <div class="question-card">
+                <p class="question-text">
+                    48. In the context of microcontrollers, what is the role of the "firmware"?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Firmware is a specific type of software that is permanently programmed into a hardware device's non-volatile memory (like a microcontroller's flash memory). Its role is to provide the low-level control for the hardware, enabling it to perform its basic functions and interact with other components. For microcontrollers, the Arduino sketch you upload is essentially its firmware.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 49 -->
+            <div class="question-card">
+                <p class="question-text">
+                    49. What is the "resolution" of a digital output (e.g., a PWM signal) and how does it relate to the number of bits used?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The "resolution" of a digital output refers to the number of discrete steps or levels that the output signal can achieve. For a PWM signal, it determines how finely the average voltage or duty cycle can be controlled. It directly relates to the number of bits used: an N-bit PWM output can produce 2<sup>N</sup> distinct levels (e.g., 8-bit PWM has 256 levels).</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 50 -->
+            <div class="question-card">
+                <p class="question-text">
+                    50. Why is mechanical advantage often incorporated into mechatronic systems (e.g., using gears or levers)?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Mechanical advantage is incorporated to amplify force or torque, or to change speed and direction of motion. This allows smaller, less powerful (and often less expensive) motors to drive larger loads or achieve higher precision. For example, a gearbox provides mechanical advantage to increase torque at the expense of speed, enabling a small motor to move a heavy robotic arm.</p>
+                </details>
+            </div>
+
+
+            <h2 class="section-title">Section 2: Problem-Solving Questions</h2>
+
+            <!-- Question 51 -->
+            <div class="question-card">
+                <p class="question-text">
+                    51. Consider a circuit with a 12 V DC power supply, a 1.8 k&Omega; resistor, and a silicon diode (assume 0.7 V forward voltage drop) connected in series.
+                    <br><br>
+                    a) What is the voltage across the 1.8 k&Omega; resistor?
+                    <br>
+                    b) Calculate the current flowing through the circuit.
+                    <br>
+                    c) If the diode were replaced with an ideal wire (short circuit), how would the current in the circuit change? Briefly explain.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Voltage across the 1.8 k&Omega; resistor:</b></p>
+                    <p>In a series circuit with a forward-biased silicon diode, the voltage drop across the diode is approximately 0.7 V.
+                    <br>The voltage across the resistor (V<sub>R</sub>) is the supply voltage minus the diode's forward voltage drop:
+                    <pre>V<sub>R</sub> = V<sub>supply</sub> - V<sub>diode</sub>
+V<sub>R</sub> = 12 V - 0.7 V
+V<sub>R</sub> = 11.3 V</pre>
+                    <p><b>b) Current flowing through the circuit:</b></p>
+                    <p>Using Ohm's Law (I = V/R) for the resistor:
+                    <pre>I = V<sub>R</sub> / R
+I = 11.3 V / 1.8 k&Omega;
+I = 11.3 V / 1800 &Omega;
+I &approx; 0.006278 A or 6.278 mA</pre>
+                    <p><b>c) If the diode were replaced with an ideal wire (short circuit), how would the current in the circuit change? Briefly explain.</b></p>
+                    <p>If the diode were replaced by an ideal wire, its voltage drop would become 0 V. The entire supply voltage (12 V) would then drop across the 1.8 k&Omega; resistor.
+                    <pre>New Current = V<sub>supply</sub> / R
+New Current = 12 V / 1800 &Omega;
+New Current &approx; 0.006667 A or 6.667 mA</pre>
+                    <p>The current in the circuit would <b>increase</b> from approximately 6.278 mA to 6.667 mA. This is because replacing the diode with an ideal wire removes the 0.7 V voltage drop, effectively increasing the voltage available across the resistor, and thus increasing the current according to Ohm's Law.</p>
+                </details>
+            </div>
+
+            <!-- Question 52 -->
+            <div class="question-card">
+                <p class="question-text">
+                    52. A 220 &mu;F capacitor is charged to 12 V.
+                    <br><br>
+                    a) What is the maximum charge (in Coulombs) the capacitor can store at this voltage?
+                    <br>
+                    b) What is the energy (in Joules) stored in the capacitor when it is charged to 12 V?
+                    <br>
+                    c) If this charged capacitor is then connected to a light bulb (modeled as a resistor), would the light bulb illuminate instantly and then dim, or gradually brighten? Explain why.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Maximum charge (in Coulombs) the capacitor can store:</b></p>
+                    <pre>Q = C * V
+Q = (220 * 10<sup>-6</sup> F) * 12 V
+Q = 0.00264 C</pre>
+                    <p><b>b) Energy (in Joules) stored in the capacitor:</b></p>
+                    <pre>E = 0.5 * C * V<sup>2</sup>
+E = 0.5 * (220 * 10<sup>-6</sup> F) * (12 V)<sup>2</sup>
+E = 0.5 * 220 * 10<sup>-6</sup> * 144
+E = 15840 * 10<sup>-6</sup> J
+E = 0.01584 J</pre>
+                    <p><b>c) If this charged capacitor is then connected to a light bulb (modeled as a resistor), would the light bulb illuminate instantly and then dim, or gradually brighten? Explain why.</b></p>
+                    <p>The light bulb would illuminate <b>instantly and then gradually dim</b>. When the charged capacitor is connected to the light bulb, it immediately begins to discharge its stored energy through the bulb. The current is highest at the beginning of discharge, causing the bulb to be brightest. As the capacitor discharges, its voltage and the current through the bulb decrease exponentially, causing the light to gradually dim until the capacitor is fully discharged.</p>
+                </details>
+            </div>
+
+            <!-- Question 53 -->
+            <div class="question-card">
+                <p class="question-text">
+                    53. An Arduino Mega uses a 10-bit ADC with a default 5.0 V reference. A linear position sensor connected to an analog input produces a voltage output that ranges from 0.2 V (at 0 mm position) to 4.8 V (at 100 mm position).
+                    <br><br>
+                    a) Calculate the voltage resolution (step size) of the Arduino's ADC.
+                    <br>
+                    b) If the Arduino reads a digital value of 410 from this position sensor, what is the analog voltage output by the sensor?
+                    <br>
+                    c) What physical position (in mm) does this digital reading (410) correspond to?
+                    <br>
+                    d) If the position is known to change at a maximum rate corresponding to a signal frequency of 10 Hz, what is the theoretical minimum sampling rate required for the ADC to accurately capture this position change?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Voltage resolution (step size) of the Arduino's ADC:</b></p>
+                    <p>Number of Steps = 2<sup>10</sup> = 1024
+                    <pre>Resolution = V<sub>ref</sub> / Number of Steps
+Resolution = 5.0 V / 1024
+Resolution &approx; 0.0048828 V/step or 4.8828 mV/step</pre>
+                    <p><b>b) If the Arduino reads a digital value of 410, what is the analog voltage output by the sensor?</b></p>
+                    <pre>Analog Voltage = Digital Reading * Resolution
+Analog Voltage = 410 * (5.0 V / 1024)
+Analog Voltage &approx; 410 * 0.0048828 V
+Analog Voltage &approx; 2.002 V</pre>
+                    <p><b>c) What physical position (in mm) does this digital reading (410) correspond to?</b></p>
+                    <p>The sensor voltage range is 4.8 V - 0.2 V = 4.6 V.
+                    <br>The sensor position range is 100 mm - 0 mm = 100 mm.
+                    <br>The voltage per mm sensitivity of the sensor is 4.6 V / 100 mm = 0.046 V/mm.
+                    <br><br>The voltage read (2.002 V) is relative to the sensor's minimum output (0.2 V).
+                    <pre>Voltage above min = 2.002 V - 0.2 V = 1.802 V</pre>
+                    <pre>Position = (Voltage above min) / (Voltage per mm)
+Position = 1.802 V / 0.046 V/mm
+Position &approx; 39.17 mm</pre>
+                    <p><b>d) Theoretical minimum sampling rate required:</b></p>
+                    <p>According to Nyquist-Shannon theorem, Sampling Rate = 2 * F<sub>max</sub>
+                    <pre>Sampling Rate = 2 * 10 Hz = 20 Hz</pre>
+                    <p>Therefore:</p>
+                    <p>a) Voltage resolution: <b>0.00488 V/step</b></p>
+                    <p>b) Analog voltage output: <b>2.002 V</b></p>
+                    <p>c) Physical position: <b>39.17 mm</b></p>
+                    <p>d) Minimum sampling rate: <b>20 Hz</b></p>
+                </details>
+            </div>
+
+            <!-- Question 54 -->
+            <div class="question-card">
+                <p class="question-text">
+                    54. You are designing a robotic arm joint that needs to rotate precisely between specific angles and hold its position against varying loads. The joint should complete a 180&deg; rotation in 2 seconds.
+                    <br><br>
+                    a) Would a standard DC motor with a gearbox or a servomotor generally be more suitable for this application, and why?
+                    <br>
+                    b) If you decide to use a MOSFET H-bridge to control a DC motor for this joint, explain the primary function of the H-bridge and how it allows for bidirectional control of the motor.
+                    <br>
+                    c) Suppose the robotic arm needs to report its current joint angle to a central controller using Serial Peripheral Interface (SPI) communication. If the microcontroller sends a 16-bit angle value (2 bytes) and the SPI clock speed is 1 MHz, approximately how long would it take to transmit one angle value? (Assume no overhead for chip select or other protocol specific delays, just data bits).
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Motor suitability:</b></p>
+                    <p>A <b>servomotor</b> would generally be more suitable for this application.
+                    <br><b>Justification:</b> Servomotors are designed for precise angular positioning and holding torque, especially against varying loads, due to their integrated feedback mechanism (encoder) and closed-loop control. While a DC motor with a gearbox can provide torque, it lacks the inherent precision and holding capability of a servomotor without additional external feedback and control loops, which would add complexity.</p>
+                    <p><b>b) Primary function of an H-bridge for DC motor control:</b></p>
+                    <p>The primary function of an H-bridge is to allow a DC motor to be driven in <b>both forward and reverse directions</b>, and often to control its speed (using PWM). It achieves bidirectional control by having four switching elements (e.g., MOSFETs or transistors) arranged in an "H" configuration. By selectively turning ON pairs of switches, current can be directed through the motor in either direction. For example, turning on the top-left and bottom-right switches allows current to flow one way, while turning on the top-right and bottom-left switches reverses the current flow, thus reversing the motor's direction.</p>
+                    <p><b>c) Time to transmit one angle value via SPI:</b></p>
+                    <p>Total bits to transmit = 16 bits (for 2 bytes)
+                    <br>SPI Clock Speed = 1 MHz = 1,000,000 bits per second (bps)
+                    <pre>Time = Total Bits / Baud Rate
+Time = 16 bits / 1,000,000 bps
+Time = 0.000016 seconds or 16 &mu;s</pre>
+                    <p>Therefore:</p>
+                    <p>a) Motor suitability: <b>Servomotor</b> (with justification)</p>
+                    <p>b) H-bridge explanation: (as above)</p>
+                    <p>c) Transmission time: <b>16 &mu;s</b></p>
+                </details>
+            </div>
+
+            <!-- Question 55 -->
+            <div class="question-card">
+                <p class="question-text">
+                    55. A robotic arm needs to pick up an object weighing 200 grams and move it through a vertical distance of 0.5 meters.
+                    <br><br>
+                    a) Calculate the minimum work (in Joules) required to lift the object. (Assume g = 9.81 m/s<sup>2</sup>).
+                    <br>
+                    b) If the motor lifting the object has an efficiency of 75%, how much electrical energy (in Joules) must be supplied to the motor to perform this lift?
+                    <br>
+                    c) If the motor operates at 12 V and draws an average current of 0.5 A during the lift, how long (in seconds) would the lift take?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Minimum work required to lift the object:</b></p>
+                    <p>Work (W) = Force (F) &times; Distance (d)
+                    <br>Force (F) = mass (m) &times; gravity (g)
+                    <pre>m = 200 grams = 0.2 kg
+g = 9.81 m/s<sup>2</sup>
+d = 0.5 meters</pre>
+                    <pre>F = 0.2 kg * 9.81 m/s<sup>2</sup> = 1.962 N
+W = 1.962 N * 0.5 m = 0.981 J</pre>
+                    <p><b>b) Electrical energy supplied to the motor (given 75% efficiency):</b></p>
+                    <p>Efficiency (&eta;) = Work Output / Energy Input
+                    <br>Energy Input = Work Output / Efficiency
+                    <pre>Work Output = 0.981 J
+Efficiency = 75% = 0.75</pre>
+                    <pre>Energy Input = 0.981 J / 0.75 = 1.308 J</pre>
+                    <p><b>c) How long would the lift take (in seconds)?</b></p>
+                    <p>Electrical Power (P) = Voltage (V) &times; Current (I)
+                    <br>Energy (E) = Power (P) &times; Time (t)
+                    <br>So, Time (t) = Energy (E) / Power (P)
+                    <pre>V = 12 V
+I = 0.5 A
+E = 1.308 J (from part b)</pre>
+                    <pre>P = 12 V * 0.5 A = 6 W
+t = 1.308 J / 6 W &approx; 0.218 s</pre>
+                    <p>Therefore:</p>
+                    <p>a) Minimum work required: <b>0.981 J</b></p>
+                    <p>b) Electrical energy supplied: <b>1.308 J</b></p>
+                    <p>c) Time taken for the lift: <b>0.218 s</b></p>
+                </details>
+            </div>
+
+            <!-- Question 56 -->
+            <div class="question-card">
+                <p class="question-text">
+                    56. A simple series circuit consists of a 9 V battery and two resistors, R<sub>1</sub> = 2.2 k&Omega; and R<sub>2</sub> = 4.7 k&Omega;.
+                    <br><br>
+                    a) What is the total current flowing through the circuit?
+                    <br>
+                    b) Calculate the voltage drop across R<sub>1</sub>.
+                    <br>
+                    c) What is the power dissipated by R<sub>2</sub>?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Total current flowing through the circuit:</b></p>
+                    <p>Total Resistance (R<sub>total</sub>) = R<sub>1</sub> + R<sub>2</sub> = 2.2 k&Omega; + 4.7 k&Omega; = 6.9 k&Omega; = 6900 &Omega;
+                    <pre>I<sub>total</sub> = V<sub>supply</sub> / R<sub>total</sub>
+I<sub>total</sub> = 9 V / 6900 &Omega;
+I<sub>total</sub> &approx; 0.001304 A or 1.304 mA</pre>
+                    <p><b>b) Voltage drop across R<sub>1</sub>:</b></p>
+                    <pre>V<sub>R1</sub> = I<sub>total</sub> * R<sub>1</sub>
+V<sub>R1</sub> = 0.001304 A * 2200 &Omega;
+V<sub>R1</sub> &approx; 2.8688 V</pre>
+                    <p><b>c) Power dissipated by R<sub>2</sub>:</b></p>
+                    <pre>P<sub>R2</sub> = I<sub>total</sub><sup>2</sup> * R<sub>2</sub>
+P<sub>R2</sub> = (0.001304 A)<sup>2</sup> * 4700 &Omega;
+P<sub>R2</sub> = (1.700416 * 10<sup>-6</sup>) * 4700
+P<sub>R2</sub> &approx; 0.00799 W or 7.99 mW</pre>
+                    <p>Therefore:</p>
+                    <p>a) Total current: <b>1.304 mA</b></p>
+                    <p>b) Voltage across R<sub>1</sub>: <b>2.869 V</b></p>
+                    <p>c) Power dissipated by R<sub>2</sub>: <b>7.99 mW</b></p>
+                </details>
+            </div>
+
+            <!-- Question 57 -->
+            <div class="question-card">
+                <p class="question-text">
+                    57. A 100 mH inductor has a current flowing through it that changes from 0 A to 2 A in 50 ms.
+                    <br><br>
+                    a) Calculate the average voltage induced across the inductor during this period.
+                    <br>
+                    b) What is the energy stored in the inductor when the current reaches 2 A?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Average voltage induced across the inductor:</b></p>
+                    <pre>dI/dt = &Delta;I / &Delta;t = (2 A - 0 A) / (50 * 10<sup>-3</sup> s) = 2 A / 0.05 s = 40 A/s
+V = L * (dI/dt)
+V = (100 * 10<sup>-3</sup> H) * (40 A/s)
+V = 4 V</pre>
+                    <p><b>b) Energy stored in the inductor when the current reaches 2 A:</b></p>
+                    <pre>E = 0.5 * L * I<sup>2</sup>
+E = 0.5 * (100 * 10<sup>-3</sup> H) * (2 A)<sup>2</sup>
+E = 0.5 * 0.1 H * 4 A<sup>2</sup>
+E = 0.2 J</pre>
+                    <p>Therefore:</p>
+                    <p>a) Average induced voltage: <b>4 V</b></p>
+                    <p>b) Energy stored: <b>0.2 J</b></p>
+                </details>
+            </div>
+
+            <!-- Question 58 -->
+            <div class="question-card">
+                <p class="question-text">
+                    58. A 47 &mu;F capacitor is charged through a 10 k&Omega; resistor by a 20 V DC supply.
+                    <br><br>
+                    a) Calculate the time constant (&tau;) of this RC circuit.
+                    <br>
+                    b) What is the voltage across the capacitor after one time constant?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Time constant (&tau;) of this RC circuit:</b></p>
+                    <pre>&tau; = R * C
+&tau; = 10 * 10<sup>3</sup> &Omega; * 47 * 10<sup>-6</sup> F
+&tau; = 0.47 s</pre>
+                    <p><b>b) Voltage across the capacitor after one time constant:</b></p>
+                    <p>For a charging capacitor, the voltage across it after time t is given by:
+                    <pre>V<sub>c</sub>(t) = V<sub>supply</sub> * (1 - e<sup>-t/&tau;</sup>)</pre>
+                    <p>After one time constant (t = &tau;):
+                    <pre>V<sub>c</sub>(&tau;) = V<sub>supply</sub> * (1 - e<sup>-&tau;/&tau;</sup>)
+V<sub>c</sub>(&tau;) = V<sub>supply</sub> * (1 - e<sup>-1</sup>)
+V<sub>c</sub>(&tau;) = 20 V * (1 - 0.36788)
+V<sub>c</sub>(&tau;) = 20 V * 0.63212
+V<sub>c</sub>(&tau;) &approx; 12.64 V</pre>
+                    <p>Therefore:</p>
+                    <p>a) Time constant: <b>0.47 s</b></p>
+                    <p>b) Voltage after one time constant: <b>12.64 V</b></p>
+                </details>
+            </div>
+
+            <!-- Question 59 -->
+            <div class="question-card">
+                <p class="question-text">
+                    59. An 8-bit Analog-to-Digital Converter (ADC) has a full-scale input range of 0 V to 2.55 V.
+                    <br><br>
+                    a) What is the voltage resolution (step size) of this ADC?
+                    <br>
+                    b) If the ADC reads a digital value of 150, what is the analog input voltage?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Voltage resolution (step size) of this ADC:</b></p>
+                    <p>Number of Steps = 2<sup>8</sup> = 256
+                    <br>Full-scale range = 2.55 V - 0 V = 2.55 V
+                    <pre>Resolution = Full-scale Range / Number of Steps
+Resolution = 2.55 V / 256
+Resolution &approx; 0.00996 V/step or 9.96 mV/step</pre>
+                    <p><b>b) If the ADC reads a digital value of 150, what is the analog input voltage?</b></p>
+                    <pre>Analog Voltage = Digital Reading * Resolution
+Analog Voltage = 150 * (2.55 V / 256)
+Analog Voltage &approx; 150 * 0.00996 V
+Analog Voltage &approx; 1.494 V</pre>
+                    <p>Therefore:</p>
+                    <p>a) Voltage resolution: <b>0.00996 V/step</b></p>
+                    <p>b) Analog input voltage: <b>1.494 V</b></p>
+                </details>
+            </div>
+
+            <!-- Question 60 -->
+            <div class="question-card">
+                <p class="question-text">
+                    60. A DC motor is used to lift a 500 g mass by 1.2 meters. The motor has an efficiency of 80%.
+                    <br><br>
+                    a) Calculate the useful mechanical work done by the motor (in Joules). (Assume g = 9.81 m/s<sup>2</sup>).
+                    <br>
+                    b) How much electrical energy (in Joules) must be supplied to the motor to perform this task?
+                    <br>
+                    c) If the motor draws 0.8 A from a 6 V power supply, how long (in seconds) does it take to lift the mass?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p><b>a) Useful mechanical work done by the motor:</b></p>
+                    <pre>Work (W) = Force (F) * Distance (d)
+Force (F) = mass (m) * gravity (g)
+m = 500 g = 0.5 kg
+g = 9.81 m/s<sup>2</sup>
+d = 1.2 meters</pre>
+                    <pre>F = 0.5 kg * 9.81 m/s<sup>2</sup> = 4.905 N
+W = 4.905 N * 1.2 m = 5.886 J</pre>
+                    <p><b>b) Electrical energy supplied to the motor:</b></p>
+                    <p>Efficiency (&eta;) = Work Output / Energy Input
+                    <br>Energy Input = Work Output / Efficiency
+                    <pre>Work Output = 5.886 J
+Efficiency = 80% = 0.80</pre>
+                    <pre>Energy Input = 5.886 J / 0.80 = 7.3575 J</pre>
+                    <p><b>c) How long does it take to lift the mass?</b></p>
+                    <p>Electrical Power (P) = Voltage (V) * Current (I)
+                    <br>Energy (E) = Power (P) * Time (t)
+                    <br>So, Time (t) = Energy (E) / Power (P)
+                    <pre>V = 6 V
+I = 0.8 A
+E = 7.3575 J (from part b)</pre>
+                    <pre>P = 6 V * 0.8 A = 4.8 W
+t = 7.3575 J / 4.8 W &approx; 1.533 s</pre>
+                    <p>Therefore:</p>
+                    <p>a) Useful mechanical work: <b>5.886 J</b></p>
+                    <p>b) Electrical energy supplied: <b>7.3575 J</b></p>
+                    <p>c) Time taken for the lift: <b>1.533 s</b></p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 61 -->
+            <div class="question-card">
+                <p class="question-text">
+                    61. A voltage divider circuit uses a 15 V power supply. If R<sub>top</sub> = 5 k&Omega; and R<sub>bottom</sub> = 10 k&Omega;, what is the voltage across R<sub>bottom</sub>?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Total Resistance (R<sub>total</sub>) = R<sub>top</sub> + R<sub>bottom</sub> = 5 k&Omega; + 10 k&Omega; = 15 k&Omega;
+                    <pre>V<sub>bottom</sub> = V<sub>supply</sub> * (R<sub>bottom</sub> / R<sub>total</sub>)
+V<sub>bottom</sub> = 15 V * (10 k&Omega; / 15 k&Omega;)
+V<sub>bottom</sub> = 15 V * (10 / 15)
+V<sub>bottom</sub> = 15 V * (2 / 3)
+V<sub>bottom</sub> = 10 V</pre>
+                    <p>Therefore, the voltage across R<sub>bottom</sub> is <b>10 V</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 62 -->
+            <div class="question-card">
+                <p class="question-text">
+                    62. A 10 &mu;F capacitor is charged from 0 V to 5 V in 20 ms. Calculate the average charging current.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Charge (Q) = C * V
+                    <pre>Q = 10 * 10<sup>-6</sup> F * 5 V = 50 * 10<sup>-6</sup> C = 50 &mu;C</pre>
+                    <p>Average Current (I) = Q / t
+                    <pre>I = 50 * 10<sup>-6</sup> C / (20 * 10<sup>-3</sup> s)
+I = 50 / 20 * 10<sup>-3</sup> A
+I = 2.5 * 10<sup>-3</sup> A = 2.5 mA</pre>
+                    <p>Therefore, the average charging current is <b>2.5 mA</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 63 -->
+            <div class="question-card">
+                <p class="question-text">
+                    63. An inductor has an inductance of 50 mH. If the voltage induced across it is 10 V, what is the rate of change of current (dI/dt) through the inductor?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <pre>V = L * (dI/dt)
+dI/dt = V / L
+dI/dt = 10 V / (50 * 10<sup>-3</sup> H)
+dI/dt = 10 / 0.05 A/s
+dI/dt = 200 A/s</pre>
+                    <p>Therefore, the rate of change of current is <b>200 A/s</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 64 -->
+            <div class="question-card">
+                <p class="question-text">
+                    64. A non-inverting Op-Amp amplifier has an input resistor (R<sub>1</sub>) of 2 k&Omega; and a feedback resistor (R<sub>f</sub>) of 18 k&Omega;. If the input voltage (V<sub>in</sub>) is 0.5 V, what is the output voltage (V<sub>out</sub>)?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>For an ideal non-inverting Op-Amp configuration, the output voltage is given by the formula:
+                    <pre>V<sub>out</sub> = V<sub>in</sub> * (1 + R<sub>f</sub> / R<sub>1</sub>)
+V<sub>out</sub> = 0.5 V * (1 + 18 k&Omega; / 2 k&Omega;)
+V<sub>out</sub> = 0.5 V * (1 + 9)
+V<sub>out</sub> = 0.5 V * 10
+V<sub>out</sub> = 5 V</pre>
+                    <p>Therefore, the output voltage is <b>5 V</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 65 -->
+            <div class="question-card">
+                <p class="question-text">
+                    65. A sensor outputs a voltage from 0 V to 3.3 V. If this sensor is connected to a 10-bit ADC with a 3.3 V reference, what is the digital reading when the sensor outputs 1.65 V?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Number of Steps = 2<sup>10</sup> = 1024
+                    <br>Resolution = V<sub>ref</sub> / Number of Steps = 3.3 V / 1024 &approx; 0.0032226 V/step
+                    <pre>Digital Reading = Analog Voltage / Resolution
+Digital Reading = 1.65 V / (3.3 V / 1024)
+Digital Reading = 1.65 * 1024 / 3.3
+Digital Reading = 512</pre>
+                    <p>Therefore, the digital reading is <b>512</b>.</p>
+                </details>
+            </div>
+
+            <h2 class="section-title">Additional Problem-Solving Questions</h2>
+
+            <!-- New Math Problem 66 -->
+            <div class="question-card">
+                <p class="question-text">
+                    66. A DC motor is rated for 24 V and draws 1.5 A when operating at its nominal speed. If it produces 25 W of mechanical power, calculate its efficiency.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Electrical Power Input (P<sub>in</sub>) = V * I
+                    <pre>P<sub>in</sub> = 24 V * 1.5 A = 36 W</pre>
+                    <p>Mechanical Power Output (P<sub>out</sub>) = 25 W
+                    <pre>Efficiency (&eta;) = (P<sub>out</sub> / P<sub>in</sub>) * 100%
+&eta; = (25 W / 36 W) * 100%
+&eta; &approx; 69.44%</pre>
+                    <p>Therefore, the motor's efficiency is approximately <b>69.44%</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 67 -->
+            <div class="question-card">
+                <p class="question-text">
+                    67. A temperature sensor has a transfer function of 10 mV/&deg;C. If the sensor outputs 250 mV, what is the measured temperature?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <pre>Temperature = Output Voltage / Sensitivity
+Temperature = 250 mV / (10 mV/&deg;C)
+Temperature = 25 &deg;C</pre>
+                    <p>Therefore, the measured temperature is <b>25 &deg;C</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 68 -->
+            <div class="question-card">
+                <p class="question-text">
+                    68. A data acquisition system is sampling a vibration signal with a maximum frequency of 50 Hz. What is the minimum sampling interval (time between samples) required to avoid aliasing?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Minimum Sampling Rate (f<sub>s</sub>) = 2 * F<sub>max</sub> = 2 * 50 Hz = 100 Hz
+                    <pre>Minimum Sampling Interval (T<sub>s</sub>) = 1 / f<sub>s</sub>
+T<sub>s</sub> = 1 / 100 Hz = 0.01 seconds or 10 ms</pre>
+                    <p>Therefore, the minimum sampling interval required is <b>0.01 seconds (or 10 ms)</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 69 -->
+            <div class="question-card">
+                <p class="question-text">
+                    69. A 3-bit Digital-to-Analog Converter (DAC) has a reference voltage of 8 V. If the digital input is 101<sub>2</sub>, what is the analog output voltage?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Number of Steps = 2<sup>3</sup> = 8
+                    <br>Resolution = V<sub>ref</sub> / Number of Steps = 8 V / 8 = 1 V/step
+                    <br>Digital input 101<sub>2</sub> in decimal is 1*2<sup>2</sup> + 0*2<sup>1</sup> + 1*2<sup>0</sup> = 4 + 0 + 1 = 5
+                    <pre>Analog Output Voltage = Digital Value * Resolution
+Analog Output Voltage = 5 * 1 V/step = 5 V</pre>
+                    <p>Therefore, the analog output voltage is <b>5 V</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 70 -->
+            <div class="question-card">
+                <p class="question-text">
+                    70. A robotic gripper uses a servomotor to close its jaws. The motor needs to apply a torque of 0.2 Nm to close the jaws completely. If the motor's arm length is 5 cm, what force (in Newtons) does the motor apply at the end of its arm?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <pre>Torque (&tau;) = Force (F) * Radius (r)
+F = &tau; / r
+&tau; = 0.2 Nm
+r = 5 cm = 0.05 m</pre>
+                    <pre>F = 0.2 Nm / 0.05 m
+F = 4 N</pre>
+                    <p>Therefore, the motor applies a force of <b>4 N</b> at the end of its arm.</p>
+                </details>
+            </div>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="text-center text-gray-500 text-sm mt-12 py-6">
+            <p>&copy; <script>document.write(new Date().getFullYear())</script> Mechatronics 1 Course. All rights reserved.</p>
+            <p>Designed for a World-Class Learning Experience</p>
+        </footer>
+    </div>
+</body>
+</html>
