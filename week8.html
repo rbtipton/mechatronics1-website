@@ -3,925 +3,574 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 8 - Control Systems and Feedback</title>
+    <title>Mechatronics 1: Week 8 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Academic Blue -->
-    <!-- Application Structure Plan: The SPA is structured using a main navigation bar to switch between three core sections: 'Control Systems Concepts', 'Interactive Sandbox', and 'Practice Problems'. The 'Control Systems Concepts' section uses a sub-navigation (tabs) for 'Intro to Control Systems', 'Importance of Feedback', 'PID Control Basics', and 'System Response Characteristics'. This architecture organizes the content thematically, allowing students to focus on one concept or type at a time. The 'Interactive Sandbox' provides a simple simulation of a closed-loop control system, reinforcing understanding of input-process-output-feedback. The user flow is designed for progressive learning: grasp a concept, apply it in a simulator, and then test knowledge with practice problems. This is more engaging and effective than a static document. -->
-    <!-- Visualization & Content Choices: Concepts/Steps -> Styled text blocks (HTML/Tailwind). Examples -> Interactive step-by-step reveal with a button (JS). Diagrams -> Simple HTML/CSS representations for control loops. Sandbox Visualization -> Dynamic UI elements (slider for setpoint, number displays for actual speed, error, control output, and a simple visual representation of a motor) to illustrate basic control. Practice Problems -> Cards with a 'show answer' toggle (JS). This mix of static and interactive content enhances engagement and comprehension. -->
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .tab-active { 
-            border-color: #3b82f6; /* blue-500 */
-            color: #1d4ed8; /* blue-700 */
-            background-color: #eff6ff; /* blue-50 */
-        }
-        .step-content {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .step-content.visible {
-            display: block;
-            opacity: 1;
-        }
-        .solution-box {
-            background-color: #f8fafc;
-            border-left: 4px solid #3b82f6;
-            padding: 1rem;
-            margin-top: 1rem;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-        }
-        .btn {
-            background-color: #3b82f6;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-        .btn:hover { background-color: #2563eb; }
-        .btn-secondary {
-            background-color: #6b7280;
-        }
-        .btn-secondary:hover { background-color: #4b5563; }
-        .hidden { display: none; }
-        .katex-display { display: block; overflow-x: auto; white-space: nowrap; }
-
-        /* General component styling for diagrams */
-        .diagram-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1rem;
-            background-color: #f3f4f6;
-            border: 2px solid #d1d5db;
-            border-radius: 0.5rem;
-            min-height: 150px;
+        body {
             font-family: 'Inter', sans-serif;
-            margin-bottom: 1rem;
-            justify-content: center;
+            background-color: #f3f4f6;
+            color: #1f2937;
         }
-        .component-box {
-            background-color: #e0f2fe; /* Light blue */
-            border: 1px solid #93c5fd; /* Blue-300 */
-            border-radius: 0.25rem;
-            padding: 0.75rem;
-            text-align: center;
-            font-weight: 500;
-            color: #1d4ed8; /* Blue-700 */
-            width: 100%;
-            max-width: 150px;
-            box-sizing: border-box;
-            margin: 0.5rem 0;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
         }
-        .diagram-arrow {
-            font-size: 2rem;
-            color: #374151;
-            margin: 0.5rem 0;
-            line-height: 1;
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
         }
-        .flow-line {
-            width: 2px;
-            height: 30px;
-            background-color: #374151;
-            position: relative;
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
         }
-        .flow-line::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: -4px;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-top: 8px solid #374151;
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
         }
-
-        /* Sandbox specific styling */
-        #motor-visual {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: #3b82f6; /* Blue for motor */
-            border: 5px solid #1d4ed8;
-            position: relative;
-            animation: rotate 2s linear infinite; /* Will be controlled by JS */
-            margin: 1rem auto;
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
         }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .nav-button svg {
+          margin-bottom: 0.25rem;
         }
-
-        #motor-visual.stopped {
-            animation-play-state: paused;
-            background-color: #94a3b8; /* Gray when stopped */
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
         }
-
-        #motor-visual .dot {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: white;
-            border-radius: 50%;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
         }
-        #motor-visual .shaft {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #ccc;
-            border-radius: 4px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        #setpoint-slider {
-            width: 100%;
-            -webkit-appearance: none;
-            height: 15px;
-            border-radius: 5px;
-            background: #d3d3d3;
-            outline: none;
-            opacity: 0.7;
-            -webkit-transition: .2s;
-            transition: opacity .2s;
-        }
-        #setpoint-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #3b82f6;
-            cursor: pointer;
-        }
-        #setpoint-slider::-moz-range-thumb {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #3b82f6;
-            cursor: pointer;
-        }
-        #pseudo-code-display {
-            background-color: #1e293b; /* Dark slate */
-            color: #e2e8f0; /* Light gray */
+        .formula-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border-left: 4px solid #38bdf8; /* Blue border on left */
             padding: 1rem;
             border-radius: 0.5rem;
-            font-family: 'Fira Code', 'Courier New', monospace;
-            white-space: pre-wrap;
-            min-height: 200px;
-            font-size: 0.9rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 1rem;
+            color: #0c4a6e; /* Darker blue text */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="antialiased">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-md sticky top-0 z-10">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-bold text-blue-700">Mechatronics 1: Week 8 - Control Systems and Feedback</h1>
-                <div class="flex space-x-4 text-sm font-medium">
-                    <button data-target="concepts" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Control Systems Concepts</button>
-                    <button data-target="sandbox" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Interactive Sandbox</button>
-                    <button data-target="practice" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Practice Problems</button>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-    <main id="app-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Section: Control Systems Concepts -->
-        <section id="concepts" class="app-section">
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-3xl font-bold mb-4 text-gray-900">Control Systems: Making Mechatronics Intelligent</h2>
-                <p class="text-gray-600 mb-6">This week, we delve into the heart of intelligent mechatronic behavior: control systems. These systems are responsible for ensuring that a device or process operates precisely as intended, adapting to changes and disturbances. Understanding control theory is crucial for designing autonomous and high-performance mechatronic products.</p>
+        // Lucide React icons (inline SVGs for direct use in HTML)
+        const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+        const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+        const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
 
-                <!-- Tabs -->
-                <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex flex-wrap" aria-label="Tabs">
-                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="intro_control">Intro to Control Systems</button>
-                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="feedback">Importance of Feedback</button>
-                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="pid_basics">PID Control Basics</button>
-                        <button class="concept-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-concept="system_response">System Response Characteristics</button>
-                    </nav>
-                </div>
+        // Icons for Week 8
+        const GitFork = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9v2c0 .6-.4 1-1 1H7c-.6 0-1-.4-1-1V9"/><path d="M12 12v3"/></svg>;
+        const Repeat = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>;
+        const FunctionIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 18v-5c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v5"/><path d="M4 18h16"/><path d="M12 12V6"/></svg>;
+        const Database = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>;
+        const Clock = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
+        const TrendingUp = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>;
 
-                <!-- Content Area for Concepts -->
-                <div id="concept-content" class="mt-6">
-                    <!-- Content will be injected here by JS -->
-                </div>
-            </div>
-        </section>
 
-        <!-- Section: Interactive Sandbox -->
-        <section id="sandbox" class="app-section hidden">
-             <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-3xl font-bold mb-2 text-gray-900">Interactive Sandbox: Motor Speed Control</h2>
-                <p class="text-gray-600 mb-6">Simulate a closed-loop system attempting to maintain a desired motor speed. Adjust the 'Desired Speed' (setpoint) and observe how the 'Actual Speed' and 'Control Output' (motor power) respond. This demonstrates a basic Proportional (P) control action.</p>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4">Control Panel</h3>
-                        <div class="flex flex-col items-center space-y-4 my-8">
-                            <label for="setpoint-slider" class="font-medium">Desired Speed (RPM):</label>
-                            <input type="range" min="0" max="100" value="50" class="w-full" id="setpoint-slider">
-                            <span id="setpoint-value" class="text-gray-700 text-sm">Desired: 50 RPM</span>
-                        </div>
-                        <div class="space-y-2 text-center">
-                            <p class="text-lg font-semibold">Actual Speed: <span id="actual-speed-value" class="text-blue-700">0</span> RPM</p>
-                            <p class="text-lg font-semibold">Error: <span id="error-value" class="text-red-600">0</span> RPM</p>
-                            <p class="text-lg font-semibold">Control Output (Motor Power): <span id="control-output-value" class="text-green-600">0</span> %</p>
-                        </div>
-                        <h4 class="text-lg font-semibold mt-8 mb-2">Pseudo-Code (P-Controller):</h4>
-                        <div id="pseudo-code-display" class="min-h-[250px]">
-                            <!-- Pseudo-code will be displayed here -->
-                        </div>
+        // Concept Review Component
+        const ConceptReview = () => {
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 8: Control Flow, Functions & Data Acquisition (DAQ)</h2>
+
+              {/* Control Flow: Conditional Statements */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <GitFork className="w-7 h-7 mr-3 text-blue-600"/>
+                    1. Control Flow: Conditional Statements
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Conditional statements allow your program to execute different blocks of code based on whether a specified condition is true or false.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. The `if`, `if-else`, and `if-else if-else` Statements:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">`if`:</span> Executes code only if a condition is true.
+                    <div className="formula-box mt-2">
+                      <pre><code>if (condition) &#123;
+  // Code if condition is true
+&#125;</code></pre>
                     </div>
-                    <div class="flex flex-col items-center justify-center">
-                        <h3 class="text-xl font-semibold mb-4">Motor Visualizer</h3>
-                        <div id="motor-visual" class="stopped">
-                            <div class="shaft"></div>
-                            <div class="dot"></div>
-                        </div>
-                        <span id="motor-animation-status" class="text-gray-700 text-sm mt-2">Stopped</span>
+                  </li>
+                  <li><span className="font-medium">`if-else`:</span> Provides two paths: one if true, one if false.
+                    <div className="formula-box mt-2">
+                      <pre><code>if (condition) &#123;
+  // Code if condition is true
+&#125; else &#123;
+  // Code if condition is false
+&#125;</code></pre>
                     </div>
-                </div>
-            </div>
-        </section>
+                  </li>
+                  <li><span className="font-medium">`if-else if-else`:</span> Allows for multiple conditions to be checked sequentially.
+                    <div className="formula-box mt-2">
+                      <pre><code>if (condition1) &#123;
+  // Code if condition1 is true
+&#125; else if (condition2) &#123;
+  // Code if condition2 is true
+&#125; else &#123;
+  // Code if none of the above conditions are true
+&#125;</code></pre>
+                    </div>
+                  </li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. The `switch-case` Statement:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Used for selecting one of many code blocks to be executed, based on the value of a single variable.</li>
+                  <li>Often more readable than long `if-else if` chains for specific value comparisons.</li>
+                  <li>`break` statement is crucial to exit the `switch` block after a match. `default` case handles values not explicitly matched.</li>
+                  <div className="formula-box mt-2">
+                    <pre><code>switch (variable) &#123;
+  case value1:
+    // Code for value1
+    break;
+  case value2:
+    // Code for value2
+    break;
+  default:
+    // Code if no match
+    break;
+&#125;</code></pre>
+                  </div>
+                </ul>
+              </section>
 
-        <!-- Section: Practice Problems -->
-        <section id="practice" class="app-section hidden">
-            <div class="bg-white p-6 rounded-lg shadow">
-                 <h2 class="text-3xl font-bold mb-4 text-gray-900">Practice Problems</h2>
-                 <p class="text-gray-600 mb-6">Test your understanding with these problems from the course notes. Click "Show Answer" to reveal the detailed solution.</p>
-                 <div id="practice-problems-container" class="space-y-6">
-                    <!-- Practice problems will be injected here -->
-                 </div>
-                 <h2 class="text-3xl font-bold mt-8 mb-4 text-gray-900">Quiz</h2>
-                 <p class="text-gray-600 mb-6">Challenge your knowledge with these multiple-choice questions. Select your answer and click 'Check Answer'.</p>
-                 <div id="quiz-container" class="space-y-6">
-                    <!-- Quiz questions will be injected here -->
-                 </div>
-            </div>
-        </section>
+              {/* Looping Structures */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Repeat className="w-7 h-7 mr-3 text-green-600"/>
+                    2. Looping Structures
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Looping structures allow a block of code to be executed repeatedly.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. The `for` Loop:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Used when you know exactly how many times you want to repeat a block of code.</li>
+                  <li>Consists of initialization, condition, and increment/decrement.</li>
+                  <div className="formula-box mt-2">
+                    <pre><code>for (initialization; condition; increment/decrement) &#123;
+  // Code to be repeated
+&#125;</code></pre>
+                  </div>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. The `while` Loop:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Repeats a block of code as long as a specified condition is true.</li>
+                  <li>The condition is checked before each iteration.</li>
+                  <div className="formula-box mt-2">
+                    <pre><code>while (condition) &#123;
+  // Code to be repeated as long as condition is true
+&#125;</code></pre>
+                  </div>
+                </ul>
+              </section>
 
-    </main>
-    
-<script>
-const appData = {
-    intro_control: {
-        title: "Introduction to Control Systems: Open-Loop vs. Closed-Loop",
-        description: "Control systems are fundamental to mechatronics, ensuring that devices and processes perform as desired. They dictate how a system takes inputs, processes them, and generates outputs to achieve a specific goal.",
-        steps: [
-            "<strong>What is a Control System?</strong> A device or set of devices that manages, commands, directs, or regulates the behavior of other devices or systems. Its goal is to achieve a desired output from a process.",
-            "<strong>Open-Loop Control Systems:</strong>",
-            "&bull;   <strong>Definition:</strong> The control action is independent of the output. There is no feedback from the output to the input.",
-            "&bull;   <strong>Characteristics:</strong> Simple design, inexpensive, no stability issues (inherently stable), but less accurate, sensitive to disturbances, and requires frequent calibration.",
-            "&bull;   <strong>Real-Life Example:</strong> A common toaster. You set a time (input), and it heats for that duration. It doesn't measure the toast's brownness (output) to adjust the heating time. If the bread is too dry or too moist, the browning might not be as desired.",
-            "&bull;   <strong>Another Example:</strong> An older washing machine with a fixed wash cycle. You select the cycle, and it runs for a predetermined time without sensing how clean the clothes are.",
-            "<strong>Closed-Loop Control Systems (Feedback Control Systems):</strong>",
-            "&bull;   <strong>Definition:</strong> The control action depends on the output. The output is measured and fed back to compare with the desired input (setpoint). The difference (error) is used to adjust the control action.",
-            "&bull;   <strong>Characteristics:</strong> More accurate, less sensitive to disturbances, can compensate for changes, but more complex, expensive, and can have stability issues if not designed correctly.",
-            "&bull;   <strong>Real-Life Example:</strong> Car cruise control. You set a desired speed (setpoint). The system measures the actual speed (output) using a sensor. If the actual speed deviates from the desired speed (error), the system adjusts the engine throttle (control action) to maintain the set speed, even when going uphill or downhill.",
-            "&bull;   <strong>Another Example:</strong> A modern thermostat. You set a desired temperature. It measures the room's actual temperature. If the room is too cold, it turns on the heater until the set temperature is reached. This continuous measurement and adjustment is feedback control."
-        ],
-        example: {
-            problem: "Compare a simple kitchen fan with a multi-speed setting to a 'smart' ceiling fan that maintains a comfortable room temperature. Classify each as open-loop or closed-loop and explain why.",
-            circuitHTML: `<div class="diagram-container">
-                            <div class="component-box">Simple Fan (Fixed Speed)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">User Input (Speed Setting)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Fan Motor (Fixed Power)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Air Flow (Output)</div>
-                            <div class="my-4"></div>
-                            <div class="component-box">Smart Fan (Temp. Control)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Desired Temperature (Setpoint)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Controller</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Fan Motor (Variable Power)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Air Flow & Temperature (Output)</div>
-                            <span class="diagram-arrow">↑ (Feedback)</span>
-                            <div class="component-box">Temperature Sensor</div>
-                        </div>`, 
-            solutionSteps: [
-                {
-                    title: "Simple Kitchen Fan (Open-Loop)",
-                    content: `<strong>Classification: Open-Loop.</strong><br>
-                    <strong>Explanation:</strong> When you select a speed setting (e.g., Low, Medium, High) on a simple kitchen fan, the fan motor receives a fixed amount of power corresponding to that setting. It does not measure the actual airflow or its effect on the room's temperature. The fan will spin at that speed regardless of external factors like how hot the room is, how much resistance there is to airflow, or if a window is open. There is no feedback mechanism to adjust its operation based on the desired cooling effect.`
-                },
-                {
-                    title: "Smart Ceiling Fan (Closed-Loop)",
-                    content: `<strong>Classification: Closed-Loop (Feedback Control).</strong><br>
-                    <strong>Explanation:</strong> A 'smart' ceiling fan designed to maintain a comfortable room temperature acts as a closed-loop system.
-                    <ol class="list-decimal list-inside ml-4 mt-2">
-                        <li>You set a <strong>desired temperature</strong> (setpoint).</li>
-                        <li>A built-in <strong>temperature sensor</strong> continuously measures the <strong>actual room temperature</strong> (output).</li>
-                        <li>The fan's microcontroller (controller) compares the desired temperature with the actual temperature, calculating an <strong>error</strong>.</li>
-                        <li>Based on this error, the microcontroller adjusts the fan's speed (<strong>control action</strong>, e.g., via PWM to the motor) to cool or warm the room towards the setpoint.</li>
-                    </ol>
-                    The measured temperature is "fed back" to the system, allowing it to adapt and maintain the desired condition, demonstrating a classic feedback loop.`
-                }
-            ]
-        }
-    },
-    feedback: {
-        title: "The Importance of Feedback in Control Systems",
-        description: "Feedback is the cornerstone of robust and accurate control systems. It allows a system to monitor its own performance and make adjustments to achieve and maintain desired conditions.",
-        steps: [
-            "<strong>What is Feedback?</strong> The process of returning a portion of the output of a system or circuit to the input. This information about the actual output is used to influence the future output.",
-            "<strong>Why is Feedback Important?</strong>",
-            "&bull;   <strong>Increased Accuracy:</strong> Reduces the difference between the desired output (setpoint) and the actual output (process variable).",
-            "&bull;   <strong>Disturbance Rejection:</strong> Helps the system maintain performance despite external disturbances (e.g., changes in load, temperature, or noise).",
-            "&bull;   <strong>Improved Robustness:</strong> Makes the system less sensitive to variations in component parameters or changes in the system's dynamics.",
-            "&bull;   <strong>Stabilization (Negative Feedback):</strong> Can make unstable systems stable or improve the stability of stable systems.",
-            "<strong>Negative Feedback:</strong>",
-            "&bull;   <strong>Definition:</strong> The output signal is subtracted from the input signal (or the error is generated from the difference). This is the most common type of feedback in control systems.",
-            "&bull;   <strong>Effect:</strong> Reduces error, promotes stability, and improves accuracy. It works to counteract deviations from the setpoint.",
-            "&bull;   <strong>Real-Life Example:</strong> A refrigerator. You set a desired temperature. The internal temperature sensor provides feedback to the control system. If the temperature rises above the setpoint, the compressor (actuator) turns on to cool the fridge. If it drops below, the compressor turns off. The feedback helps maintain a stable, desired temperature.",
-            "<strong>Positive Feedback:</strong>",
-            "&bull;   <strong>Definition:</strong> The output signal is added to the input signal (reinforcing the input).",
-            "&bull;   <strong>Effect:</strong> Increases error, leads to instability, can cause runaway conditions or oscillations. Rarely used for control, but seen in oscillators or Schmitt triggers.",
-            "&bull;   <strong>Real-Life Example:</strong> The screeching sound (acoustic feedback) when a microphone is too close to a speaker. The sound from the speaker enters the microphone, is amplified, comes out of the speaker louder, and re-enters the microphone, creating a rapidly escalating loop until saturation or oscillation."
-        ],
-        example: {
-            problem: "Explain how negative feedback helps a robotic vacuum cleaner avoid obstacles and maintain a cleaning path.",
-            circuitHTML: `<div class="diagram-container">
-                            <div class="component-box">Desired Path/Obstacle Avoidance Logic</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Controller (MCU)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Motor Commands (to Wheels/Actuators)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Robot Movement & Obstacle Interaction (Output)</div>
-                            <span class="diagram-arrow">↑ (Feedback)</span>
-                            <div class="component-box">Proximity/Bump Sensors (Actual State)</div>
-                        </div>`,
-            solutionSteps: [
-                {
-                    title: "Setpoint and Actual State",
-                    content: `The **setpoint** for the robotic vacuum cleaner includes its desired cleaning path and the implicit goal of "not hitting obstacles". The **actual state** of the robot (its position relative to obstacles) is continuously measured by its sensors.`
-                },
-                {
-                    title: "Sensors as Feedback Elements",
-                    content: `Robotic vacuums use various **sensors** such as infrared (IR) proximity sensors, ultrasonic sensors, or mechanical bump sensors. These sensors provide **feedback** by detecting nearby obstacles or direct collisions.`
-                },
-                {
-                    title: "Error Detection",
-                    content: `The microcontroller (controller) compares the desired state (no collision) with the actual state (obstacle detected). If an obstacle is detected, an **error** signal is generated, indicating a deviation from the desired "clear path" state.`
-                },
-                {
-                    title: "Control Action (Correction)",
-                    content: `Upon detecting an obstacle, the negative feedback mechanism triggers a **control action**. The microcontroller immediately sends commands to the wheel motors (actuators) to stop, reverse, and/or turn, effectively changing the robot's movement to avoid the obstacle.`
-                },
-                {
-                    title: "Benefit of Negative Feedback",
-                    content: `This negative feedback loop allows the robotic vacuum to:
-                    <ul class="list-disc list-inside ml-4 mt-2">
-                        <li><strong>Increase accuracy:</strong> By continuously sensing, it can precisely navigate and avoid objects.</li>
-                        <li><strong>Reject disturbances:</strong> Unexpected obstacles (disturbances) are immediately identified and responded to.</li>
-                        <li><strong>Improve robustness:</strong> It adapts to various environments and furniture layouts without needing a pre-programmed map of every obstacle.</li>
-                    </ul>`
-                }
-            ]
-        }
-    },
-    pid_basics: {
-        title: "PID Control Basics: Proportional, Integral, Derivative",
-        description: "The Proportional-Integral-Derivative (PID) controller is the most widely used control algorithm in industry due to its effectiveness and relative simplicity. It calculates an 'error' value and then applies a correction based on three terms.",
-        steps: [
-            "<strong>The PID Concept:</strong> A PID controller continuously calculates an 'error' value as the difference between a desired setpoint (SP) and a measured process variable (PV). It then applies a correction based on three types of responses: Proportional (P), Integral (I), and Derivative (D).",
-            "<strong>1. Proportional (P) Term:</strong>",
-            "&bull;   <strong>Action:</strong> Corrects the output proportionally to the *current error*.",
-            "&bull;   <strong>Formula:</strong> $P_{output} = K_p \times \text{error}$ (where $K_p$ is the proportional gain).",
-            "&bull;   <strong>Effect:</strong> Faster response to changes. A larger $K_p$ means a stronger response. Can lead to oscillations and a sustained 'steady-state error' (offset) where the system never quite reaches the setpoint.",
-            "&bull;   <strong>Analogy:</strong> Pushing a ball back to the center of a table. The harder it is from the center, the harder you push. But you might push it past the center.",
-            "<strong>2. Integral (I) Term:</strong>",
-            "&bull;   <strong>Action:</strong> Corrects the output based on the *sum of past errors* over time.",
-            "&bull;   <strong>Formula:</strong> $I_{output} = K_i \times \int \text{error} \, dt$ (where $K_i$ is the integral gain).",
-            "&bull;   <strong>Effect:</strong> Eliminates steady-state error (offset). If there's a persistent error, the integral term will grow, eventually driving the error to zero. Can cause overshoot and 'integral windup' if not properly handled.",
-            "&bull;   <strong>Analogy:</strong> If the ball keeps drifting to one side, you apply a small, persistent correction to counteract that drift over time until it stops drifting.",
-            "<strong>3. Derivative (D) Term:</strong>",
-            "&bull;   <strong>Action:</strong> Corrects the output based on the *rate of change of the error*.",
-            "&bull;   <strong>Formula:</strong> $D_{output} = K_d \times \frac{d(\text{error})}{dt}$ (where $K_d$ is the derivative gain).",
-            "&bull;   <strong>Effect:</strong> Dampens oscillations, anticipates future error, and improves system stability and response time. Reduces overshoot. Highly sensitive to noise in the sensor readings.",
-            "&bull;   <strong>Analogy:</strong> If the ball is moving very fast towards the center, you start applying a braking force *before* it reaches the center to slow it down and prevent it from overshooting.",
-            "<strong>Total PID Output:</strong> The control signal sent to the actuator is the sum of these three terms: $Output = P_{output} + I_{output} + D_{output}$",
-            "Real-Life Example: Temperature control in a sophisticated HVAC system. The P term reacts quickly to temperature changes, the I term eliminates any persistent small difference from the set temperature, and the D term prevents the system from overshooting the target temperature and causing oscillations between too hot and too cold."
-        ],
-        example: {
-            problem: "A liquid filling machine uses a PID controller to ensure each bottle receives exactly 500ml of liquid. Describe how each PID term (P, I, D) would contribute if a bottle is underfilled (e.g., gets 490ml).",
-            circuitHTML: `<div class="diagram-container">
-                            <div class="component-box">Desired Volume (500ml)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Comparator (Error = Desired - Actual)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">PID Controller (Kp, Ki, Kd)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Valve Actuator (Opens/Closes)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Liquid Volume (Output)</div>
-                            <span class="diagram-arrow">↑ (Feedback)</span>
-                            <div class="component-box">Volume Sensor</div>
-                        </div>`,
-            solutionSteps: [
-                {
-                    title: "Scenario & Error",
-                    content: `<strong>Setpoint (SP):</strong> 500ml<br>
-                    <strong>Actual Volume (PV):</strong> 490ml<br>
-                    <strong>Error:</strong> SP - PV = 500ml - 490ml = +10ml (Positive error, meaning it's underfilled)`
-                },
-                {
-                    title: "Proportional (P) Term Contribution",
-                    content: `The P term will generate a control output proportional to the current error (+10ml). This would cause the valve to open *more* (or stay open longer) to immediately add more liquid. The larger the initial underfill, the stronger the immediate corrective action.`
-                },
-                {
-                    title: "Integral (I) Term Contribution",
-                    content: `If there's a consistent tendency to underfill (e.g., due to a slowly clogging nozzle, building up a small but persistent error over many bottles), the integral term will accumulate this error. This accumulated error will cause the I term to gradually increase the valve's opening duration/amount over time, systematically eliminating the persistent 10ml underfill, eventually driving the average error to zero.`
-                },
-                {
-                    title: "Derivative (D) Term Contribution",
-                    content: `If the filling speed is rapidly increasing (meaning the error is changing quickly from, say, -20ml to -10ml in a short time), the D term might slightly *reduce* the control output. Conversely, if the filling speed is rapidly *decreasing* (meaning the error is changing quickly from, say, -5ml to -10ml), the D term would increase the control output. In essence, it 'anticipates' the trend of the error, helping to prevent overfilling if the liquid is coming in too fast, or speeding up the correction if it's coming in too slowly, thereby reducing overshoot and oscillations around the 500ml mark.`
-                },
-                {
-                    title: "Combined Effect",
-                    content: `Together, the PID terms work to ensure the bottle is filled quickly (P), accurately (I, eliminating steady-state error), and without excessive over/underfilling (D, dampening oscillations and reacting to error rate).`
-                }
-            ]
-        }
-    },
-    system_response: {
-        title: "System Response Characteristics",
-        description: "When designing control systems, it's crucial to understand how a system responds to a given input (often a 'step input' where the setpoint suddenly changes). Key characteristics define the quality of this response.",
-        steps: [
-            "<strong>Setpoint (SP):</strong> The desired value for the system's output (e.g., target temperature, desired speed).",
-            "<strong>Process Variable (PV):</strong> The actual, measured output of the system (e.g., actual temperature, actual speed).",
-            "<strong>Error (e):</strong> The difference between the setpoint and the process variable: $e = SP - PV$. The goal of a control system is to minimize this error.",
-            "<strong>Transient Response:</strong> Describes the system's behavior as it moves from its initial state to its final (steady) state after an input change. Key metrics include:",
-            "&bull;   <strong>Rise Time ($T_r$):</strong> The time it takes for the response to rise from a specified percentage (e.g., 10%) to another specified percentage (e.g., 90%) of its final value.",
-            "&bull;   <strong>Overshoot ($M_p$):</strong> The amount by which the response momentarily exceeds its final (steady-state) value before settling. Usually expressed as a percentage of the final value. Excessive overshoot can be undesirable (e.g., robot arm hitting something).",
-            "&bull;   <strong>Settling Time ($T_s$):</strong> The time required for the response to reach and stay within a specified percentage band (e.g., $\pm 2\%$ or $\pm 5\%$) of its final steady-state value.",
-            "&bull;   <strong>Peak Time ($T_p$):</strong> The time required to reach the first peak of the overshoot.",
-            "<strong>Steady-State Response:</strong> Describes the system's behavior as time approaches infinity, after the transient response has died out.",
-            "&bull;   <strong>Steady-State Error ($e_{ss}$):</strong> The difference between the desired setpoint and the actual output once the system has settled. A good control system aims for zero steady-state error.",
-            "Real-Life Example: A robotic arm tasked with moving a payload to a precise position. When given a new position (step input), the arm's transient response involves accelerating, potentially overshooting the target slightly (overshoot), and then stabilizing around the target (settling time). Ideally, once settled, it should maintain the exact target position without any offset (zero steady-state error). Tuning the controller (e.g., PID gains) is critical to optimize these response characteristics."
-        ],
-        example: {
-            problem: "Imagine you're controlling a robot's speed. You command it to go from 0 m/s to 1 m/s. Describe what 'overshoot' and 'settling time' would mean in this context, and why they are important.",
-            circuitHTML: `<div class="diagram-container">
-                            <div class="component-box">Desired Speed (1 m/s)</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Controller</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Motor Power</div>
-                            <span class="diagram-arrow">↓</span>
-                            <div class="component-box">Robot Speed (Actual)</div>
-                            <span class="diagram-arrow">↑ (Feedback)</span>
-                            <div class="component-box">Speed Sensor</div>
-                        </div>`,
-            solutionSteps: [
-                {
-                    title: "Overshoot in Robot Speed Control",
-                    content: `If the robot's control system exhibits **overshoot**, it means that when you command it to reach 1 m/s, its actual speed momentarily goes *above* 1 m/s (e.g., to 1.1 m/s) before coming back down to settle at 1 m/s. This is often depicted as a "peak" in the speed graph that exceeds the target.`
-                },
-                {
-                    title: "Importance of Overshoot",
-                    content: `Excessive overshoot can be problematic:
-                    <ul class="list-disc list-inside ml-4 mt-2">
-                        <li><strong>Safety:</strong> If the robot's speed briefly exceeds a safe limit, it could cause damage or harm.</li>
-                        <li><strong>Efficiency:</strong> Oscillating around the setpoint consumes more energy.</li>
-                        <li><strong>Precision:</strong> In tasks requiring smooth motion, overshoot indicates jerky or imprecise control.</li>
-                    </ul>`
-                },
-                {
-                    title: "Settling Time in Robot Speed Control",
-                    content: `**Settling time** is the duration it takes for the robot's speed to reach and stay within a narrow band (e.g., $\pm 2\%$ or $\pm 5\%$) of the desired 1 m/s speed. For instance, if the settling time is 2 seconds, it means that after 2 seconds, the robot's speed will be consistently between 0.98 m/s and 1.02 m/s.`
-                },
-                {
-                    title: "Importance of Settling Time",
-                    content: `Settling time is crucial because:
-                    <ul class="list-disc list-inside ml-4 mt-2">
-                        <li><strong>Productivity:</strong> In manufacturing or logistics, a shorter settling time means the robot can complete its task faster.</li>
-                        <li><strong>Smoothness:</strong> A very long settling time indicates a sluggish or poorly damped response, which might feel unresponsive to a user.</li>
-                        <li><strong>Stability:</strong> If the settling time is too long, the system might be close to instability or constantly oscillating.</li>
+              {/* Program Organization with Functions */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <FunctionIcon className="w-7 h-7 mr-3 text-purple-600"/>
+                    3. Program Organization with Functions
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Functions are blocks of code that perform a specific task. They help organize code, make it more readable, and promote reusability.
+                </p>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Definition:</span> Define a function to encapsulate a piece of logic.</li>
+                  <li><span className="font-medium">Calling a Function:</span> Execute the code within a function by calling its name.</li>
+                  <li><span className="font-medium">Parameters & Return Values:</span> Functions can accept inputs (parameters) and provide outputs (return values).</li>
+                  <li><span className="font-medium">Scope of Variables:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">Local Variables:</span> Declared inside a function; only accessible within that function.</li>
+                      <li><span className="font-medium">Global Variables:</span> Declared outside all functions; accessible by any function in the sketch.</li>
                     </ul>
-                    Both overshoot and settling time are critical performance metrics for evaluating and tuning the effectiveness of a control system.`
-                }
-            ]
-        }
-    }
-};
+                  </li>
+                </ul>
+              </section>
 
-const practiceProblems = [
-    {
-        id: 1,
-        title: "Open-Loop vs. Closed-Loop Identification",
-        problemHTML: `Classify the following systems as either Open-Loop or Closed-Loop control systems, and briefly explain your reasoning:
-        1. A traffic light system that changes lights based on a fixed timer.
-        2. A self-balancing robot that uses gyroscopes to stay upright.`,
-        answerHTML: `<b>Solution:</b><br>
-        1.  <strong>Traffic Light System (Fixed Timer): Open-Loop.</strong><br>
-            <strong>Reasoning:</strong> The traffic light operates solely on a predefined schedule (timer) regardless of actual traffic flow or density. It does not receive feedback from sensors (e.g., cameras or vehicle detectors) to adjust its timing based on demand. Its output (light sequence) is independent of the actual conditions (traffic queue length).<br><br>
-        2.  <strong>Self-Balancing Robot: Closed-Loop.</strong><br>
-            <strong>Reasoning:</strong> The robot continuously measures its tilt angle and angular velocity using gyroscopes and accelerometers (sensors providing feedback). If it detects a deviation from its upright position (error), its control system calculates and applies corrective torque to its wheels (actuators) to return to balance. The control action is directly dependent on the measured output (robot's balance).<br>
-        <div class="solution-box">1. Open-Loop; 2. Closed-Loop</div>`
-    },
-    {
-        id: 2,
-        title: "Role of Feedback",
-        problemHTML: `You are designing a robotic arm for a delicate assembly task that requires very precise positioning. Why is incorporating negative feedback into the arm's control system absolutely critical for achieving this precision?`,
-        answerHTML: `<b>Solution:</b><br>
-        Incorporating negative feedback is critical for precise positioning in a robotic arm for several reasons:
-        <ul class="list-disc list-inside ml-4 mt-2">
-            <li><strong>Error Correction:</strong> Without feedback, the arm would move a predetermined amount based on an open-loop command. However, factors like motor load, friction, temperature changes, or manufacturing imperfections would cause the arm to deviate from the desired position. Negative feedback constantly measures the actual position (e.g., using encoders), compares it to the desired position (setpoint), calculates the error, and then adjusts the motor commands to reduce that error.</li>
-            <li><strong>Disturbance Rejection:</strong> If an external force (a disturbance) slightly pushes the arm off course during the delicate task, the feedback system immediately detects this deviation and applies corrective action to bring it back to the setpoint. An open-loop system would not react to such disturbances.</li>
-            <li><strong>Improved Accuracy & Robustness:</strong> Feedback ensures that the arm actually reaches and maintains the target position, regardless of these internal and external variations. This makes the system highly accurate and robust to changing conditions, which is essential for delicate assembly.</li>
-        </ul>
-        <div class="solution-box">Negative feedback enables error correction, disturbance rejection, and improves accuracy/robustness for precise positioning.</div>`
-    },
-    {
-        id: 3,
-        title: "PID Term Effects",
-        problemHTML: `You are tuning a PID controller for a water heater to maintain a steady temperature.
-        1. If the heater consistently settles at 3°C below the desired temperature, which PID term would you adjust to eliminate this offset?
-        2. If the water temperature oscillates significantly above and below the desired temperature before finally settling, which PID term's gain might be too high, and which term would you increase to reduce these oscillations?`,
-        answerHTML: `<b>Solution:</b><br>
-        1.  To eliminate a consistent offset (steady-state error) where the heater settles below the desired temperature, you would adjust the **Integral (I) term**. The integral term accumulates past errors and will continue to increase its contribution until the error is driven to zero.<br><br>
-        2.  If the water temperature oscillates significantly, the **Proportional (P) term's gain ($K_p$)** might be too high, causing an aggressive response that overshoots the target. To reduce these oscillations and improve stability, you would increase the **Derivative (D) term's gain ($K_d$)**. The derivative term anticipates future error by reacting to the rate of change of error, providing a damping effect.<br>
-        <div class="solution-box">1. Integral (I); 2. P (too high), increase D.</div>`
-    }
-];
-
-const quizQuestions = [
-    {
-        id: 1,
-        question: "Which characteristic is typical of an open-loop control system?",
-        options: [
-            "High accuracy due to feedback.",
-            "Ability to reject disturbances.",
-            "Simpler design and lower cost.",
-            "More complex and expensive."
-        ],
-        answer: "Simpler design and lower cost.",
-        explanation: "Open-loop systems are simpler because they lack a feedback mechanism, making them less complex and generally more economical."
-    },
-    {
-        id: 2,
-        question: "What is the primary benefit of using negative feedback in a control system?",
-        options: [
-            "To amplify the output signal significantly.",
-            "To increase the system's sensitivity to noise.",
-            "To reduce the error between desired and actual output.",
-            "To cause sustained oscillations."
-        ],
-        answer: "To reduce the error between desired and actual output.",
-        explanation: "Negative feedback works to counteract deviations from the setpoint, thereby reducing the error and improving accuracy."
-    },
-    {
-        id: 3,
-        question: "Which term in a PID controller is responsible for eliminating steady-state error?",
-        options: [
-            "Proportional (P)",
-            "Integral (I)",
-            "Derivative (D)",
-            "Error (e)"
-        ],
-        answer: "Integral (I)",
-        explanation: "The Integral term accumulates past errors, ensuring that any persistent offset is eventually driven to zero."
-    },
-    {
-        id: 4,
-        question: "A control system's response temporarily exceeds its desired setpoint before settling. This phenomenon is called:",
-        options: [
-            "Rise time",
-            "Settling time",
-            "Steady-state error",
-            "Overshoot"
-        ],
-        answer: "Overshoot",
-        explanation: "Overshoot occurs when the system's output goes beyond the setpoint before stabilizing."
-    },
-    {
-        id: 5,
-        question: "What does a long 'settling time' indicate about a control system's response?",
-        options: [
-            "It is highly accurate.",
-            "It is unstable.",
-            "It takes a long time to stabilize around the setpoint.",
-            "It has zero steady-state error."
-        ],
-        answer: "It takes a long time to stabilize around the setpoint.",
-        explanation: "Settling time measures how long it takes for the system's output to reach and remain within a specified band around the final value. A long settling time means it takes a long time to stabilize."
-    }
-];
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    const navLinks = document.querySelectorAll('.nav-link');
-    const appSections = document.querySelectorAll('.app-section');
-    const conceptTabs = document.querySelectorAll('.concept-tab');
-    const conceptContentContainer = document.getElementById('concept-content');
-    
-    // Main navigation
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            const targetId = link.dataset.target;
-            appSections.forEach(section => {
-                section.classList.toggle('hidden', section.id !== targetId);
-            });
-            navLinks.forEach(l => l.classList.remove('font-bold', 'text-blue-600'));
-            link.classList.add('font-bold', 'text-blue-600');
-        });
-    });
-
-    // Concept tabs
-    conceptTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const conceptId = tab.dataset.concept;
-            conceptTabs.forEach(t => t.classList.remove('tab-active', 'border-blue-500', 'text-blue-600'));
-            tab.classList.add('tab-active', 'border-blue-500', 'text-blue-600');
-            renderConcept(conceptId);
-        });
-    });
-
-    function renderConcept(conceptId) {
-        const data = appData[conceptId];
-        if (!data) return;
-
-        let stepsHTML = data.steps.map(step => `<li class="mb-2">${step}</li>`).join('');
-        let exampleStepsHTML = data.example.solutionSteps.map((step, index) => `
-            <div id="step-${index}" class="step-content border-t pt-4 mt-4">
-                <h4 class="font-semibold text-lg text-blue-700">${step.title}</h4>
-                <div class="text-gray-700 mt-2">${step.content}</div>
+              {/* Introduction to Data Acquisition (DAQ) */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Database className="w-7 h-7 mr-3 text-red-600"/>
+                    4. Introduction to Data Acquisition (DAQ)
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Data Acquisition (DAQ) is the process of measuring real-world physical conditions and converting the resulting analog signals into digital values that a computer or microcontroller can analyze.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. The "Pipeline" of DAQ:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Physical Phenomenon / Measurand:</span> The quantity you want to measure (e.g., actual temperature).</li>
+                  <li><span className="font-medium">Sensor (Transducer):</span> Converts the physical quantity into an electrical signal (e.g., thermistor resistance changes to voltage).</li>
+                  <li><span className="font-medium">Signal Conditioning:</span> Modifies the sensor's electrical signal to make it suitable for the ADC (e.g., amplification, filtering, linearization). Op-Amps are often used here.</li>
+                  <li><span className="font-medium">Analog-to-Digital Converter (ADC):</span> Converts the conditioned analog signal into a digital value.</li>
+                  <li><span className="font-medium">Microcontroller/Computer:</span> Processes, analyzes, stores, and uses the digital data for control or display.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Sampling Theory (Conceptual):</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Sampling Rate:</span> How often the analog signal is converted to a digital value (samples per second).</li>
+                  <li><span className="font-medium">Nyquist-Shannon Sampling Theorem:</span> To accurately reconstruct an analog signal from its digital samples, the sampling rate must be at least twice the highest frequency component of the analog signal.</li>
+                  <li><span className="font-medium">Aliasing:</span> Occurs when the sampling rate is too low, causing higher frequencies in the analog signal to appear as lower frequencies in the sampled digital data, leading to incorrect readings.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">C. Data Representation and Resolution:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Resolution:</span> The smallest change in the analog input that the ADC can detect. Determined by the number of bits in the ADC (e.g., 10-bit ADC has $2^{10}=1024$ levels).</li>
+                  <li><span className="font-medium">Quantization Error:</span> The difference between the actual analog value and the closest digital value that the ADC can represent. Inherent in the conversion process.</li>
+                  <li><span className="font-medium">Averaging Multiple Samples:</span> A common technique to reduce the effect of random noise in sensor readings, providing a more stable and accurate measurement.</li>
+                </ul>
+              </section>
             </div>
-        `).join('');
+          );
+        };
 
-        conceptContentContainer.innerHTML = `
-            <h3 class="text-2xl font-bold text-gray-800">${data.title}</h3>
-            <p class="mt-2 mb-4 text-gray-600">${data.description}</p>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div>
-                    <h4 class="text-xl font-semibold mb-2">Key Concepts & Real-Life Application</h4>
-                    <ul class="list-decimal list-inside text-gray-700 space-y-1">${stepsHTML}</ul>
+        // Conditional Logic Sandbox
+        const ConditionalLogicSandbox = () => {
+          const [temperature, setTemperature] = useState(25);
+          const [lightLevel, setLightLevel] = useState(500);
+          const [outputMessage, setOutputMessage] = useState('');
+
+          useEffect(() => {
+            evaluateConditions();
+          }, [temperature, lightLevel]);
+
+          const evaluateConditions = () => {
+            let message = "System Status:\n";
+
+            // Example if-else if-else
+            if (temperature > 30) {
+              message += "  - Temperature: HIGH (Cooling System Active)\n";
+            } else if (temperature < 10) {
+              message += "  - Temperature: LOW (Heating System Active)\n";
+            } else {
+              message += "  - Temperature: NORMAL\n";
+            }
+
+            // Example switch-case (simplified for light levels)
+            let lightStatus;
+            if (lightLevel > 700) {
+              lightStatus = "BRIGHT";
+            } else if (lightLevel > 300) {
+              lightStatus = "MEDIUM";
+            } else {
+              lightStatus = "DIM";
+            }
+
+            switch (lightStatus) {
+              case "BRIGHT":
+                message += "  - Light: Bright (Dimming Lights)\n";
+                break;
+              case "MEDIUM":
+                message += "  - Light: Medium\n";
+                break;
+              case "DIM":
+                message += "  - Light: Dim (Turning on Lights)\n";
+                break;
+              default:
+                message += "  - Light: Unknown\n";
+                break;
+            }
+            setOutputMessage(message);
+          };
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Conditional Logic Simulator</h2>
+              <p className="text-gray-700 mb-4">
+                Adjust the sensor values and observe how the system status changes based on conditional statements.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="temperatureInput" className="text-lg font-medium text-gray-700 mb-2">Temperature (°C): {temperature}</label>
+                  <input
+                    type="range"
+                    id="temperatureInput"
+                    min="0"
+                    max="40"
+                    value={temperature}
+                    onChange={(e) => setTemperature(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
                 </div>
+
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="lightLevelInput" className="text-lg font-medium text-gray-700 mb-2">Light Level (0-1023 ADC): {lightLevel}</label>
+                  <input
+                    type="range"
+                    id="lightLevelInput"
+                    min="0"
+                    max="1023"
+                    value={lightLevel}
+                    onChange={(e) => setLightLevel(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-md font-semibold whitespace-pre-wrap">
+                {outputMessage}
+              </div>
+            </div>
+          );
+        };
+
+
+        // Practice Problems Component
+        const PracticeProblems = () => {
+          const [activeTab, setActiveTab] = useState('homework');
+
+          const homeworkQuestions = [
+            {
+              id: 1,
+              type: 'text',
+              question: 'Explain the difference between the `for` loop and the `while` loop in Arduino programming, and provide a scenario where each would be more appropriate.',
+              answer: 'The `for` loop is typically used when you know in advance how many times you want to repeat a block of code (e.g., iterating a fixed number of times). Example scenario: Blinking an LED 5 times. The `while` loop is used when you want to repeat a block of code as long as a certain condition remains true (e.g., repeating until a sensor reads a specific value). Example scenario: Waiting for a button to be pressed.',
+              explanation: 'The `for` loop is count-controlled, making it ideal for definite iterations. The `while` loop is condition-controlled, making it suitable for indefinite iterations where the loop continues until a specific state is met.'
+            },
+            {
+              id: 2,
+              type: 'text',
+              question: 'What is the primary benefit of using functions in your Arduino code? Illustrate with a simple example of a function definition and call.',
+              answer: 'The primary benefit of using functions is to organize code, improve readability, and promote reusability. Functions break down complex programs into smaller, manageable, and self-contained modules.\n\nExample:\n```cpp\nvoid blinkLED(int pinNumber, int delayTime) {\n  digitalWrite(pinNumber, HIGH);\n  delay(delayTime);\n  digitalWrite(pinNumber, LOW);\n  delay(delayTime);\n}\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  blinkLED(13, 500); // Call the function to blink LED on pin 13 with 500ms delay\n  // Other code...\n}\n```',
+              explanation: 'Functions allow you to write a block of code once and reuse it multiple times, reducing redundancy and making the code easier to understand and debug. The example shows a `blinkLED` function that takes pin number and delay time as parameters, making it versatile.'
+            },
+            {
+              id: 3,
+              type: 'multiple_choice',
+              question: 'Which component is responsible for converting an analog signal into a digital signal in a DAQ system?',
+              options: ['A) Sensor', 'B) Actuator', 'C) Analog-to-Digital Converter (ADC)', 'D) Digital-to-Analog Converter (DAC)'],
+              correctAnswer: 'C) Analog-to-Digital Converter (ADC)',
+              explanation: 'The ADC is specifically designed to convert continuous analog signals (like voltage from a sensor) into discrete digital values that a microcontroller can understand and process. Sensors convert physical phenomena to electrical signals, and actuators convert electrical signals to physical actions.'
+            },
+            {
+              id: 4,
+              type: 'text',
+              question: 'You are reading data from a noisy temperature sensor. What common data acquisition technique can you use to improve the stability and accuracy of your temperature readings?',
+              answer: 'Averaging multiple samples is a common technique to improve the stability and accuracy of readings from a noisy sensor. By taking several consecutive readings and calculating their average, the random fluctuations (noise) tend to cancel each other out, providing a more stable and accurate representation of the true value.',
+              explanation: 'Noise is inherent in many sensor readings. Averaging helps to smooth out these random variations, effectively increasing the signal-to-noise ratio and giving a more reliable measurement. This is a simple yet effective digital filtering technique.'
+            },
+            {
+              id: 5,
+              type: 'text',
+              question: 'Consider a scenario where you need to turn on an LED if a light sensor reading is below a certain threshold AND a motion sensor detects movement. Write an `if` statement for this logic in Arduino C++ syntax.',
+              answer: '```cpp\nint lightSensorValue = analogRead(A0); // Assuming light sensor on A0\nint motionSensorState = digitalRead(2); // Assuming motion sensor on digital pin 2\n\nconst int LIGHT_THRESHOLD = 200; // Example threshold for dim light\n\nif (lightSensorValue < LIGHT_THRESHOLD && motionSensorState == HIGH) {\n  // Turn on LED or perform action\n  digitalWrite(13, HIGH); // Assuming LED on pin 13\n}\nelse {\n  digitalWrite(13, LOW); // Turn off LED\n}\n```',
+              explanation: 'This `if` statement uses the logical AND operator (`&&`) to combine two conditions: the `lightSensorValue` being below a `LIGHT_THRESHOLD` (indicating dim light) AND the `motionSensorState` being `HIGH` (indicating motion). Both must be true for the LED to turn on. The `else` block ensures the LED is off if the conditions are not met.'
+            }
+          ];
+
+          const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
+
+          const handleHomeworkChange = (id, value) => {
+            setHomeworkAnswers(prev => ({
+              ...prev,
+              [id]: value
+            }));
+          };
+
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
+
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
+            });
+            setQuizResults(newResults);
+          };
+
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
+
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
+
+              <div className="flex mb-6 space-x-4">
+                <button
+                  onClick={() => setActiveTab('homework')}
+                  className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+                    activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Homework Questions
+                </button>
+              </div>
+
+              {activeTab === 'homework' && (
                 <div>
-                    <h4 class="text-xl font-semibold mb-2">Interactive Example: ${data.example.problem}</h4>
-                    ${data.example.circuitHTML || ''}
-                    <div id="example-steps-container">${exampleStepsHTML}</div>
-                    <div class="mt-4 flex space-x-2">
-                         <button id="next-step-btn" class="btn">Start</button>
-                         <button id="reset-steps-btn" class="btn btn-secondary">Reset</button>
+                  <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-blue-500"/>
+                    Homework Questions
+                  </h3>
+                  <p className="text-gray-700 mb-4">
+                    Instructions: Show all work and steps clearly.
+                  </p>
+                  {homeworkQuestions.map((q) => (
+                    <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+                      {q.type === 'text' ? (
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                          placeholder="Type your answer here..."
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
+                        ></textarea>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                              />
+                              <span className="ml-2">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
+                        </div>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
+                        </div>
+                      )}
+                      <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                        <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                        <div className="mt-2 text-indigo-700">
+                          <p className="whitespace-pre-wrap">{q.explanation}</p>
+                        </div >
+                      </details>
                     </div>
+                  ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
                 </div>
-            </div>`;
-        
-        setupInteractiveExample();
-    }
-    
-    let currentStep = -1;
-    function setupInteractiveExample() {
-        const nextBtn = document.getElementById('next-step-btn');
-        const resetBtn = document.getElementById('reset-steps-btn');
-        const steps = document.querySelectorAll('.step-content');
-        currentStep = -1;
-
-        const showNextStep = () => {
-            if (currentStep >= 0) {
-                steps[currentStep].classList.remove('visible');
-            }
-            currentStep++;
-            if (currentStep < steps.length) {
-                steps[currentStep].classList.add('visible');
-                nextBtn.textContent = 'Next Step';
-            }
-            if (currentStep >= steps.length - 1) {
-                nextBtn.disabled = true;
-                nextBtn.textContent = 'Finished';
-            }
+              )}
+            </div>
+          );
         };
 
-        const resetSteps = () => {
-            steps.forEach(step => step.classList.remove('visible'));
-            currentStep = -1;
-            nextBtn.disabled = false;
-            nextBtn.textContent = 'Start';
+
+        // Main App Component
+        const App = () => {
+          const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
+
+          return (
+            <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+              <header className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+                  Mechatronics 1 Study Guide
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 8: Control Flow, Functions & Data Acquisition (DAQ)</p>
+                <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                    <Home className="w-5 h-5 mr-2" />
+                    Back to Course Hub
+                </a>
+              </header>
+
+              <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+                <button
+                  onClick={() => setActiveSection('review')}
+                  className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+                >
+                  <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Concept Review</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('sandbox')}
+                  className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+                >
+                  <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Interactive Sandbox</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('practice')}
+                  className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Practice Problems</span>
+                </button>
+              </nav>
+
+              <main className="container">
+                {activeSection === 'review' && <ConceptReview />}
+                {activeSection === 'sandbox' && <ConditionalLogicSandbox />}
+                {activeSection === 'practice' && <PracticeProblems />}
+              </main>
+
+              <footer className="text-center text-gray-500 text-sm mt-12">
+                <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+              </footer>
+            </div>
+          );
         };
 
-        nextBtn.addEventListener('click', showNextStep);
-        resetBtn.addEventListener('click', resetSteps);
-    }
-    
-    function renderPracticeProblems() {
-        const container = document.getElementById('practice-problems-container');
-        container.innerHTML = practiceProblems.map(p => `
-            <div class="border rounded-lg p-4">
-                <h4 class="text-lg font-semibold">${p.title}</h4>
-                <p class="mt-2 text-gray-700">${p.problemHTML}</p>
-                <div id="answer-${p.id}" class="mt-4 p-4 bg-blue-50 rounded hidden">
-                   ${p.answerHTML}
-                </div>
-                <button data-answer-id="${p.id}" class="toggle-answer-btn btn mt-4 text-sm">Show Answer</button>
-            </div>
-        `).join('');
-
-        document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const answerId = btn.dataset.answerId;
-                const answerEl = document.getElementById(`answer-${answerId}`);
-                answerEl.classList.toggle('hidden');
-                btn.textContent = answerEl.classList.contains('hidden') ? 'Show Answer' : 'Hide Answer';
-            });
-        });
-    }
-
-    function renderQuiz() {
-        const container = document.getElementById('quiz-container');
-        container.innerHTML = quizQuestions.map((q, index) => `
-            <div class="border rounded-lg p-4">
-                <h4 class="text-lg font-semibold mb-3">Q${index + 1}: ${q.question}</h4>
-                <div class="space-y-2">
-                    ${q.options.map((option, optIndex) => `
-                        <label class="block">
-                            <input type="radio" name="quiz-q${q.id}" value="${option}" class="mr-2">
-                            ${option}
-                        </label>
-                    `).join('')}
-                </div>
-                <button data-question-id="${q.id}" class="check-quiz-btn btn mt-4 text-sm">Check Answer</button>
-                <div id="quiz-feedback-${q.id}" class="mt-3 text-sm font-semibold"></div>
-            </div>
-        `).join('');
-
-        document.querySelectorAll('.check-quiz-btn').forEach(btn => {
-            btn.addEventListener('click', (event) => {
-                const questionId = btn.dataset.questionId;
-                const selectedOption = document.querySelector(`input[name="quiz-q${questionId}"]:checked`);
-                const feedbackEl = document.getElementById(`quiz-feedback-${questionId}`);
-                const question = quizQuestions.find(q => q.id == questionId);
-
-                if (!selectedOption) {
-                    feedbackEl.innerHTML = `<span class="text-yellow-600">Please select an option.</span>`;
-                    return;
-                }
-
-                if (selectedOption.value === question.answer) {
-                    feedbackEl.innerHTML = `<span class="text-green-600">Correct!</span> ${question.explanation}`;
-                } else {
-                    feedbackEl.innerHTML = `<span class="text-red-600">Incorrect.</span> The correct answer is: <strong>${question.answer}</strong>. ${question.explanation}`;
-                }
-            });
-        });
-    }
-
-    // --- Sandbox Logic for Motor Speed Control Simulation ---
-    const setpointSlider = document.getElementById('setpoint-slider');
-    const setpointValueDisplay = document.getElementById('setpoint-value');
-    const actualSpeedValueDisplay = document.getElementById('actual-speed-value');
-    const errorValueDisplay = document.getElementById('error-value');
-    const controlOutputValueDisplay = document.getElementById('control-output-value');
-    const pseudoCodeDisplay = document.getElementById('pseudo-code-display');
-    const motorVisual = document.getElementById('motor-visual');
-    const motorAnimationStatus = document.getElementById('motor-animation-status');
-
-    const pseudoCode = `// PID (Proportional) Motor Speed Control Pseudo-Code
-
-// Controller gains (tuned for simulation)
-const Kp = 0.5; // Proportional gain
-
-// Simulation variables
-let desiredSpeed = 0; // RPM (Setpoint)
-let actualSpeed = 0;  // RPM (Process Variable)
-let error = 0;        // Error = desiredSpeed - actualSpeed
-let controlOutput = 0; // Motor Power (%)
-
-function setup() {
-  // Initialize communication, motor driver, encoder (simulated)
-  // ...
-}
-
-function loop() {
-  // 1. Read Setpoint (from user slider)
-  desiredSpeed = readSetpoint();
-
-  // 2. Read Actual Speed (from simulated encoder/sensor)
-  // In simulation, this will slowly approach target based on controlOutput
-  actualSpeed = simulateMotorDynamics(controlOutput, actualSpeed);
-
-  // 3. Calculate Error
-  error = desiredSpeed - actualSpeed;
-
-  // 4. Calculate Control Output (P-controller logic)
-  controlOutput = Kp * error;
-
-  // Clamp control output to realistic motor power limits (0-100%)
-  if (controlOutput > 100) controlOutput = 100;
-  if (controlOutput < 0) controlOutput = 0; // Motor only spins one way
-
-  // 5. Apply Control Output to Actuator (simulated motor)
-  applyMotorPower(controlOutput);
-
-  // Update display values
-  updateDisplays();
-
-  // Small delay for simulation loop
-  delay(100); 
-}`;
-
-    // Simulation variables
-    let desiredSpeed = 50; // RPM (Setpoint)
-    let actualSpeed = 0;  // RPM (Process Variable)
-    const Kp = 0.1; // Proportional gain for simulation
-
-    // Simulate motor dynamics (very simplified)
-    function simulateMotorDynamics(power, currentSpeed) {
-        // Higher power increases speed faster
-        // Speed will slowly decay if power is low
-        const acceleration = power * 0.05; // Adjust this for simulation speed
-        const decay = 0.02; // How fast motor slows down naturally
-
-        let newSpeed = currentSpeed + acceleration - decay * currentSpeed;
-
-        // Ensure speed doesn't exceed desired unless actively overshooting
-        if (newSpeed > desiredSpeed + 5 && power < 10) { // Simulate settling behavior
-            newSpeed -= 0.5;
-        }
-
-        if (newSpeed < 0) newSpeed = 0;
-        if (newSpeed > 100) newSpeed = 100; // Max speed for simulation
-
-        return newSpeed;
-    }
-
-    let simulationInterval;
-
-    function updateSimulationOutputs() {
-        // Read desired speed from slider
-        desiredSpeed = parseInt(setpointSlider.value);
-        setpointValueDisplay.textContent = `Desired: ${desiredSpeed} RPM`;
-
-        // Calculate error
-        let error = desiredSpeed - actualSpeed;
-        errorValueDisplay.textContent = error.toFixed(1) + ' RPM';
-        errorValueDisplay.className = error === 0 ? 'text-green-600' : 'text-red-600';
-
-
-        // Calculate control output (P-controller)
-        let controlOutput = Kp * error;
-
-        // Clamp control output to realistic motor power limits (0-100%)
-        if (controlOutput > 100) controlOutput = 100;
-        if (controlOutput < 0) controlOutput = 0; // Motor only spins one way
-
-        controlOutputValueDisplay.textContent = controlOutput.toFixed(1) + ' %';
-
-        // Update actual speed based on control output
-        actualSpeed = simulateMotorDynamics(controlOutput, actualSpeed);
-        actualSpeedValueDisplay.textContent = actualSpeed.toFixed(1) + ' RPM';
-
-        // Update motor visual based on actual speed
-        const animationSpeed = actualSpeed / 100; // Normalize to 0-1 for animation
-        if (actualSpeed > 0.5) {
-            motorVisual.classList.remove('stopped');
-            motorVisual.style.animationDuration = `${2 / animationSpeed}s`; // Faster for higher speed
-            motorAnimationStatus.textContent = `Spinning (${actualSpeed.toFixed(1)} RPM)`;
-        } else {
-            motorVisual.classList.add('stopped');
-            motorVisual.style.animationDuration = `0s`;
-            motorAnimationStatus.textContent = `Stopped`;
-        }
-    }
-
-    setpointSlider.addEventListener('input', () => {
-        // Stop and restart simulation if setpoint changes to allow for fresh response
-        if (simulationInterval) {
-            clearInterval(simulationInterval);
-            actualSpeed = actualSpeed; // Keep current speed for smooth transition
-        }
-        simulationInterval = setInterval(updateSimulationOutputs, 100); // Update every 100ms
-    });
-
-    // Initial setup
-    document.querySelector('.nav-link[data-target="concepts"]').click(); // Activate 'Concepts' tab by default
-    document.querySelector('.concept-tab[data-concept="intro_control"]').click(); // Activate first concept tab by default
-    renderPracticeProblems(); // Render practice problems
-    renderQuiz(); // Render quiz questions
-    pseudoCodeDisplay.textContent = pseudoCode; // Display pseudo-code initially
-
-    // Start initial simulation
-    simulationInterval = setInterval(updateSimulationOutputs, 100);
-});
-</script>
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 </body>
 </html>
