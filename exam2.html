@@ -123,364 +123,675 @@
             <!-- Question 1 -->
             <div class="question-card">
                 <p class="question-text">
-                    1. In the context of digital electronics, how are logical '1' and '0' states typically represented?
+                    1. In digital systems, information is typically represented using discrete states, commonly referred to as HIGH and LOW. True or False?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>In digital systems, logical '1' and '0' states are typically represented by two discrete voltage levels, commonly referred to as HIGH and LOW, respectively.</p>
+                    <p>The correct answer is <b>True</b>. Digital systems operate on binary logic, representing information with distinct high and low voltage levels.</p>
                 </details>
             </div>
 
             <!-- Question 2 -->
             <div class="question-card">
                 <p class="question-text">
-                    2. A compact integrated circuit that functions as a complete computer system, including a processor, memory, and programmable input/output capabilities, is best described as a:
+                    2. A ________ is a complete computer system on a single integrated circuit, containing a processor, memory, and programmable input/output peripherals, making it ideal for embedded applications.
                 </p>
-                <ul class="options-list">
-                    <li>a) Microprocessor</li>
-                    <li>b) Microcontroller</li>
-                    <li>c) FPGA</li>
-                    <li>d) ASIC</li>
-                </ul>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>The correct answer is <b>b) Microcontroller</b>. Microcontrollers are designed for embedded applications where a compact, self-contained computing solution is needed.</p>
+                    <p>The correct answer is <b>microcontroller</b>. Microcontrollers are designed for specific control tasks in embedded systems.</p>
                 </details>
             </div>
 
             <!-- Question 3 -->
             <div class="question-card">
                 <p class="question-text">
-                    3. What is the primary role of the `setup()` function in an Arduino sketch, and how does it differ from the `loop()` function?
+                    3. In an Arduino sketch, the `loop()` function is primarily used for which purpose?
                 </p>
+                <ul class="options-list">
+                    <li>a) To set up initial pin modes and serial communication.</li>
+                    <li>b) To execute code continuously after initialization.</li>
+                    <li>c) To declare global variables.</li>
+                    <li>d) To define custom functions.</li>
+                </ul>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>The `setup()` function in an Arduino sketch is used for initialization tasks that need to run only once when the program starts. This includes setting pin modes (INPUT/OUTPUT), initializing serial communication, and setting up initial variable values. The `loop()` function, in contrast, contains the main program logic that runs continuously and repeatedly after `setup()` has completed.</p>
+                    <p>The correct answer is <b>b) To execute code continuously after initialization</b>. The `loop()` function runs repeatedly, making it suitable for continuous sensing, processing, and actuating tasks.</p>
                 </details>
             </div>
 
             <!-- Question 4 -->
             <div class="question-card">
                 <p class="question-text">
-                    4. An Analog-to-Digital Converter (ADC) serves what fundamental purpose in a mechatronic system?
+                    4. What is the process of converting a continuous analog signal into a discrete digital representation?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>An ADC's fundamental purpose is to convert continuous, real-world analog signals (like temperature, pressure, or light intensity) into discrete digital values that a microcontroller or digital system can understand and process.</p>
+                    <p>The correct answer is <b>Analog-to-Digital Conversion (ADC)</b>.</p>
                 </details>
             </div>
 
             <!-- Question 5 -->
             <div class="question-card">
                 <p class="question-text">
-                    5. Explain how Pulse Width Modulation (PWM) can be used to achieve an effect similar to an analog output from a digital pin.
+                    5. The resolution of an Analog-to-Digital Converter (ADC) refers to:
                 </p>
+                <ul class="options-list">
+                    <li>a) The speed at which it converts signals.</li>
+                    <li>b) The number of discrete digital values it can produce.</li>
+                    <li>c) The maximum input voltage it can handle.</li>
+                    <li>d) Its ability to filter out noise.</li>
+                </ul>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>PWM approximates an analog output by rapidly switching a digital signal (e.g., 5V or 0V) ON and OFF at a high frequency. By varying the "duty cycle" (the proportion of ON time to the total period), the average voltage output changes. For example, a 50% duty cycle on a 5V signal will yield an average of 2.5V, effectively simulating an analog voltage.</p>
+                    <p>The correct answer is <b>b) The number of discrete digital values it can produce</b>. Higher resolution means more distinct digital levels to represent the analog input.</p>
                 </details>
             </div>
 
             <!-- Question 6 -->
             <div class="question-card">
                 <p class="question-text">
-                    6. What type of programming construct allows a program to make decisions and execute different blocks of code based on whether certain conditions are met?
+                    6. According to the Nyquist-Shannon sampling theorem, what is the minimum sampling rate required to accurately reconstruct a signal with a maximum frequency component of $F_{max}$?
                 </p>
-                <ul class="options-list">
-                    <li>a) Loop structures (e.g., `for`, `while`)</li>
-                    <li>b) Function definitions</li>
-                    <li>c) Conditional statements (e.g., `if`, `else if`, `else`)</li>
-                    <li>d) Variable declarations</li>
-                </ul>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>The correct answer is <b>c) Conditional statements (e.g., `if`, `else if`, `else`)</b>. These statements control the flow of execution based on the evaluation of boolean expressions.</p>
+                    <p>The correct answer is <b>at least $2 \times F_{max}$ (twice the maximum frequency)</b>. This minimum rate is known as the Nyquist rate.</p>
                 </details>
             </div>
 
             <!-- Question 7 -->
             <div class="question-card">
                 <p class="question-text">
-                    7. Which looping construct is most appropriate when you need to ensure a block of code executes at least once, and then continues to repeat as long as a specified condition remains true?
+                    7. Pulse Width Modulation (PWM) is a technique used to achieve an average analog voltage output from a digital pin by varying the:
                 </p>
                 <ul class="options-list">
-                    <li>a) `for` loop</li>
-                    <li>b) `while` loop</li>
-                    <li>c) `do-while` loop</li>
-                    <li>d) `switch` statement</li>
+                    <li>a) Frequency of the digital signal.</li>
+                    <li>b) Amplitude of the digital signal.</li>
+                    <li>c) Duty cycle of the digital signal.</li>
+                    <li>d) Phase of the digital signal.</li>
                 </ul>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>The correct answer is <b>c) `do-while` loop</b>. The `do-while` loop executes its block of code at least once before checking the condition, making it suitable for scenarios where an initial execution is always required.</p>
+                    <p>The correct answer is <b>c) Duty cycle of the digital signal</b>. By changing the proportion of time the signal is HIGH versus LOW, the average voltage can be controlled.</p>
                 </details>
             </div>
 
             <!-- Question 8 -->
             <div class="question-card">
                 <p class="question-text">
-                    8. Discuss the advantages of using functions or subroutines in programming for complex mechatronic systems.
+                    8. Which of the following Arduino functions is used to set a digital pin as either an INPUT or an OUTPUT?
                 </p>
+                <ul class="options-list">
+                    <li>a) `digitalWrite()`</li>
+                    <li>b) `analogRead()`</li>
+                    <li>c) `pinMode()`</li>
+                    <li>d) `Serial.begin()`</li>
+                </ul>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>Breaking down a large program into smaller, reusable functions offers several advantages:
-                        <br>1.  <b>Modularity:</b> Each function performs a specific task, making the code easier to understand and manage.
-                        <br>2.  <b>Reusability:</b> Functions can be called multiple times from different parts of the program, reducing code duplication.
-                        <br>3.  <b>Readability:</b> Well-named functions make the program's logic clearer.
-                        <br>4.  <b>Debugging:</b> Isolating issues to specific functions simplifies the debugging process.
-                        <br>5.  <b>Collaboration:</b> Multiple developers can work on different functions simultaneously.</p>
+                    <p>The correct answer is <b>c) `pinMode()`</b>. This function configures the direction of a specified pin.</p>
                 </details>
             </div>
 
             <!-- Question 9 -->
             <div class="question-card">
                 <p class="question-text">
-                    9. What is the primary function of a Data Acquisition (DAQ) system in an experimental setup?
+                    9. True or False: The `if` statement in Arduino programming allows a block of code to execute only if a specified condition is true.
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>The primary function of a Data Acquisition (DAQ) system is to collect real-world physical signals (e.g., temperature, pressure, force) from sensors, convert these analog signals into digital data, and then process, analyze, or store this digital information, often for monitoring or control purposes.</p>
+                    <p>The correct answer is <b>True</b>. `if` statements are fundamental for implementing conditional logic.</p>
                 </details>
             </div>
 
             <!-- Question 10 -->
             <div class="question-card">
                 <p class="question-text">
-                    10. According to the Nyquist-Shannon sampling theorem, if an analog signal has a maximum frequency component of $F_{max}$, what is the minimum sampling rate required to avoid aliasing?
+                    10. Which type of loop is best suited for iterating a known number of times?
                 </p>
+                <ul class="options-list">
+                    <li>a) `while` loop</li>
+                    <li>b) `do-while` loop</li>
+                    <li>c) `for` loop</li>
+                    <li>d) `if-else` statement</li>
+                </ul>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>According to the Nyquist-Shannon sampling theorem, the minimum sampling rate (often called the Nyquist rate) must be at least <b>twice</b> the highest frequency component ($F_{max}$) of the analog signal. So, Sampling Rate $\ge 2 \times F_{max}$.</p>
+                    <p>The correct answer is <b>c) `for` loop</b>. `for` loops are designed for definite iteration where the number of repetitions is predetermined.</p>
                 </details>
             </div>
 
             <!-- New Conceptual Question 11 -->
             <div class="question-card">
                 <p class="question-text">
-                    11. What is the main difference between a digital signal and an analog signal?
+                    11. What is the binary representation of the decimal number 13?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>An <b>analog signal</b> is continuous and can take on any value within a given range, often varying smoothly over time (e.g., temperature, sound waves). A <b>digital signal</b> is discrete, meaning it can only take on a finite number of distinct values, typically represented by binary states (e.g., HIGH/LOW, 1/0).</p>
+                    <p>The correct answer is <b>1101<sub>2</sub></b>. (8 + 4 + 0 + 1 = 13)</p>
                 </details>
             </div>
 
             <!-- New Conceptual Question 12 -->
             <div class="question-card">
                 <p class="question-text">
-                    12. Explain the concept of "resolution" in the context of an Analog-to-Digital Converter (ADC).
+                    12. What is the purpose of the `Serial.begin()` function in Arduino programming?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>The <b>resolution</b> of an ADC refers to the smallest change in the analog input voltage that can be detected and converted into a unique digital output value. It is determined by the number of bits the ADC uses (e.g., an 8-bit ADC has 2<sup>8</sup> = 256 discrete levels). Higher resolution means finer granularity in the conversion.</p>
+                    <p>The `Serial.begin()` function initializes serial communication between the Arduino board and a computer (or other serial device) at a specified baud rate. This allows the Arduino to send and receive data via the USB port for debugging or communication purposes.</p>
                 </details>
             </div>
 
             <!-- New Conceptual Question 13 -->
             <div class="question-card">
                 <p class="question-text">
-                    13. What is the purpose of a "pull-up" or "pull-down" resistor when connecting a switch to a microcontroller input pin?
+                    13. Explain the concept of "mapping" or "scaling" in Arduino, particularly when dealing with analog sensor readings.
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>Pull-up or pull-down resistors are used to ensure that a microcontroller input pin has a defined logical state (HIGH or LOW) when a switch is open. Without them, the pin would be "floating" and susceptible to electrical noise, leading to unpredictable readings. A pull-up resistor connects the pin to VCC (HIGH), while a pull-down resistor connects it to GND (LOW).</p>
+                    <p>Mapping (or scaling) in Arduino refers to converting a value from one range of numbers to another range. For analog sensor readings, this is often used to transform the raw ADC values (e.g., 0-1023) into a more meaningful physical unit or a different output range (e.g., 0-255 for LED brightness, or actual temperature in Celsius). The `map()` function in Arduino is commonly used for this purpose.</p>
                 </details>
             </div>
 
             <!-- New Conceptual Question 14 -->
             <div class="question-card">
                 <p class="question-text">
-                    14. Describe a scenario where a `while` loop would be more appropriate than a `for` loop in an Arduino program.
+                    14. What is the main difference between a microcontroller and a general-purpose computer (like a desktop PC)?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>A `while` loop is more appropriate when the number of iterations is not known beforehand, and the loop needs to continue as long as a certain condition remains true. For example, reading a sensor until a specific threshold is reached, or waiting for a serial input character. A `for` loop is typically used when the number of iterations is fixed or predetermined.</p>
+                    <p>A microcontroller is designed for specific control tasks in embedded systems, typically with limited resources (CPU, memory) and optimized for real-time interaction with hardware. A general-purpose computer is designed for a wide range of tasks, with more powerful processors, larger memory, and extensive operating systems, focusing on flexibility and user interaction rather than direct hardware control.</p>
                 </details>
             </div>
 
             <!-- New Conceptual Question 15 -->
             <div class="question-card">
                 <p class="question-text">
-                    15. What is the significance of "baud rate" in serial communication, such as with an Arduino's Serial Monitor?
+                    15. True or False: A Digital-to-Analog Converter (DAC) converts a continuous analog signal into a discrete digital signal.
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>Baud rate in serial communication refers to the rate at which information is transferred in symbols per second. In simple terms, it's the speed of data transmission. For successful communication between two devices (e.g., Arduino and a computer's Serial Monitor), both must be configured to the same baud rate, otherwise, the data will be corrupted and unreadable.</p>
+                    <p>The correct answer is <b>False</b>. A DAC performs the opposite function: it converts a discrete digital signal into a continuous analog signal.</p>
                 </details>
             </div>
 
             <!-- New Conceptual Question 16 -->
             <div class="question-card">
                 <p class="question-text">
-                    16. Explain the concept of "sampling rate" in data acquisition and why it is important.
+                    16. What is the significance of the "baud rate" in serial communication?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>Sampling rate is the number of samples taken per second from a continuous analog signal to convert it into a discrete digital signal. It is crucial because if the sampling rate is too low (less than twice the highest frequency in the signal, as per Nyquist-Shannon theorem), a phenomenon called "aliasing" occurs, where higher frequencies in the original signal appear as lower, incorrect frequencies in the sampled data, leading to distorted or inaccurate representation.</p>
+                    <p>The baud rate defines the speed at which data is transmitted serially, measured in bits per second (bps). It is crucial that both the transmitting and receiving devices are configured to the same baud rate for successful and intelligible communication.</p>
                 </details>
             </div>
 
             <!-- New Conceptual Question 17 -->
             <div class="question-card">
                 <p class="question-text">
-                    17. What is the role of a Digital-to-Analog Converter (DAC) in a mechatronic system, and provide an example of its application.
+                    17. Explain why "floating" digital input pins on a microcontroller can lead to unpredictable behavior.
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>A Digital-to-Analog Converter (DAC) converts digital signals (e.g., from a microcontroller) back into analog signals (e.g., varying voltage or current). Its role is to provide a continuous, real-world output from digital instructions. An example application is controlling the speed of a DC motor with variable voltage, where the microcontroller outputs digital values that the DAC converts into a smooth analog voltage to drive the motor.</p>
+                    <p>A "floating" digital input pin is one that is not connected to a defined voltage (HIGH or LOW). Such a pin is highly susceptible to electromagnetic interference (EMI) or static electricity, causing it to randomly switch between HIGH and LOW states. This unpredictable behavior can lead to erroneous readings and unintended actions in a microcontroller program. Pull-up or pull-down resistors are used to prevent floating states.</p>
                 </details>
             </div>
 
             <!-- New Conceptual Question 18 -->
             <div class="question-card">
                 <p class="question-text">
-                    18. What is a "boolean" data type in programming, and what values can it hold?
+                    18. What is the purpose of the `delay()` function in Arduino programming?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>A "boolean" data type is a fundamental data type in programming that can represent only two possible truth values: `true` or `false`. It is commonly used for logical operations and conditional statements to control program flow.</p>
+                    <p>The `delay()` function pauses the program for a specified number of milliseconds. It is used to introduce timed delays in the execution flow, which can be useful for blinking LEDs, waiting for sensor stabilization, or timing sequences of actions. However, it blocks other code from running during the delay.</p>
                 </details>
             </div>
 
             <!-- New Conceptual Question 19 -->
             <div class="question-card">
                 <p class="question-text">
-                    19. Explain the concept of "mapping" or "scaling" in programming, particularly when dealing with sensor inputs and actuator outputs.
+                    19. What is the difference between `digitalWrite()` and `analogWrite()` in Arduino?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>"Mapping" or "scaling" in programming refers to the process of converting a range of input values from one scale to a corresponding range of output values on another scale. This is essential when a sensor (e.g., an analog temperature sensor) outputs values in one range (e.g., 0-1023 from an ADC), but an actuator (e.g., an LED brightness control) requires values in a different range (e.g., 0-255 for PWM). Mapping ensures the sensor's input can effectively control the actuator's behavior.</p>
+                    <p><b>`digitalWrite()`</b> is used to set a digital pin to either a HIGH (5V/3.3V) or LOW (0V) state. It's for binary outputs.
+                    <br><b>`analogWrite()`</b> (for PWM pins) is used to generate a Pulse Width Modulation signal, effectively producing an "analog-like" output by varying the duty cycle of a square wave. It takes a value from 0-255 to control the average voltage.</p>
                 </details>
             </div>
 
             <!-- New Conceptual Question 20 -->
             <div class="question-card">
                 <p class="question-text">
-                    20. What is the purpose of comments in programming code, and why are they considered good practice?
+                    20. Explain the concept of "overflow" in digital systems when dealing with numerical data.
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>Comments are non-executable lines of text within code that are used to explain what the code does, why it does it, and how it works. They are good practice because they improve code readability, making it easier for others (and your future self) to understand, maintain, and debug the program. They do not affect the program's execution or performance.</p>
+                    <p>Overflow occurs when a calculation or operation produces a result that is too large to be represented by the available number of bits or data type. For example, if an 8-bit unsigned integer can hold values from 0 to 255, adding 1 to 255 would cause an overflow, typically resulting in the value wrapping around to 0.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 21 -->
+            <div class="question-card">
+                <p class="question-text">
+                    21. What is the hexadecimal representation of the binary number 11110000<sub>2</sub>?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Group the binary number into 4-bit nibbles: 1111 0000.
+                    <br>1111<sub>2</sub> = F<sub>16</sub>
+                    <br>0000<sub>2</sub> = 0<sub>16</sub>
+                    <br>So, the correct answer is <b>F0<sub>16</sub></b>.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 22 -->
+            <div class="question-card">
+                <p class="question-text">
+                    22. How does the `const` keyword affect a variable in Arduino programming?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The `const` keyword declares a variable as "constant," meaning its value cannot be changed after it has been initialized. This is useful for defining pin numbers or fixed parameters that should not be accidentally modified during program execution, improving code robustness and readability.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 23 -->
+            <div class="question-card">
+                <p class="question-text">
+                    23. What is the purpose of a `switch-case` statement in programming? When might it be preferred over a series of `if-else if` statements?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A `switch-case` statement is used to control the flow of execution based on the value of a single variable or expression. It allows for multiple execution paths. It is often preferred over a long series of `if-else if` statements when checking a single variable against many distinct constant values, as it can make the code more readable, organized, and sometimes more efficient.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 24 -->
+            <div class="question-card">
+                <p class="question-text">
+                    24. Describe the concept of a "logic gate" in digital electronics. Provide an example of a basic logic gate and its function.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A logic gate is an elementary building block of digital circuits that performs a basic logical function (AND, OR, NOT, etc.) on one or more binary inputs and produces a single binary output.
+                    <br>Example: An <b>AND gate</b> produces a HIGH output only if all its inputs are HIGH; otherwise, its output is LOW.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 25 -->
+            <div class="question-card">
+                <p class="question-text">
+                    25. What is the function of the `millis()` function in Arduino, and how does it differ from `delay()`?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The `millis()` function returns the number of milliseconds that have passed since the Arduino board began running the current program. It is non-blocking, meaning it does not pause the program execution. This differs from `delay()` which halts all program execution for a specified duration, making `millis()` more suitable for multitasking and responsive applications.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 26 -->
+            <div class="question-card">
+                <p class="question-text">
+                    26. Explain the concept of "pull-up" and "pull-down" resistors for digital inputs.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A <b>pull-up resistor</b> connects an input pin to the positive voltage supply (e.g., 5V), ensuring the pin reads HIGH when left unconnected or when a switch is open.
+                    <br>A <b>pull-down resistor</b> connects an input pin to ground (0V), ensuring the pin reads LOW when left unconnected or when a switch is open.
+                    <br>Both are used to prevent input pins from "floating" and picking up random electrical noise, ensuring a defined logic state.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 27 -->
+            <div class="question-card">
+                <p class="question-text">
+                    27. What is "aliasing" in the context of analog-to-digital conversion, and what causes it?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Aliasing is a distortion that occurs when an analog signal is sampled at a rate lower than twice its highest frequency component (the Nyquist rate). This causes higher frequencies in the original signal to be misrepresented as lower, incorrect frequencies in the digitized signal, making it impossible to accurately reconstruct the original waveform.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 28 -->
+            <div class="question-card">
+                <p class="question-text">
+                    28. Describe the difference between a `while` loop and a `do-while` loop in programming.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A `while` loop checks its condition *before* executing the loop body. If the condition is false initially, the loop body will never execute.
+                    <br>A `do-while` loop executes its loop body *at least once* before checking the condition. The condition is checked after each iteration, and the loop continues as long as the condition is true.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 29 -->
+            <div class="question-card">
+                <p class="question-text">
+                    29. What is the maximum decimal value that can be represented by an 8-bit unsigned integer?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>For an N-bit unsigned integer, the maximum value is $2^N - 1$.
+                    <br>For 8 bits: $2^8 - 1 = 256 - 1 = 255$.
+                    <br>The correct answer is <b>255</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 30 -->
+            <div class="question-card">
+                <p class="question-text">
+                    30. Explain the concept of "digital noise" in a microcontroller input and how it can be mitigated.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Digital noise refers to unwanted, random fluctuations in voltage that can cause a digital input pin to rapidly switch between HIGH and LOW states, even when the intended signal is stable. This can lead to erroneous readings (e.g., multiple button presses from a single physical press). It can be mitigated using hardware solutions (e.g., pull-up/pull-down resistors, capacitors for debouncing) or software solutions (e.g., debouncing algorithms in code that ignore rapid changes within a short time window).</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 31 -->
+            <div class="question-card">
+                <p class="question-text">
+                    31. What is the purpose of a "function" in programming?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A function (or subroutine/method) is a block of organized, reusable code that performs a specific task. Its purpose is to break down complex problems into smaller, manageable parts, promote code reusability, improve readability, and simplify debugging.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 32 -->
+            <div class="question-card">
+                <p class="question-text">
+                    32. Describe the difference between `int` and `float` data types in Arduino programming.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>An `int` (integer) data type stores whole numbers (e.g., 1, 100, -5). It uses 2 bytes of memory on most Arduinos and has a limited range.
+                    <br>A `float` (floating-point) data type stores numbers with decimal points (e.g., 3.14, -0.5, 10.0). It uses 4 bytes of memory and can represent a much wider range of values, but calculations with floats can be slower and less precise than with integers.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 33 -->
+            <div class="question-card">
+                <p class="question-text">
+                    33. When using `analogRead()`, what is the typical range of digital values returned by a 10-bit ADC on an Arduino, assuming a default reference voltage?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A 10-bit ADC produces $2^{10} = 1024$ discrete values. These values typically range from <b>0 to 1023</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 34 -->
+            <div class="question-card">
+                <p class="question-text">
+                    34. What is the primary benefit of using a `const` variable for pin assignments in Arduino, rather than just using the raw number directly in `pinMode()` and `digitalWrite()`?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The primary benefit is improved code readability and easier modification. By using a meaningful name (e.g., `const int ledPin = 13;`), the code becomes self-documenting. If the pin assignment needs to change, you only need to modify the `const` declaration once, rather than searching and replacing every instance of the raw number throughout the code, reducing errors.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 35 -->
+            <div class="question-card">
+                <p class="question-text">
+                    35. Describe how a simple LED is typically connected to an Arduino digital output pin, including any necessary external components.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A simple LED is typically connected with its anode (longer leg) to the Arduino digital output pin and its cathode (shorter leg) to ground, but with a current-limiting resistor placed in series with the LED. The resistor is crucial to limit the current flowing through the LED, preventing it from burning out due to excessive current from the Arduino pin.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 36 -->
+            <div class="question-card">
+                <p class="question-text">
+                    36. What is the purpose of the `if-else if-else` structure?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The `if-else if-else` structure allows a program to execute different blocks of code based on a series of mutually exclusive conditions. The program evaluates conditions sequentially; the first condition that evaluates to true has its corresponding code block executed, and then the rest of the structure is skipped. If none of the `if` or `else if` conditions are true, the `else` block (if present) is executed.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 37 -->
+            <div class="question-card">
+                <p class="question-text">
+                    37. Explain the concept of "sampling rate" in Analog-to-Digital Conversion.
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The sampling rate (or sampling frequency) in ADC refers to how many times per second an analog signal is measured and converted into a digital value. It is measured in Hertz (Hz) or samples per second. A higher sampling rate captures more data points from the analog signal, allowing for a more accurate digital representation, especially for rapidly changing signals.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 38 -->
+            <div class="question-card">
+                <p class="question-text">
+                    38. What is the role of the `setup()` function in an Arduino sketch?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The `setup()` function in an Arduino sketch is executed only once when the Arduino board starts up or is reset. Its primary role is to initialize variables, set pin modes (INPUT/OUTPUT), start serial communication, and perform any other one-time configurations required for the program to run.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 39 -->
+            <div class="question-card">
+                <p class="question-text">
+                    39. How does a `while` loop differ from a `for` loop in terms of when their conditions are checked?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>A `for` loop typically has its initialization, condition check, and iteration step defined at the beginning of the loop statement, making it ideal for iterating a fixed number of times or through a known sequence. A `while` loop only has a condition check at the beginning; its initialization and iteration steps must be handled explicitly within the loop body. `while` loops are better suited for indefinite iteration, where the number of repetitions is not known beforehand and depends on a condition becoming false.</p>
+                </details>
+            </div>
+
+            <!-- New Conceptual Question 40 -->
+            <div class="question-card">
+                <p class="question-text">
+                    40. What is the purpose of comments in Arduino (or any) programming code?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Comments are non-executable lines of text within code that are ignored by the compiler. Their purpose is to explain the code, its logic, and its functionality to human readers (programmers). Good comments improve code readability, maintainability, and collaboration, making it easier for others (and your future self) to understand and modify the program.</p>
                 </details>
             </div>
 
             <h2 class="section-title">Section 2: Mathematical Problems</h2>
 
-            <!-- Question 21 -->
+            <!-- Question 41 -->
             <div class="question-card">
                 <p class="question-text">
-                    21. A 12-bit Analog-to-Digital Converter (ADC) has a reference voltage of 3.3 V. Calculate the voltage resolution (step size) of this ADC.
+                    41. A 10-bit ADC has a reference voltage of 5.0 V. What is the voltage resolution (step size) of this ADC?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>The number of unique digital steps for an N-bit ADC is 2<sup>N</sup>.
-                    <br>For a 12-bit ADC, Number of Steps = 2<sup>12</sup> = 4096.
-                    <br><br>The voltage resolution (step size) is calculated as:
+                    <p>Number of Steps = $2^{10} = 1024$
                     <pre>Resolution = V<sub>ref</sub> / Number of Steps
-Resolution = 3.3 V / 4096
-Resolution &approx; 0.00080566 V/step or 0.80566 mV/step</pre>
-                    <p>Therefore, the voltage resolution of the 12-bit ADC is approximately <b>0.000806 V/step</b> (or 0.806 mV/step).</p>
+Resolution = 5.0 V / 1024
+Resolution &approx; 0.0048828 V/step or 4.88 mV/step</pre>
+                    <p>Therefore, the voltage resolution is approximately <b>0.00488 V/step</b>.</p>
                 </details>
             </div>
 
-            <!-- Question 22 -->
+            <!-- Question 42 -->
             <div class="question-card">
                 <p class="question-text">
-                    22. A Pulse Width Modulation (PWM) signal is generated from a 5 V supply. If the desired average DC equivalent voltage output is 3.5 V, what duty cycle percentage should be set for the PWM signal?
+                    42. An analog temperature sensor outputs a voltage that ranges from 0.5 V (for 0°C) to 3.0 V (for 100°C). If an Arduino (with a 10-bit ADC and 5V reference) reads a digital value of 512 from this sensor, what is the temperature in °C?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>The average DC equivalent voltage (V<sub>avg</sub>) for a PWM signal is given by:
-                    <pre>V<sub>avg</sub> = Duty Cycle (%) / 100 * V<sub>supply</sub></pre>
-                    <p>Rearranging to solve for Duty Cycle (%):
-                    <pre>Duty Cycle (%) = (V<sub>avg</sub> / V<sub>supply</sub>) * 100</pre>
-                    <p>Given:
-                    <pre>V<sub>avg</sub> = 3.5 V
-V<sub>supply</sub> = 5 V</pre>
-                    <p>Calculation:
-                    <pre>Duty Cycle (%) = (3.5 V / 5 V) * 100
-Duty Cycle (%) = 0.7 * 100
-Duty Cycle (%) = 70%</pre>
-                    <p>Therefore, the duty cycle should be <b>70%</b>.</p>
+                    <p>First, find the analog voltage corresponding to the digital reading:</p>
+                    <pre>ADC Resolution = 5.0 V / 1024 &approx; 0.0048828 V/step
+Analog Voltage = Digital Reading * ADC Resolution
+Analog Voltage = 512 * 0.0048828 V &approx; 2.5 V</pre>
+                    <p>Next, use the sensor's transfer function to find the temperature. The sensor range is 3.0 V - 0.5 V = 2.5 V for 100°C.
+                    <br>Sensor sensitivity = 2.5 V / 100°C = 0.025 V/°C.
+                    <br>The voltage measured is 2.5 V, which is 2.5 V - 0.5 V = 2.0 V above the 0°C reading.
+                    <pre>Temperature = (Analog Voltage - V<sub>min_sensor</sub>) / Sensor Sensitivity
+Temperature = (2.5 V - 0.5 V) / 0.025 V/°C
+Temperature = 2.0 V / 0.025 V/°C = 80 °C</pre>
+                    <p>Therefore, the temperature is <b>80 °C</b>.</p>
                 </details>
             </div>
 
-            <!-- Question 23 -->
+            <!-- Question 43 -->
             <div class="question-card">
                 <p class="question-text">
-                    23. An audio signal has a maximum frequency component of 15 kHz. What is the minimum theoretical sampling rate required to accurately capture this signal for digital processing, according to the Nyquist-Shannon sampling theorem?
+                    43. A Pulse Width Modulation (PWM) signal is generated from a 3.3 V supply. If the duty cycle of the PWM signal is 60%, what is the approximate average DC equivalent voltage output?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>According to the Nyquist-Shannon sampling theorem, the minimum sampling rate (Nyquist rate) must be at least twice the highest frequency component of the signal.
-                    <pre>Minimum Sampling Rate = 2 * F<sub>max</sub></pre>
-                    <p>Given:
-                    <pre>F<sub>max</sub> = 15 kHz = 15,000 Hz</pre>
-                    <p>Calculation:
-                    <pre>Minimum Sampling Rate = 2 * 15,000 Hz
-Minimum Sampling Rate = 30,000 Hz or 30 kHz</pre>
-                    <p>Therefore, the minimum theoretical sampling rate required is <b>30,000 Hz</b> (or 30 kHz).</p>
+                    <pre>Average Voltage = Supply Voltage * Duty Cycle
+Average Voltage = 3.3 V * 0.60
+Average Voltage = 1.98 V</pre>
+                    <p>Therefore, the approximate average DC equivalent voltage output is <b>1.98 V</b>.</p>
                 </details>
             </div>
 
-            <!-- Question 24 -->
+            <!-- Question 44 -->
             <div class="question-card">
                 <p class="question-text">
-                    24. How many unique, discrete states can be represented by a 16-bit unsigned digital signal?
+                    44. An analog pressure sensor produces a signal with a maximum frequency component of 30 Hz. What is the theoretical minimum sampling rate (according to the Nyquist-Shannon sampling theorem) required to accurately capture this signal?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>The number of unique discrete values that can be represented by an N-bit unsigned digital signal is given by 2<sup>N</sup>.
-                    <pre>Number of Unique States = 2<sup>N</sup></pre>
-                    <p>Given:
-                    <pre>N = 16 bits</pre>
-                    <p>Calculation:
-                    <pre>Number of Unique States = 2<sup>16</sup> = 65,536</pre>
-                    <p>Therefore, a 16-bit unsigned digital signal can represent <b>65,536</b> unique, discrete states.</p>
+                    <pre>Minimum Sampling Rate = 2 * F<sub>max</sub>
+Minimum Sampling Rate = 2 * 30 Hz = 60 Hz</pre>
+                    <p>Therefore, the theoretical minimum sampling rate is <b>60 Hz</b>.</p>
                 </details>
             </div>
 
-            <!-- Question 25 -->
+            <!-- Question 45 -->
             <div class="question-card">
                 <p class="question-text">
-                    25. A temperature sensor outputs an analog reading from 0 to 1023 (from an Arduino's 10-bit ADC). You want to map this temperature reading to a fan speed control value ranging from 0 (off) to 255 (max speed), with the following conditions:
-                    <br>
-                    - Readings from 0 to 200 map to fan speed 0 (fan off).
-                    <br>
-                    - Readings from 201 to 1023 map linearly to fan speed from 0 to 255.
-                    <br><br>
-                    If the sensor reads a value of 612, what should the mapped fan speed level be?
+                    45. How many unique, discrete values can be represented by a 12-bit unsigned digital signal?
                 </p>
                 <details>
                     <summary><b>Solution</b></summary>
-                    <p>First, identify the mapping ranges:
-                    <br>Input range for linear mapping: [201, 1023]
-                    <br>Output range for linear mapping: [0, 255]
-                    <br><br>The length of the input range is 1023 - 201 = 822.
-                    <br>The length of the output range is 255 - 0 = 255.
-                    <br><br>The sensor reading is 612. Since 612 is within the 201-1023 range, we apply linear mapping.
-                    <br><br>The formula for linear mapping from one range to another is:
-                    <pre>Output = (Input - Input<sub>min</sub>) * (Output<sub>max</sub> - Output<sub>min</sub>) / (Input<sub>max</sub> - Input<sub>min</sub>) + Output<sub>min</sub></pre>
-                    <p>In this case:
-                    <pre>Input = 612
-Input<sub>min</sub> = 201
-Input<sub>max</sub> = 1023
-Output<sub>min</sub> = 0
-Output<sub>max</sub> = 255</pre>
-                    <p>Calculation:
-                    <pre>Fan Speed = (612 - 201) * (255 - 0) / (1023 - 201) + 0
-Fan Speed = 411 * 255 / 822
-Fan Speed = 104805 / 822
-Fan Speed &approx; 127.5</pre>
-                    <p>Since fan speed is typically an integer, round to the nearest whole number.
-                    <pre>Fan Speed = 128</pre>
-                    <p>Therefore, if the sensor reads a value of 612, the mapped fan speed level should be <b>128</b>.</p>
+                    <pre>Number of Unique Values = 2<sup>N</sup>
+Number of Unique Values = 2<sup>12</sup> = 4096</pre>
+                    <p>Therefore, <b>4096</b> unique, discrete values can be represented.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 46 -->
+            <div class="question-card">
+                <p class="question-text">
+                    46. A digital signal needs to represent temperatures from 0°C to 100°C with a resolution of 0.5°C. What is the minimum number of bits required for this digital representation?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Total range = 100°C - 0°C = 100°C
+                    <br>Number of steps = Total range / Resolution = 100°C / 0.5°C/step = 200 steps
+                    <br>To find the minimum number of bits (N), we need $2^N \ge \text{Number of steps}$.
+                    <pre>2<sup>N</sup> &ge; 200</pre>
+                    <p>We know:
+                    <br>$2^7 = 128$
+                    <br>$2^8 = 256$
+                    <br>So, N must be at least 8.
+                    <br>The correct answer is <b>8 bits</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 47 -->
+            <div class="question-card">
+                <p class="question-text">
+                    47. An Arduino program uses the `map()` function to convert an analog sensor reading (0-1023) to a motor speed (0-255). If the analog reading is 767, what will be the mapped motor speed?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>The `map()` function in Arduino performs linear scaling.
+                    <pre>mappedValue = map(value, fromLow, fromHigh, toLow, toHigh)</pre>
+                    <pre>motorSpeed = map(767, 0, 1023, 0, 255)</pre>
+                    <p>The ratio of the input range covered is: $(767 - 0) / (1023 - 0) = 767 / 1023 \approx 0.74975$
+                    <br>The corresponding value in the output range: $0.74975 * (255 - 0) = 0.74975 * 255 \approx 191.18$
+                    <br>Since motor speed is usually an integer, it would be <b>191</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 48 -->
+            <div class="question-card">
+                <p class="question-text">
+                    48. A digital output pin on an Arduino is used to control an LED. If the LED is connected to a PWM pin and `analogWrite(pin, 127)` is called, and the Arduino operates on a 5V supply, what is the approximate average voltage across the LED (assuming an ideal LED with no forward voltage drop for simplicity in this calculation)?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>`analogWrite()` takes a value from 0 to 255.
+                    <br>Duty Cycle = `analogWrite` value / 255 = 127 / 255 $\approx$ 0.498
+                    <br>Average Voltage = Supply Voltage * Duty Cycle
+                    <pre>Average Voltage = 5 V * (127 / 255)
+Average Voltage &approx; 5 V * 0.4980
+Average Voltage &approx; 2.49 V</pre>
+                    <p>Therefore, the approximate average voltage across the LED is <b>2.49 V</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 49 -->
+            <div class="question-card">
+                <p class="question-text">
+                    49. A sensor provides a digital output in binary. If the sensor outputs 1010<sub>2</sub>, what is its decimal equivalent?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <pre>1010<sub>2</sub> = (1 * 2<sup>3</sup>) + (0 * 2<sup>2</sup>) + (1 * 2<sup>1</sup>) + (0 * 2<sup>0</sup>)
+= (1 * 8) + (0 * 4) + (1 * 2) + (0 * 1)
+= 8 + 0 + 2 + 0
+= 10</pre>
+                    <p>Therefore, the decimal equivalent is <b>10</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 50 -->
+            <div class="question-card">
+                <p class="question-text">
+                    50. If an Arduino sketch executes a `delay(1000)` function, how many seconds will the program pause?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>`delay()` takes its argument in milliseconds.
+                    <pre>1000 milliseconds = 1 second</pre>
+                    <p>Therefore, the program will pause for <b>1 second</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 51 -->
+            <div class="question-card">
+                <p class="question-text">
+                    51. A 6-bit DAC (Digital-to-Analog Converter) has a maximum output voltage of 10 V. What is its voltage resolution (step size)?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Number of steps = $2^6 = 64$
+                    <pre>Resolution = Maximum Output Voltage / Number of Steps
+Resolution = 10 V / 64
+Resolution &approx; 0.15625 V/step</pre>
+                    <p>Therefore, the voltage resolution is approximately <b>0.15625 V/step</b>.</p>
+                </details>
+            </div>
+
+            <!-- New Math Problem 52 -->
+            <div class="question-card">
+                <p class="question-text">
+                    52. If a temperature sensor has a range of -20°C to 80°C and a resolution of 1°C, how many discrete temperature levels can it distinguish?
+                </p>
+                <details>
+                    <summary><b>Solution</b></summary>
+                    <p>Total temperature range = 80°C - (-20°C) = 100°C
+                    <br>Number of discrete levels = Total range / Resolution + 1 (to include both endpoints)
+                    <pre>Number of levels = 100°C / 1°C + 1 = 100 + 1 = 101 levels</pre>
+                    <p>Therefore, it can distinguish <b>101</b> discrete temperature levels.</p>
                 </details>
             </div>
         </main>
 
         <!-- Footer Section -->
         <footer class="text-center text-gray-500 text-sm mt-12 py-6">
-            <p>&copy; <script>document.write(new Date().getFullYear())</script> Mechatronics 1 Course. All rights reserved.</p>
+            <p>&copy; <script>document.write(new Date().getFullYear())</script> Dr. Roger Tipton. All rights reserved.</p>
             <p>Designed for a World-Class Learning Experience</p>
         </footer>
     </div>
