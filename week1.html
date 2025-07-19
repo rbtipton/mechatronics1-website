@@ -1,419 +1,736 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 1 - Electrical Fundamentals</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Academic Blue -->
-    <!-- Application Structure Plan: The SPA is structured using a main navigation bar to switch between three sections: 'Learning Modules', 'Circuit Simulator', and 'Practice Problems'. The main 'Learning Modules' section uses a sub-navigation (tabs) for 'Key Concepts', 'Fundamental Laws', and 'Circuit Rules'. This architecture organizes the content thematically, allowing students to focus on one area at a time. The user flow encourages progressive learning: grasp a concept, see it applied in an interactive calculation, compare related rules visually, and test knowledge. This is more effective than a static document. -->
-    <!-- Visualization & Content Choices: Key Concepts -> Styled text cards (HTML/Tailwind). Laws & Formulas -> Highlighted blocks. Math Examples -> Interactive step-by-step reveal with a button (JS). Series vs. Parallel Resistors -> Bar chart comparison (Chart.js/Canvas). Practice Problems -> Cards with a 'show answer' toggle (JS). This mix of static and interactive content enhances engagement and comprehension. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .tab-active { 
-            border-color: #3b82f6; /* blue-500 */
-            color: #1d4ed8; /* blue-700 */
-            background-color: #eff6ff; /* blue-50 */
-        }
-        .step-content {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .step-content.visible {
-            display: block;
-            opacity: 1;
-        }
-        .solution-box {
-            background-color: #f8fafc;
-            border-left: 4px solid #3b82f6;
-            padding: 1rem;
-            margin-top: 1rem;
-            font-family: 'Courier New', monospace;
-            overflow-x: auto;
-        }
-        .btn {
-            background-color: #3b82f6;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-        .btn:hover { background-color: #2563eb; }
-        .btn-secondary {
-            background-color: #6b7280;
-        }
-        .btn-secondary:hover { background-color: #4b5563; }
-        .hidden { display: none; }
-        .katex-display { display: block; overflow-x: auto; white-space: nowrap; }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800">
+import React, { useState, useEffect } from 'react';
 
-    <header class="bg-white shadow-md sticky top-0 z-10">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between">
-                <h1 class="text-2xl font-bold text-blue-700">Mechatronics 1: Week 1 Fundamentals</h1>
-                <div class="flex space-x-4 text-sm font-medium">
-                    <button data-target="modules" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Learning Modules</button>
-                    <button data-target="practice" class="nav-link px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Practice Problems</button>
-                </div>
-            </div>
-        </nav>
-    </header>
+// Lucide React icons (assuming they are available in the environment)
+// If not, these would need to be replaced with inline SVGs or other icon libraries.
+const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
 
-    <main id="app-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <!-- Section: Learning Modules -->
-        <section id="modules" class="app-section">
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-3xl font-bold mb-4 text-gray-900">Introduction to Mechatronics & Electrical Concepts</h2>
-                <p class="text-gray-600 mb-6">This module covers the core concepts needed to begin your journey in mechatronics. We'll define the field, introduce the fundamental quantities of electricity, and explore the laws that govern them. Select a topic below to begin.</p>
+// Concept Review Component
+const ConceptReview = () => {
+  return (
+    <div className="p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 1: Introduction to Mechatronics & Electrical Fundamentals</h2>
 
-                <!-- Tabs -->
-                <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex flex-wrap" aria-label="Tabs">
-                        <button class="module-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-module="concepts">Key Concepts</button>
-                        <button class="module-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-module="laws">Fundamental Laws</button>
-                        <button class="module-tab whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm" data-module="rules">Circuit Rules</button>
-                    </nav>
-                </div>
+      {/* What is Mechatronics? */}
+      <section className="mb-8">
+        <h3 className="text-2xl font-semibold text-indigo-700 mb-3">1. What is Mechatronics?</h3>
+        <p className="text-gray-700 leading-relaxed mb-2">
+          Mechatronics is a multidisciplinary field that seamlessly combines <span className="font-medium text-indigo-600">mechanical engineering</span>, <span className="font-medium text-indigo-600">electrical engineering</span>, <span className="font-medium text-indigo-600">computer science</span>, and <span className="font-medium text-indigo-600">control engineering</span>. It focuses on designing and building intelligent systems and products that integrate these diverse domains.
+        </p>
+        <h4 className="text-xl font-medium text-gray-800 mb-2">Why is Mechatronics important?</h4>
+        <ul className="list-disc list-inside text-gray-700 ml-4">
+          <li><span className="font-medium">Complexity:</span> Modern systems (smartphones, robots, cars) involve a complex interplay of these disciplines.</li>
+          <li><span className="font-medium">Efficiency & Automation:</span> Enables automation, precision, and efficiency in various industries.</li>
+          <li><span className="font-medium">Innovation:</span> Fosters new product capabilities not possible with a single discipline.</li>
+        </ul>
+        <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Examples of Mechatronic Systems:</h4>
+        <ul className="list-disc list-inside text-gray-700 ml-4">
+          <li><span className="font-medium">Robots:</span> Industrial, humanoid, surgical robots (e.g., robotic arm for car assembly).</li>
+          <li><span className="font-medium">Automotive Systems:</span> ABS, electronic fuel injection, adaptive cruise control.</li>
+          <li><span className="font-medium">Consumer Electronics:</span> Digital cameras, printers, washing machines, drones.</li>
+          <li><span className="font-medium">Medical Devices:</span> Prosthetics, MRI machines.</li>
+        </ul>
+        <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Key Disciplines:</h4>
+        <ul className="list-disc list-inside text-gray-700 ml-4">
+          <li><span className="font-medium">Mechanical Engineering:</span> Physical systems, kinematics, dynamics, materials.</li>
+          <li><span className="font-medium">Electrical Engineering:</span> Circuits, electronics, sensors, actuators.</li>
+          <li><span className="font-medium">Computer Science/Software Engineering:</span> Algorithms, programming, real-time control.</li>
+          <li><span className="font-medium">Control Engineering:</span> Feedback systems, stability, automation.</li>
+        </ul>
+      </section>
 
-                <!-- Content Area for Modules -->
-                <div id="module-content" class="mt-6">
-                    <!-- Content will be injected here by JS -->
-                </div>
-            </div>
-        </section>
+      {/* Basic Electrical Quantities */}
+      <section className="mb-8">
+        <h3 className="text-2xl font-semibold text-indigo-700 mb-3">2. Basic Electrical Quantities</h3>
+        <ul className="list-disc list-inside text-gray-700 ml-4 space-y-3">
+          <li><span className="font-medium">Charge (Q):</span> Fundamental property of matter. Measured in <span className="font-medium">Coulombs (C)</span>.</li>
+          <li><span className="font-medium">Current (I):</span> Rate of flow of electric charge. Measured in <span className="font-medium">Amperes (A)</span> (`1 A = 1 C/s`). Conventional current is positive charge flow.</li>
+          <li><span className="font-medium">Voltage (V) or Potential Difference:</span> Energy per unit charge. Electrical "pressure." Measured in <span className="font-medium">Volts (V)</span> (`1 V = 1 J/C`).</li>
+          <li><span className="font-medium">Resistance (R):</span> Opposition to current flow. Measured in <span className="font-medium">Ohms (Ω)</span>.</li>
+        </ul>
+      </section>
 
-        <!-- Section: Practice Problems -->
-        <section id="practice" class="app-section hidden">
-            <div class="bg-white p-6 rounded-lg shadow">
-                 <h2 class="text-3xl font-bold mb-4 text-gray-900">Practice Problems</h2>
-                 <p class="text-gray-600 mb-6">Test your understanding with these problems. Click "Show Answer" to reveal the detailed solution.</p>
-                 <div id="practice-problems-container" class="space-y-6">
-                    <!-- Practice problems will be injected here -->
-                 </div>
-            </div>
-        </section>
+      {/* Ohm's Law */}
+      <section className="mb-8">
+        <h3 className="text-2xl font-semibold text-indigo-700 mb-3">3. Ohm's Law</h3>
+        <p className="text-gray-700 leading-relaxed mb-2">
+          Fundamental relationship between voltage, current, and resistance.
+        </p>
+        <p className="text-lg font-mono bg-gray-100 p-3 rounded-md mb-3">
+          Formula: `V = I * R`
+        </p>
+        <p className="text-gray-700 mb-2">Where:</p>
+        <ul className="list-disc list-inside text-gray-700 ml-4">
+          <li>`V` = Voltage (Volts)</li>
+          <li>`I` = Current (Amperes)</li>
+          <li>`R` = Resistance (Ohms)</li>
+        </ul>
+        <p className="text-gray-700 mt-3">Rearrangements: `I = V/R`, `R = V/I`</p>
+        <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Power (P):</h4>
+        <p className="text-gray-700 leading-relaxed mb-2">
+          Rate at which energy is transferred or dissipated. Measured in <span className="font-medium">Watts (W)</span> (`1 W = 1 J/s`).
+        </p>
+        <p className="text-lg font-mono bg-gray-100 p-3 rounded-md mb-3">
+          Formulas: `P = V * I`, `P = I^2 * R`, `P = V^2/R`
+        </p>
+      </section>
 
-    </main>
-    
-<script>
-const appData = {
-    concepts: {
-        title: "Key Concepts",
-        content: `
-            <div class="mb-8">
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">What is Mechatronics?</h3>
-                <p class="mb-4">Mechatronics is a multidisciplinary field that combines mechanical engineering, electrical engineering, computer science, and control engineering. It's about designing and building intelligent systems and products that integrate these different domains seamlessly.</p>
-                <div class="grid md:grid-cols-3 gap-4">
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-blue-800">Robotic Arm</h4>
-                        <p class="text-sm text-gray-700 mt-1">Mechanical links driven by electric motors, controlled by software with sensor feedback.</p>
-                    </div>
-                    <div class="bg-green-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-green-800">ABS Brakes</h4>
-                        <p class="text-sm text-gray-700 mt-1">Wheel speed sensors provide data to a microcontroller that modulates hydraulic brake pressure.</p>
-                    </div>
-                    <div class="bg-yellow-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-yellow-800">Washing Machine</h4>
-                        <p class="text-sm text-gray-700 mt-1">A motor, water level sensor, and controller work together to execute a wash cycle.</p>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Basic Electrical Quantities</h3>
-                <div class="space-y-4">
-                    <div><strong>Charge (Q):</strong> The fundamental property of matter experiencing force in an electromagnetic field. Measured in Coulombs (C).</div>
-                    <div><strong>Current (I):</strong> The rate of flow of electric charge. Measured in Amperes (A), where 1 A = 1 C/s.</div>
-                    <div><strong>Voltage (V):</strong> The energy per unit charge, or "electrical pressure," that drives current. Measured in Volts (V), where 1 V = 1 J/C.</div>
-                    <div><strong>Resistance (R):</strong> A material's opposition to the flow of current. Measured in Ohms (Ω).</div>
-                </div>
-            </div>
-        `
-    },
-    laws: {
-        title: "Fundamental Laws",
-        content: `
-            <div class="mb-8">
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Ohm's Law & Power</h3>
-                <p class="mb-4">Ohm's Law describes the relationship between voltage, current, and resistance. Power is the rate at which energy is used or dissipated.</p>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="font-semibold">Key Formulas</h4>
-                        <div class="solution-box">
-                            V = I ⋅ R &nbsp;&nbsp; (Ohm's Law)<br>
-                            P = V ⋅ I &nbsp;&nbsp; (Power)<br>
-                            P = I² ⋅ R<br>
-                            P = V² / R
-                        </div>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold mb-2">Interactive Example: LED Resistor</h4>
-                        <p class="text-sm mb-2">An LED needs 2V and 20mA (0.02A). If powered by a 5V source, what series resistor is needed?</p>
-                        <div id="ohm-example"></div>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Kirchhoff's Laws</h3>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div>
-                        <h4 class="font-semibold">Kirchhoff's Voltage Law (KVL)</h4>
-                        <p class="text-sm mb-2">The algebraic sum of all voltages around any closed loop is zero. (Conservation of Energy)</p>
-                        <div class="solution-box">Σ V = 0</div>
-                        <p class="text-xs mt-2">Example: In a series circuit with a 9V battery and two resistors dropping 4V and 5V, the equation is -9V + 4V + 5V = 0.</p>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold">Kirchhoff's Current Law (KCL)</h4>
-                        <p class="text-sm mb-2">The sum of currents entering a node equals the sum of currents leaving it. (Conservation of Charge)</p>
-                        <div class="solution-box">Σ I_in = Σ I_out</div>
-                        <p class="text-xs mt-2">Example: If 5A flows into a node and splits, the two exiting currents must sum to 5A.</p>
-                    </div>
-                </div>
-            </div>
-        `
-    },
-    rules: {
-        title: "Circuit Rules",
-        content: `
-            <div class="mb-8">
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Resistors in Series & Parallel</h3>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="font-semibold">Resistors in Series</h4>
-                        <p class="text-sm">Connected end-to-end. Current is the same through all. Total resistance is the sum of individual resistances.</p>
-                        <div class="solution-box">R_eq = R₁ + R₂ + ... + Rₙ</div>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold">Resistors in Parallel</h4>
-                        <p class="text-sm">Connected across the same two points. Voltage is the same across all. Total resistance is the reciprocal of the sum of reciprocals.</p>
-                        <div class="solution-box">1/R_eq = 1/R₁ + 1/R₂ + ... + 1/Rₙ</div>
-                    </div>
-                </div>
-            </div>
-             <div class="mb-8">
-                <h3 class="text-xl font-bold text-gray-800 mb-3">Visual Comparison</h3>
-                <p class="text-sm mb-4">See how dramatically the equivalent resistance (R_eq) changes for two 100Ω resistors when connected in series vs. parallel.</p>
-                 <div class="chart-container w-full max-w-lg mx-auto h-64 md:h-80">
-                    <canvas id="resistanceChart"></canvas>
-                </div>
-            </div>
-            <div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-3">Divider Rules</h3>
-                 <div class="grid md:grid-cols-2 gap-8">
-                    <div>
-                        <h4 class="font-semibold">Voltage Divider Rule (for Series)</h4>
-                        <p class="text-sm mb-2">Finds the voltage across one resistor in a series circuit.</p>
-                        <div class="solution-box katex-display">V_x = V_total ⋅ (R_x / R_eq)</div>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold">Current Divider Rule (for Parallel)</h4>
-                        <p class="text-sm mb-2">Finds the current through one branch in a parallel circuit. Note the 'opposite' resistor in the numerator.</p>
-                        <div class="solution-box katex-display">I₁ = I_total ⋅ (R₂ / (R₁ + R₂))</div>
-                    </div>
-                </div>
-            </div>
-        `
-    }
+      {/* Kirchhoff's Voltage Law (KVL) */}
+      <section className="mb-8">
+        <h3 className="text-2xl font-semibold text-indigo-700 mb-3">4. Kirchhoff's Voltage Law (KVL)</h3>
+        <p className="text-gray-700 leading-relaxed mb-2">
+          States that the algebraic sum of all voltages around any closed loop in a circuit is equal to zero. (Conservation of energy)
+        </p>
+        <p className="text-lg font-mono bg-gray-100 p-3 rounded-md mb-3">
+          Formal Statement: `Sum of Voltages around a closed loop = 0`
+        </p>
+      </section>
+
+      {/* Kirchhoff's Current Law (KCL) */}
+      <section className="mb-8">
+        <h3 className="text-2xl font-semibold text-indigo-700 mb-3">5. Kirchhoff's Current Law (KCL)</h3>
+        <p className="text-gray-700 leading-relaxed mb-2">
+          States that the algebraic sum of all currents entering and exiting a node (or junction) in a circuit is equal to zero. (Conservation of charge)
+        </p>
+        <p className="text-lg font-mono bg-gray-100 p-3 rounded-md mb-3">
+          Formal Statement: `Sum of Currents entering a node = Sum of Currents exiting a node`
+        </p>
+      </section>
+
+      {/* Resistors in Series and Parallel */}
+      <section className="mb-8">
+        <h3 className="text-2xl font-semibold text-indigo-700 mb-3">6. Resistors in Series and Parallel</h3>
+        <h4 className="text-xl font-medium text-gray-800 mb-2">Resistors in Series:</h4>
+        <ul className="list-disc list-inside text-gray-700 ml-4">
+          <li>Connected end-to-end, single path for current.</li>
+          <li>Current is the <span className="font-medium">same</span> through all series resistors.</li>
+          <li>Voltages <span className="font-medium">add up</span> across series resistors.</li>
+          <li>Equivalent Resistance (Req): `Req = R1 + R2 + R3 + ... + Rn`</li>
+        </ul>
+        <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Resistors in Parallel:</h4>
+        <ul className="list-disc list-inside text-gray-700 ml-4">
+          <li>Connected across the same two points, multiple paths for current.</li>
+          <li>Voltage is the <span className="font-medium">same</span> across all parallel resistors.</li>
+          <li>Currents <span className="font-medium">divide</span> among parallel resistors.</li>
+          <li>Equivalent Resistance (Req): `1/Req = 1/R1 + 1/R2 + 1/R3 + ... + 1/Rn`</li>
+          <li>For two parallel resistors: `Req = (R1 * R2) / (R1 + R2)`</li>
+        </ul>
+      </section>
+
+      {/* Voltage Divider Rule */}
+      <section className="mb-8">
+        <h3 className="text-2xl font-semibold text-indigo-700 mb-3">7. Voltage Divider Rule</h3>
+        <p className="text-gray-700 leading-relaxed mb-2">
+          Used to find the voltage across a specific resistor in a <span className="font-medium">series circuit</span>.
+        </p>
+        <p className="text-lg font-mono bg-gray-100 p-3 rounded-md mb-3">
+          Formula: `V_Rx = V_T * (R_x / R_eq)`
+        </p>
+        <p className="text-gray-700">Where `R_eq` is the total equivalent resistance of the series circuit.</p>
+      </section>
+
+      {/* Current Divider Rule */}
+      <section className="mb-8">
+        <h3 className="text-2xl font-semibold text-indigo-700 mb-3">8. Current Divider Rule</h3>
+        <p className="text-gray-700 leading-relaxed mb-2">
+          Used to find the current through a specific resistor in a <span className="font-medium">parallel circuit</span> (for two resistors).
+        </p>
+        <p className="text-lg font-mono bg-gray-100 p-3 rounded-md mb-3">
+          Formulas: `I_1 = I_T * (R_2 / (R_1 + R_2))`, `I_2 = I_T * (R_1 / (R_1 + R_2))`
+        </p>
+        <p className="text-gray-700">Notice the "opposite" resistor in the numerator.</p>
+      </section>
+    </div>
+  );
 };
 
-const practiceProblems = [
-    {
-        id: 1,
-        title: "Ohm's Law & Power",
-        problemHTML: `A 12V battery is connected across a 150Ω resistor. Calculate the current flowing through it and the power it dissipates.`,
-        answerHTML: `<b>Solution:</b><br>
-        Current (I) = V / R = 12V / 150Ω = 0.08A (or 80mA).<br>
-        Power (P) = V * I = 12V * 0.08A = 0.96W.`
-    },
-    {
-        id: 2,
-        title: "Series Circuit & KVL",
-        problemHTML: `Three resistors (R₁=220Ω, R₂=330Ω, R₃=470Ω) are in series with a 9V battery. Find the total current and the voltage drop across each resistor.`,
-        answerHTML: `<b>Solution:</b><br>
-        R_eq = 220 + 330 + 470 = 1020Ω.<br>
-        I_total = 9V / 1020Ω ≈ 0.0088A (8.8mA).<br>
-        V₁ = I * R₁ ≈ 1.94V.<br>
-        V₂ = I * R₂ ≈ 2.91V.<br>
-        V₃ = I * R₃ ≈ 4.14V.<br>
-        Check KVL: 1.94V + 2.91V + 4.14V ≈ 8.99V (close to 9V).`
-    },
-    {
-        id: 3,
-        title: "Parallel Circuit & KCL",
-        problemHTML: `Three resistors (R₁=1kΩ, R₂=2.2kΩ, R₃=4.7kΩ) are in parallel with a 24V supply. Find the total current.`,
-        answerHTML: `<b>Solution:</b><br>
-        I₁ = 24V / 1000Ω = 24mA.<br>
-        I₂ = 24V / 2200Ω ≈ 10.9mA.<br>
-        I₃ = 24V / 4700Ω ≈ 5.1mA.<br>
-        I_total = I₁ + I₂ + I₃ ≈ 24 + 10.9 + 5.1 = 40mA (KCL).`
-    }
-];
+// Ohm's Law Sandbox Component
+const OhmLawSandbox = () => {
+  const [voltage, setVoltage] = useState('');
+  const [current, setCurrent] = useState('');
+  const [resistance, setResistance] = useState('');
+  const [power, setPower] = useState('');
+  const [message, setMessage] = useState('');
 
-document.addEventListener('DOMContentLoaded', () => {
-    const navLinks = document.querySelectorAll('.nav-link');
-    const appSections = document.querySelectorAll('.app-section');
-    const moduleTabs = document.querySelectorAll('.module-tab');
-    const moduleContentContainer = document.getElementById('module-content');
-    let resistanceChart = null;
+  const calculateOhm = () => {
+    setMessage('');
+    let V = parseFloat(voltage);
+    let I = parseFloat(current);
+    let R = parseFloat(resistance);
 
-    // Main navigation
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            const targetId = link.dataset.target;
-            appSections.forEach(section => section.classList.toggle('hidden', section.id !== targetId));
-            navLinks.forEach(l => l.classList.remove('font-bold', 'text-blue-600'));
-            link.classList.add('font-bold', 'text-blue-600');
-        });
-    });
-
-    // Module tabs
-    moduleTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const moduleId = tab.dataset.module;
-            moduleTabs.forEach(t => t.classList.remove('tab-active'));
-            tab.classList.add('tab-active');
-            renderModule(moduleId);
-        });
-    });
-
-    function renderModule(moduleId) {
-        const data = appData[moduleId];
-        if (!data) return;
-
-        moduleContentContainer.innerHTML = data.content;
-
-        if (moduleId === 'laws') {
-            setupInteractiveExample('ohm-example', [
-                { title: "Step 1: Find Voltage Drop", content: `The resistor must handle the excess voltage: <div class="solution-box">V_resistor = 5V - 2V = 3V</div>` },
-                { title: "Step 2: Apply Ohm's Law", content: `With 20mA (0.02A) current: <div class="solution-box">R = V / I = 3V / 0.02A = 150Ω</div>` },
-                { title: "Result", content: `<div class="p-4 bg-green-100 text-green-800 rounded-lg">A <strong>150Ω</strong> resistor is needed.</div>`}
-            ]);
-        }
-        
-        if (moduleId === 'rules') {
-            renderResistanceChart();
-        }
+    if (isNaN(V) && isNaN(I) && isNaN(R)) {
+      setMessage("Please enter at least two values to calculate.");
+      setPower('');
+      return;
     }
 
-    function setupInteractiveExample(containerId, steps) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        let currentStep = -1;
-        container.innerHTML = `
-            <div id="interactive-steps-container"></div>
-            <div class="mt-4 flex space-x-2">
-                 <button id="next-step-btn" class="btn text-sm">Start</button>
-                 <button id="reset-steps-btn" class="btn btn-secondary text-sm">Reset</button>
-            </div>`;
-        
-        const stepsContainer = container.querySelector('#interactive-steps-container');
-        const nextBtn = container.querySelector('#next-step-btn');
-        const resetBtn = container.querySelector('#reset-steps-btn');
-        
-        const showNextStep = () => {
-            currentStep++;
-            if (currentStep < steps.length) {
-                const step = steps[currentStep];
-                const stepEl = document.createElement('div');
-                stepEl.className = 'step-content border-t pt-2 mt-2';
-                stepEl.innerHTML = `
-                    <h5 class="font-semibold text-blue-700">${step.title}</h5>
-                    <div class="text-gray-700 text-sm mt-1">${step.content}</div>
-                `;
-                stepsContainer.appendChild(stepEl);
-                setTimeout(() => stepEl.classList.add('visible'), 50);
-                nextBtn.textContent = 'Next Step';
-            }
-            if (currentStep >= steps.length - 1) {
-                nextBtn.disabled = true;
-                nextBtn.textContent = 'Finished';
-            }
-        };
-
-        const resetSteps = () => {
-            stepsContainer.innerHTML = '';
-            currentStep = -1;
-            nextBtn.disabled = false;
-            nextBtn.textContent = 'Start';
-        };
-
-        nextBtn.addEventListener('click', showNextStep);
-        resetBtn.addEventListener('click', resetSteps);
+    // Attempt to calculate missing value
+    if (!isNaN(V) && !isNaN(I) && isNaN(R)) {
+      R = V / I;
+      setResistance(R.toFixed(2));
+    } else if (!isNaN(V) && isNaN(I) && !isNaN(R)) {
+      I = V / R;
+      setCurrent(I.toFixed(2));
+    } else if (isNaN(V) && !isNaN(I) && !isNaN(R)) {
+      V = I * R;
+      setVoltage(V.toFixed(2));
+    } else if (!isNaN(V) && !isNaN(I) && !isNaN(R)) {
+      // All three entered, check for consistency
+      if (Math.abs(V - (I * R)) > 0.01) { // Allow for small floating point errors
+        setMessage("The entered values for V, I, R are inconsistent with Ohm's Law. Please adjust two values.");
+        setPower('');
+        return;
+      }
+    } else {
+      setMessage("Please enter at least two values to calculate.");
+      setPower('');
+      return;
     }
-    
-    function renderPracticeProblems() {
-        const container = document.getElementById('practice-problems-container');
-        container.innerHTML = practiceProblems.map(p => `
-            <div class="border rounded-lg p-4">
-                <h4 class="text-lg font-semibold">${p.title}</h4>
-                <p class="mt-2 text-gray-700">${p.problemHTML}</p>
-                <div id="answer-${p.id}" class="mt-4 p-4 bg-blue-50 rounded hidden">
-                   ${p.answerHTML}
-                </div>
-                <button data-answer-id="${p.id}" class="toggle-answer-btn btn mt-4 text-sm">Show Answer</button>
+
+    // After calculating the missing value (or if all were provided and consistent), calculate power
+    if (!isNaN(V) && !isNaN(I)) {
+      setPower((V * I).toFixed(2));
+    } else if (!isNaN(I) && !isNaN(R)) {
+      setPower((I * I * R).toFixed(2));
+    } else if (!isNaN(V) && !isNaN(R)) {
+      setPower((V * V / R).toFixed(2));
+    }
+  };
+
+  const resetFields = () => {
+    setVoltage('');
+    setCurrent('');
+    setResistance('');
+    setPower('');
+    setMessage('');
+  };
+
+  return (
+    <div className="p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Ohm's Law Sandbox</h2>
+      <p className="text-gray-700 mb-4">
+        Enter any two values (Voltage, Current, or Resistance) to calculate the third, along with the Power dissipated.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="flex flex-col">
+          <label htmlFor="voltage" className="text-lg font-medium text-gray-700 mb-2">Voltage (V)</label>
+          <input
+            type="number"
+            id="voltage"
+            value={voltage}
+            onChange={(e) => setVoltage(e.target.value)}
+            placeholder="Enter Voltage"
+            className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="current" className="text-lg font-medium text-gray-700 mb-2">Current (A)</label>
+          <input
+            type="number"
+            id="current"
+            value={current}
+            onChange={(e) => setCurrent(e.target.value)}
+            placeholder="Enter Current"
+            className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="resistance" className="text-lg font-medium text-gray-700 mb-2">Resistance (Ω)</label>
+          <input
+            type="number"
+            id="resistance"
+            value={resistance}
+            onChange={(e) => setResistance(e.target.value)}
+            placeholder="Enter Resistance"
+            className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="power" className="text-lg font-medium text-gray-700 mb-2">Power (W)</label>
+          <input
+            type="text"
+            id="power"
+            value={power}
+            readOnly
+            placeholder="Calculated Power"
+            className="p-3 bg-gray-100 border border-gray-300 rounded-md"
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-4 mb-4">
+        <button
+          onClick={calculateOhm}
+          className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+        >
+          Calculate
+        </button>
+        <button
+          onClick={resetFields}
+          className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+        >
+          Reset
+        </button>
+      </div>
+
+      {message && (
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-md relative" role="alert">
+          <span className="block sm:inline">{message}</span>
+        </div>
+      )}
+
+      <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <h3 className="text-xl font-semibold text-gray-800 mb-3">Circuit Visualization:</h3>
+        <div className="flex flex-col items-center justify-center p-4">
+          {/* Simple circuit diagram placeholder */}
+          <div className="border-2 border-gray-700 rounded-lg p-4 flex flex-col items-center justify-center relative">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gray-50 px-2 text-sm text-gray-600">Source</div>
+            <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+              V{voltage ? `=${voltage}V` : ''}
             </div>
-        `).join('');
+            <div className="w-1 h-12 bg-gray-700 my-2"></div> {/* Wire */}
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gray-50 px-2 text-sm text-gray-600">Resistor</div>
+            <div className="w-24 h-8 bg-red-500 rounded-md flex items-center justify-center text-white font-bold text-lg">
+              R{resistance ? `=${resistance}Ω` : ''}
+            </div>
+            <div className="w-1 h-12 bg-gray-700 my-2"></div> {/* Wire */}
+            <div className="text-gray-800 font-bold text-lg mt-2">
+              I{current ? `=${current}A` : ''}
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mt-4">
+            (Simplified representation of a basic series circuit with a voltage source and a resistor)
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-        document.querySelectorAll('.toggle-answer-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const answerId = btn.dataset.answerId;
-                const answerEl = document.getElementById(`answer-${answerId}`);
-                answerEl.classList.toggle('hidden');
-                btn.textContent = answerEl.classList.contains('hidden') ? 'Show Answer' : 'Hide Answer';
-            });
-        });
+// Practice Problems Component
+const PracticeProblems = () => {
+  const [activeTab, setActiveTab] = useState('homework'); // 'homework' or 'quiz'
+
+  const homeworkQuestions = [
+    {
+      id: 1,
+      type: 'text',
+      question: 'Briefly define Mechatronics in your own words and provide two examples of mechatronic systems not mentioned in the lecture notes.',
+      answer: 'Mechatronics is a field that integrates mechanical, electrical, computer, and control engineering to design intelligent systems. Examples: Drones (mechanical structure, electrical motors, computer for flight control, control algorithms for stability), 3D Printers (mechanical motion systems, electrical heaters/motors, computer for slicing/G-code interpretation, feedback control for precision).'
+    },
+    {
+      id: 2,
+      type: 'text',
+      question: 'Explain the difference between voltage and current using an analogy (different from the water pipe and "people in a crowd" analogies).',
+      answer: 'Analogy: Imagine a downhill ski slope. Voltage is like the height of the mountain. A higher mountain (more voltage) gives skiers more potential energy. Current is like the number of skiers passing a specific point on the slope per minute. More skiers (more current) mean a greater flow. Resistance would be like obstacles or narrow parts of the slope that impede the flow of skiers.'
+    },
+    {
+      id: 3,
+      type: 'calculation',
+      question: 'A 12V battery is connected across a 150 Ohm resistor. Calculate the current flowing through the resistor and the power dissipated by the resistor.',
+      subQuestions: [
+        { label: 'Current (A)', key: 'current', formula: 'I = V/R', expected: '0.08' },
+        { label: 'Power (W)', key: 'power', formula: 'P = V*I', expected: '0.96' }
+      ],
+      explanation: 'Current: `I = V/R = 12V / 150Ω = 0.08A`. Power: `P = V * I = 12V * 0.08A = 0.96W`.'
+    },
+    {
+      id: 4,
+      type: 'calculation',
+      question: 'If a light bulb draws 0.5A of current and dissipates 60W of power, what is its resistance?',
+      subQuestions: [
+        { label: 'Resistance (Ω)', key: 'resistance', formula: 'R = P / I^2 or R = V / I (after finding V)', expected: '240' }
+      ],
+      explanation: 'First, find Voltage: `V = P/I = 60W / 0.5A = 120V`. Then, find Resistance: `R = V/I = 120V / 0.5A = 240Ω`. Alternatively, `R = P/I^2 = 60W / (0.5A)^2 = 60W / 0.25A^2 = 240Ω`.'
+    },
+    {
+      id: 5,
+      type: 'calculation',
+      question: 'Three resistors (`R_1 = 220Ω`, `R_2 = 330Ω`, `R_3 = 470Ω`) are connected in series to a 9V battery. Calculate the total equivalent resistance, total current, and voltage drop across each resistor. Verify KVL.',
+      subQuestions: [
+        { label: 'Total Equivalent Resistance (Ω)', key: 'req', formula: 'Req = R1 + R2 + R3', expected: '1020' },
+        { label: 'Total Current (A)', key: 'itotal', formula: 'I = V_source / Req', expected: '0.0088' }, // 9/1020
+        { label: 'Voltage across R1 (V)', key: 'vr1', formula: 'V = I * R1', expected: '1.936' }, // 0.0088235 * 220
+        { label: 'Voltage across R2 (V)', key: 'vr2', formula: 'V = I * R2', expected: '2.911' }, // 0.0088235 * 330
+        { label: 'Voltage across R3 (V)', key: 'vr3', formula: 'V = I * R3', expected: '4.147' }  // 0.0088235 * 470
+      ],
+      explanation: 'Total Resistance: `Req = 220 + 330 + 470 = 1020Ω`. Total Current: `I = 9V / 1020Ω ≈ 0.0088235A`. `V_R1 = I * R1 = 0.0088235 * 220 ≈ 1.94V`. `V_R2 = I * R2 = 0.0088235 * 330 ≈ 2.91V`. `V_R3 = I * R3 = 0.0088235 * 470 ≈ 4.15V`. KVL Check: `1.94 + 2.91 + 4.15 ≈ 9V`.'
+    },
+    {
+      id: 6,
+      type: 'calculation',
+      question: 'Three resistors (`R_1 = 1.0 kΩ`, `R_2 = 2.2 kΩ`, `R_3 = 4.7 kΩ`) are connected in parallel to a 24V power supply. Calculate the equivalent resistance, total current, and current through each resistor. Verify KCL.',
+      subQuestions: [
+        { label: 'Equivalent Resistance (kΩ)', key: 'req_parallel', formula: '1/Req = 1/R1 + 1/R2 + 1/R3', expected: '0.613' }, // 1 / (1/1000 + 1/2200 + 1/4700)
+        { label: 'Total Current (A)', key: 'itotal_parallel', formula: 'I = V_source / Req', expected: '0.0391' }, // 24 / 613.3
+        { label: 'Current through R1 (A)', key: 'ir1', formula: 'I = V / R1', expected: '0.024' }, // 24/1000
+        { label: 'Current through R2 (A)', key: 'ir2', formula: 'I = V / R2', expected: '0.0109' }, // 24/2200
+        { label: 'Current through R3 (A)', key: 'ir3', formula: 'I = V / R3', expected: '0.0051' }  // 24/4700
+      ],
+      explanation: 'Equivalent Resistance: `1/Req = 1/1000 + 1/2200 + 1/4700 ≈ 0.001630`. `Req ≈ 613.3Ω ≈ 0.613 kΩ`. Total Current: `I_total = 24V / 613.3Ω ≈ 0.0391A`. `I_R1 = 24V / 1000Ω = 0.024A`. `I_R2 = 24V / 2200Ω ≈ 0.0109A`. `I_R3 = 24V / 4700Ω ≈ 0.0051A`. KCL Check: `0.024 + 0.0109 + 0.0051 = 0.04A ≈ I_total`. (Note: slight differences due to rounding)'
+    },
+    {
+      id: 7,
+      type: 'calculation',
+      question: 'Voltage Divider: In a series circuit, a 15V source is connected to a `1 kΩ` resistor and a `3 kΩ` resistor. What is the voltage across the `3 kΩ` resistor?',
+      subQuestions: [
+        { label: 'Voltage across 3kΩ resistor (V)', key: 'v3k', formula: 'V_Rx = V_T * (Rx / Req)', expected: '11.25' }
+      ],
+      explanation: 'Total Resistance: `Req = 1kΩ + 3kΩ = 4kΩ`. Voltage across 3kΩ: `V_3kΩ = 15V * (3kΩ / 4kΩ) = 15V * 0.75 = 11.25V`.'
+    },
+    {
+      id: 8,
+      type: 'calculation',
+      question: 'Current Divider: A total current of 50 mA enters a parallel combination of two resistors: `R_A = 100Ω` and `R_B = 400Ω`. Calculate the current flowing through `R_A` and `R_B`.',
+      subQuestions: [
+        { label: 'Current through RA (mA)', key: 'ira', formula: 'I_A = I_T * (R_B / (R_A + R_B))', expected: '40' },
+        { label: 'Current through RB (mA)', key: 'irb', formula: 'I_B = I_T * (R_A / (R_A + R_B))', expected: '10' }
+      ],
+      explanation: 'Total Resistance for current division: `R_A + R_B = 100Ω + 400Ω = 500Ω`. Current through `R_A`: `I_A = 50mA * (400Ω / 500Ω) = 50mA * 0.8 = 40mA`. Current through `R_B`: `I_B = 50mA * (100Ω / 500Ω) = 50mA * 0.2 = 10mA`.'
     }
+  ];
 
-    function renderResistanceChart() {
-        const ctx = document.getElementById('resistanceChart');
-        if (!ctx) return;
-        if (resistanceChart) {
-            resistanceChart.destroy();
+  const quizQuestions = [
+    {
+      id: 1,
+      question: 'Which of the following is NOT typically considered a core discipline within Mechatronics?',
+      options: ['Mechanical Engineering', 'Electrical Engineering', 'Civil Engineering', 'Computer Science'],
+      correctAnswer: 'Civil Engineering',
+      explanation: 'While civil engineering might involve some overlapping principles (e.g., structural analysis), it\'s not a core, direct discipline for designing integrated intelligent systems in the same way the others are.'
+    },
+    {
+      id: 2,
+      question: 'The unit of electric current is the:',
+      options: ['Volt', 'Ohm', 'Ampere', 'Coulomb'],
+      correctAnswer: 'Ampere',
+      explanation: 'Volt is for voltage, Ohm is for resistance, Ampere is for current, and Coulomb is for charge.'
+    },
+    {
+      id: 3,
+      question: 'If a circuit has a voltage of 12V and a current of 0.2A, what is the resistance?',
+      options: ['2.4 Ω', '60 Ω', '24 Ω', '0.016 Ω'],
+      correctAnswer: '60 Ω',
+      explanation: 'Using Ohm\'s Law, `R = V/I = 12V / 0.2A = 60Ω`.'
+    },
+    {
+      id: 4,
+      question: 'According to Kirchhoff\'s Voltage Law (KVL), the sum of voltages around any closed loop in a circuit must be:',
+      options: ['Equal to the total current', 'Equal to the total resistance', 'Zero', 'A positive constant'],
+      correctAnswer: 'Zero',
+      explanation: 'KVL is based on the conservation of energy, meaning no energy is lost or gained when traversing a complete loop.'
+    },
+    {
+      id: 5,
+      question: 'Three resistors (R1, R2, R3) are connected in series. Their equivalent resistance (Req) is given by:',
+      options: ['1/R1 + 1/R2 + 1/R3', 'R1 + R2 + R3', '(R1 * R2 * R3) / (R1 + R2 + R3)', 'sqrt(R1^2 + R2^2 + R3^2)'],
+      correctAnswer: 'R1 + R2 + R3',
+      explanation: 'For resistors in series, the resistances simply add up. Option \'a\' is for parallel resistors (sum of reciprocals).'
+    },
+    {
+      id: 6,
+      question: 'Short Answer: A 24V source is connected to two parallel resistors, `R_A = 8Ω` and `R_B = 12Ω`. What is the voltage across `R_A`?',
+      type: 'short_answer',
+      correctAnswer: '24V',
+      explanation: 'In a parallel circuit, the voltage across each parallel component is the same as the source voltage.'
+    },
+    {
+      id: 7,
+      question: 'Short Answer: A 24V source is connected to two parallel resistors, `R_A = 8Ω` and `R_B = 12Ω`. What is the total current drawn from the source?',
+      type: 'short_answer',
+      correctAnswer: '5A',
+      explanation: 'First, find the equivalent resistance (Req) for the parallel combination: `1/Req = 1/8Ω + 1/12Ω = 3/24Ω + 2/24Ω = 5/24Ω`. So, `Req = 24/5Ω = 4.8Ω`. Now use Ohm\'s Law to find the total current (`I_T`) from the source: `I_T = V_S / Req = 24V / 4.8Ω = 5A`.'
+    }
+  ];
+
+  const [homeworkAnswers, setHomeworkAnswers] = useState({});
+  const [quizSelections, setQuizSelections] = useState({});
+  const [quizResults, setQuizResults] = useState({});
+
+  const handleHomeworkChange = (id, key, value) => {
+    setHomeworkAnswers(prev => ({
+      ...prev,
+      [id]: {
+        ...(prev[id] || {}),
+        [key]: value
+      }
+    }));
+  };
+
+  const handleQuizSelect = (questionId, selectedOption) => {
+    setQuizSelections(prev => ({
+      ...prev,
+      [questionId]: selectedOption
+    }));
+  };
+
+  const checkQuizAnswers = () => {
+    const newResults = {};
+    quizQuestions.forEach(q => {
+      const userAnswer = quizSelections[q.id];
+      if (q.type === 'short_answer') {
+        // Simple case-insensitive trim-insensitive comparison for short answer
+        newResults[q.id] = userAnswer && userAnswer.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase();
+      } else {
+        newResults[q.id] = userAnswer === q.correctAnswer;
+      }
+    });
+    setQuizResults(newResults);
+  };
+
+  const resetQuiz = () => {
+    setQuizSelections({});
+    setQuizResults({});
+  };
+
+  return (
+    <div className="p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
+
+      <div className="flex mb-6 space-x-4">
+        <button
+          onClick={() => setActiveTab('homework')}
+          className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+            activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          Homework Questions
+        </button>
+        <button
+          onClick={() => setActiveTab('quiz')}
+          className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+            activeTab === 'quiz' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          Week 1 Quiz
+        </button>
+      </div>
+
+      {activeTab === 'homework' && (
+        <div>
+          <h3 className="text-2xl font-semibold text-indigo-700 mb-4">Homework 1 Questions</h3>
+          <p className="text-gray-700 mb-4">
+            Instructions: Show all work and steps clearly. Include units in your final answers.
+          </p>
+          {homeworkQuestions.map((q) => (
+            <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+              {q.type === 'text' ? (
+                <textarea
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                  placeholder="Type your answer here..."
+                  value={homeworkAnswers[q.id]?.answer || ''}
+                  onChange={(e) => handleHomeworkChange(q.id, 'answer', e.target.value)}
+                ></textarea>
+              ) : (
+                <div className="space-y-3">
+                  {q.subQuestions.map(sq => (
+                    <div key={sq.key} className="flex flex-col">
+                      <label htmlFor={`hw-${q.id}-${sq.key}`} className="text-md text-gray-700 mb-1">{sq.label}</label>
+                      <input
+                        type="number"
+                        id={`hw-${q.id}-${sq.key}`}
+                        className="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        value={homeworkAnswers[q.id]?.[sq.key] || ''}
+                        onChange={(e) => handleHomeworkChange(q.id, sq.key, e.target.value)}
+                        placeholder={`Enter ${sq.label}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                <div className="mt-2 text-indigo-700">
+                  <p>{q.explanation}</p>
+                </div >
+              </details>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {activeTab === 'quiz' && (
+        <div>
+          <h3 className="text-2xl font-semibold text-indigo-700 mb-4">Week 1 Quiz</h3>
+          <p className="text-gray-700 mb-4">
+            Instructions: Choose the best answer.
+          </p>
+          {quizQuestions.map((q) => (
+            <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+              {q.type === 'short_answer' ? (
+                <input
+                  type="text"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Type your answer here..."
+                  value={quizSelections[q.id] || ''}
+                  onChange={(e) => handleQuizSelect(q.id, e.target.value)}
+                />
+              ) : (
+                <div className="space-y-2">
+                  {q.options.map((option, index) => (
+                    <label key={index} className="flex items-center text-gray-700 cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`quiz-${q.id}`}
+                        value={option}
+                        checked={quizSelections[q.id] === option}
+                        onChange={() => handleQuizSelect(q.id, option)}
+                        className="form-radio h-4 w-4 text-indigo-600"
+                      />
+                      <span className="ml-2">{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+              {quizResults[q.id] !== undefined && (
+                <div className="mt-3 flex items-center">
+                  {quizResults[q.id] ? (
+                    <CheckCircle className="text-green-500 mr-2" />
+                  ) : (
+                    <XCircle className="text-red-500 mr-2" />
+                  )}
+                  <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                    {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                  </span>
+                </div>
+              )}
+              {quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                <div className="mt-2 text-sm text-gray-600">
+                  <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
+                  <p className="text-gray-700">Explanation: {q.explanation}</p>
+                </div>
+              )}
+            </div>
+          ))}
+          <div className="flex gap-4 mt-6">
+            <button
+              onClick={checkQuizAnswers}
+              className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+            >
+              Check Answers
+            </button>
+            <button
+              onClick={resetQuiz}
+              className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+            >
+              Reset Quiz
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+// Main App Component
+const App = () => {
+  const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
+
+  return (
+    <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+      {/* Tailwind CSS CDN */}
+      <script src="https://cdn.tailwindcss.com"></script>
+      {/* Inter Font */}
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+      <style>{`
+        body {
+          font-family: 'Inter', sans-serif;
         }
-        resistanceChart = new Chart(ctx.getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: ['Series', 'Parallel'],
-                datasets: [{
-                    label: 'Equivalent Resistance (Ω)',
-                    data: [200, 50], // R_eq for two 100Ω resistors
-                    backgroundColor: ['rgba(59, 130, 246, 0.6)', 'rgba(22, 163, 74, 0.6)'],
-                    borderColor: ['rgba(59, 130, 246, 1)', 'rgba(22, 163, 74, 1)'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        title: { display: true, text: 'Resistance (Ω)' }
-                    }
-                },
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
-    }
+        /* Custom styles for better aesthetics and responsiveness */
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 1rem;
+        }
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
+        }
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
+        }
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
+        }
+        .nav-button svg {
+          margin-bottom: 0.25rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
+        }
+      `}</style>
 
-    // Initial setup
-    document.querySelector('.nav-link[data-target="modules"]').click();
-    document.querySelector('.module-tab[data-module="concepts"]').click();
-    renderPracticeProblems();
-});
-</script>
-</body>
-</html>
+      <header className="text-center mb-8">
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+          Mechatronics 1 Study Guide
+        </h1>
+        <p className="text-xl sm:text-2xl text-gray-600">Week 1: Electrical Fundamentals</p>
+      </header>
+
+      <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+        <button
+          onClick={() => setActiveSection('review')}
+          className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+        >
+          <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+          <span className="text-sm sm:text-base">Concept Review</span>
+        </button>
+        <button
+          onClick={() => setActiveSection('sandbox')}
+          className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+        >
+          <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+          <span className="text-sm sm:text-base">Interactive Sandbox</span>
+        </button>
+        <button
+          onClick={() => setActiveSection('practice')}
+          className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+        >
+          <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+          <span className="text-sm sm:text-base">Practice Problems</span>
+        </button>
+      </nav>
+
+      <main className="container">
+        {activeSection === 'review' && <ConceptReview />}
+        {activeSection === 'sandbox' && <OhmLawSandbox />}
+        {activeSection === 'practice' && <PracticeProblems />}
+      </main>
+
+      <footer className="text-center text-gray-500 text-sm mt-12">
+        <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
