@@ -60,64 +60,6 @@
             padding: 1rem 1.5rem;
           }
         }
-        /* Custom styles for the circuit visualization */
-        .circuit-diagram {
-            border: 2px solid #374151; /* Darker gray border */
-            border-radius: 0.75rem; /* More rounded */
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            background-color: #f9fafb; /* Lighter background for the diagram */
-        }
-        .circuit-label {
-            position: absolute;
-            background-color: #f9fafb; /* Match diagram background */
-            padding: 0 0.5rem;
-            font-size: 0.875rem; /* text-sm */
-            color: #4b5563; /* gray-600 */
-            border-radius: 0.25rem;
-        }
-        .voltage-source {
-            width: 4rem; /* 64px */
-            height: 4rem; /* 64px */
-            background-color: #3b82f6; /* Blue-500 */
-            border-radius: 9999px; /* Fully rounded */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700; /* font-bold */
-            font-size: 1.125rem; /* text-lg */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .resistor-element {
-            width: 6rem; /* 96px */
-            height: 2rem; /* 32px */
-            background-color: #ef4444; /* Red-500 */
-            border-radius: 0.375rem; /* rounded-md */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700; /* font-bold */
-            font-size: 1.125rem; /* text-lg */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .wire {
-            width: 0.25rem; /* 4px */
-            height: 3rem; /* 48px */
-            background-color: #374151; /* Dark gray */
-            margin: 0.5rem 0;
-        }
-        .current-indicator {
-            color: #1f2937; /* Dark gray */
-            font-weight: 700; /* font-bold */
-            font-size: 1.125rem; /* text-lg */
-            margin-top: 0.5rem;
-        }
         .formula-box {
             background-color: #e0f2fe; /* Light blue background */
             border-left: 4px solid #38bdf8; /* Blue border on left */
@@ -142,19 +84,9 @@
         const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
         const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
         const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
-        const Lightbulb = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2C7.8 2 4.1 4.3 2.4 8.7A4.4 4.4 0 0 0 4 15h.3c.7 0 1.4.3 1.8.9l.4.9c1.4 2.3 3.4 3.4 5.4 3.4 2 0 4-.9 5.4-3.4l.4-.9c.4-.6 1.1-.9 1.8-.9H20a4.4 4.4 0 0 0 1.6-6.3C19.9 4.3 16.2 2 12 2z"/></svg>;
-        const Zap = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>;
-        const Bolt = ({ className }) => <Zap className={className} />; // Reusing Zap for Bolt
-        const CircuitBoard = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><path d="M9 9h6v6H9z"/><path d="M12 1v3"/><path d="M12 20v3"/><path d="M1 12h3"/><path d="M20 12h3"/></svg>;
-        const Split = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 18V9"/><path d="M17 13l-5 5-5-5"/></svg>;
         const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
 
-        // New Icons for Week 2
-        const CapacitorIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7 5h10M7 19h10M12 5v14"/></svg>;
-        const InductorIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 12s3-4 6-4 6 4 6 4 3 4 6 4"/></svg>;
-        const Grid = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>;
-
-        // New Icons for Week 3
+        // Icons for Week 3
         const SemiconductorIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2v20"/><path d="M17 5H7"/><path d="M17 19H7"/><path d="M5 12h14"/></svg>;
         const DiodeIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 12h20"/><path d="M18 7l4 5-4 5"/><path d="M14 7v10"/></svg>;
         const LedIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 12v2"/><path d="M10 10l-2 2"/><path d="M14 10l2 2"/><path d="M12 2a4 4 0 0 0-4 4v2a4 4 0 0 0 4 4 4 4 0 0 0 4-4V6a4 4 0 0 0-4-4z"/><path d="M7 17h10"/><path d="M12 22v-3"/></svg>;
@@ -166,197 +98,139 @@
         const ConceptReview = () => {
           return (
             <div className="p-6 bg-white rounded-lg shadow-lg">
-              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 3: Semiconductors, Diodes & Transistors</h2>
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 3: Semiconductors, Diodes, Transistors, and Relays</h2>
 
-              {/* What are Semiconductors? */}
+              {/* Introduction to Semiconductors */}
               <section className="mb-8">
                 <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
-                    <SemiconductorIcon className="w-7 h-7 mr-3 text-green-600"/>
-                    1. What are Semiconductors?
+                    <SemiconductorIcon className="w-7 h-7 mr-3 text-blue-600"/>
+                    1. Introduction to Semiconductors
                 </h3>
                 <p className="text-gray-700 leading-relaxed mb-2">
-                  Definition: Materials that have electrical conductivity between that of a conductor (like copper) and an insulator (like glass). Their conductivity can be precisely controlled, making them ideal for electronic devices.
+                  <span className="font-medium">Definition:</span> Materials that have electrical conductivity between that of a conductor (like copper) and an insulator (like glass). Their conductivity can be precisely controlled, making them ideal for electronic devices.
                 </p>
-                <p className="text-gray-700 mb-2">Common Semiconductor Materials: Silicon (Si) is the most prevalent, Germanium (Ge), Gallium Arsenide (GaAs).</p>
+                <p className="text-gray-700 mb-2">
+                  <span className="font-medium">Common Materials:</span> Silicon (Si) is the most prevalent, Germanium (Ge), Gallium Arsenide (GaAs).
+                </p>
                 <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Intrinsic vs. Extrinsic Semiconductors:</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Intrinsic:</span> Pure semiconductor material (e.g., pure silicon). Very few free charge carriers (electrons or holes), low conductivity.</li>
-                  <li><span className="font-medium">Extrinsic:</span> Intentionally "doped" with impurities to increase conductivity.</li>
-                </ul>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Types of Doping:</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">N-type Semiconductor:</span> Doped with <span className="font-medium">donor</span> impurities (e.g., Phosphorus, Arsenic). Adds extra electrons, making electrons the <span className="font-medium">majority carriers</span>.</li>
-                  <li><span className="font-medium">P-type Semiconductor:</span> Doped with <span className="font-medium">acceptor</span> impurities (e.g., Boron, Aluminum). Creates "holes" (absence of an electron), making holes the <span className="font-medium">majority carriers</span>.</li>
-                </ul>
-              </section>
-
-              {/* The P-N Junction */}
-              <section className="mb-8">
-                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
-                    <DiodeIcon className="w-7 h-7 mr-3 text-indigo-500"/>
-                    2. The P-N Junction: The Heart of the Diode
-                </h3>
-                <p className="text-gray-700 leading-relaxed mb-2">
-                  Definition: A P-N junction is formed when a P-type semiconductor is brought into contact with an N-type semiconductor. This junction is the fundamental building block of most semiconductor devices.
-                </p>
-                <p className="text-gray-700 mb-2"><span className="font-medium">Depletion Region:</span> At the junction, free electrons from the N-side diffuse into the P-side, and holes from the P-side diffuse into the N-side. This creates a region near the junction that is depleted of free charge carriers, leaving behind immobile positive and negative ions. This region acts as an insulator and creates a <span className="font-medium">built-in potential barrier</span>.</p>
-              </section>
-
-              {/* Diodes */}
-              <section className="mb-8">
-                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
-                    <DiodeIcon className="w-7 h-7 mr-3 text-indigo-500"/>
-                    3. Diodes
-                </h3>
-                <p className="text-gray-700 leading-relaxed mb-2">
-                  Definition: A two-terminal semiconductor device that essentially allows current to flow in only one direction. It's often called a "one-way valve" for electricity.
-                </p>
-                <p className="text-gray-700 mb-2"><span className="font-medium">Symbol:</span> A triangle with a line at its apex. The triangle points in the direction of conventional current flow.</p>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Anode (A):</span> The P-type material, positive terminal.</li>
-                  <li><span className="font-medium">Cathode (K):</span> The N-type material, negative terminal (the line/bar side).</li>
-                </ul>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Diode Biasing:</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Forward Bias:</span> Positive voltage to anode relative to cathode. If voltage exceeds forward voltage drop (`VF`, typically 0.7V for silicon), current flows easily. Diode acts like a closed switch.</li>
-                  <li><span className="font-medium">Reverse Bias:</span> Negative voltage to anode relative to cathode. Depletion region widens, creating very high resistance. Only tiny leakage current flows. Diode acts like an open switch.</li>
-                  <li><span className="font-medium">Breakdown Voltage:</span> If reverse bias voltage is too high, the junction can break down, leading to large reverse current (can destroy diode).</li>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Intrinsic:</span> Pure semiconductor material (e.g., pure silicon). Very few free charge carriers, low conductivity.</li>
+                  <li><span className="font-medium">Extrinsic:</span> Intentionally "doped" with impurities to increase conductivity.
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">N-type:</span> Doped with donor impurities (e.g., Phosphorus) to create excess free electrons (negative charge carriers).</li>
+                      <li><span className="font-medium">P-type:</span> Doped with acceptor impurities (e.g., Boron) to create "holes" (absence of an electron, acting as positive charge carriers).</li>
+                    </ul>
+                  </li>
                 </ul>
               </section>
 
-              {/* Light Emitting Diodes (LEDs) */}
+              {/* Diodes (P-N Junction, LED operation) */}
               <section className="mb-8">
                 <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
-                    <LedIcon className="w-7 h-7 mr-3 text-yellow-400"/>
-                    4. Light Emitting Diodes (LEDs)
+                    <DiodeIcon className="w-7 h-7 mr-3 text-red-600"/>
+                    2. Diodes
                 </h3>
                 <p className="text-gray-700 leading-relaxed mb-2">
-                  Definition: A special type of diode that emits light when forward biased.
+                  <span className="font-medium">Definition:</span> An electronic component that acts like a one-way valve for electricity, allowing current to flow easily in one direction (forward bias) and blocking it in the opposite direction (reverse bias).
                 </p>
-                <p className="text-gray-700 mb-2"><span className="font-medium">Mechanism:</span> When electrons and holes recombine at the P-N junction under forward bias, they release energy as photons (light).</p>
-                <p className="text-gray-700 mb-2"><span className="font-medium">Color:</span> Depends on the semiconductor material, not the applied voltage (though intensity varies with current).</p>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Characteristics:</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Forward Voltage Drop (`VF`):</span> Higher than regular diodes, typically 1.8V to 3.5V depending on color.</li>
-                  <li>LEDs require a current-limiting resistor in series to prevent damage.</li>
+                <p className="text-gray-700 mb-2">
+                  <span className="font-medium">P-N Junction:</span> Formed by joining P-type and N-type semiconductor materials. At the junction, a depletion region forms, which is depleted of mobile charge carriers.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Bias Conditions:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Forward Bias:</span> Positive voltage applied to P-type (anode) and negative to N-type (cathode). Narrows the depletion region, allowing current to flow. Requires a small "forward voltage drop" (e.g., 0.7V for silicon diodes) before current flows significantly.</li>
+                  <li><span className="font-medium">Reverse Bias:</span> Positive voltage applied to N-type (cathode) and negative to P-type (anode). Widens the depletion region, blocking current flow (ideally, only a very small leakage current).</li>
                 </ul>
+
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4 flex items-center">
+                    <LedIcon className="w-6 h-6 mr-2 text-yellow-500"/>
+                    Light-Emitting Diodes (LEDs):
+                </h4>
+                <p className="text-gray-700 mb-2">Special type of diode that emits light when forward-biased. They have a specific "forward voltage" (V_F) and "forward current" (I_F) for optimal operation.</p>
+                <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h5 className="text-lg font-semibold text-gray-800 mb-2">Current Limiting Resistor for LEDs:</h5>
+                  <p className="text-gray-700 mb-1">An LED must always have a series resistor to limit the current, preventing it from burning out.</p>
+                  <p className="text-gray-700 mb-2">Formula: R = (V_supply - V_F) / I_F</p>
+                  <p className="text-gray-700">Where V_supply is the battery/source voltage, V_F is the LED's forward voltage, and I_F is the desired forward current.</p>
+                </div>
               </section>
 
-              {/* Transistors */}
+              {/* Transistors (BJT as a Switch) and Basic Relay Operation */}
               <section className="mb-8">
                 <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
-                    <TransistorIcon className="w-7 h-7 mr-3 text-blue-500"/>
-                    5. Transistors
+                    <TransistorIcon className="w-7 h-7 mr-3 text-green-700"/>
+                    3. Transistors and Relays
                 </h3>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Bipolar Junction Transistors (BJTs) as Switches:</h4>
                 <p className="text-gray-700 leading-relaxed mb-2">
-                  Definition: A semiconductor device used to amplify or switch electronic signals and electrical power. Often called a "controlled switch" or "current amplifier."
+                  <span className="font-medium">Definition:</span> A semiconductor device used to amplify or switch electronic signals and electrical power. We primarily use them as electronically controlled switches.
                 </p>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Types of Transistors:</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Bipolar Junction Transistors (BJTs):</span> Current-controlled devices. (Focus for this course).</li>
-                  <li><span className="font-medium">Field-Effect Transistors (FETs - e.g., MOSFETs):</span> Voltage-controlled devices.</li>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">NPN Transistor (Common Type):</span> Has three terminals: Collector, Base, and Emitter. A small current applied to the Base controls a larger current flow between Collector and Emitter.</li>
+                  <li><span className="font-medium">Operating Regions for Switching:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">Cutoff Region:</span> No (or very small) base current. Transistor acts like an open switch (no current flows from collector to emitter).</li>
+                      <li><span className="font-medium">Saturation Region:</span> Sufficient base current applied. Transistor acts like a closed switch (maximum current flows from collector to emitter, limited by external circuitry).</li>
+                    </ul>
+                  </li>
                 </ul>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Bipolar Junction Transistors (BJTs):</h4>
-                <p className="text-gray-700 mb-2">Construction: Three layers of doped semiconductor material, forming two P-N junctions.</p>
-                <p className="text-gray-700 mb-2">Terminals:</p>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Base (B):</span> The control input. A small current here controls a larger current.</li>
-                  <li><span className="font-medium">Collector (C):</span> Where the main current enters (for NPN).</li>
-                  <li><span className="font-medium">Emitter (E):</span> Where the main current leaves (for NPN).</li>
-                </ul>
-                <p className="text-gray-700 mb-2">Types: <span className="font-medium">NPN</span> (most common for switching) and <span className="font-medium">PNP</span>.</p>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">BJT Operation Modes (Simplified for Switching):</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Cutoff Region (OFF State):</span> No current into Base (`IB ≈ 0`). Transistor acts like an <span className="font-medium">open switch</span> between Collector and Emitter.</li>
-                  <li><span className="font-medium">Saturation Region (ON State):</span> Sufficient current into Base (`IB` is high enough). Transistor acts like a <span className="font-medium">closed switch</span> between Collector and Emitter (very low voltage drop, typically 0.2V). Maximum current flows through Collector-Emitter.</li>
-                  <li><span className="font-medium">Active Region:</span> (Amplification) Between cutoff and saturation.</li>
-                </ul>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">BJT as a Switch (NPN configuration):</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li>Concept: Use a small current at the Base (e.g., from a microcontroller) to control a much larger current flow through a load.</li>
-                  <li><span className="font-medium">Current Gain (β or hFE):</span> `IC = β × IB`. Indicates how much collector current you get for a given base current.</li>
-                  <li><span className="font-medium">Base Resistor:</span> Always use a current-limiting resistor in series with the Base to protect the transistor and controlling source.</li>
-                </ul>
-              </section>
 
-              {/* Relays */}
-              <section className="mb-8">
-                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
-                    <Power className="w-7 h-7 mr-3 text-red-600"/>
-                    6. Relays: Electromechanical Switches
-                </h3>
-                <p className="text-gray-700 leading-relaxed mb-2">
-                  Definition: An electrically operated switch that uses an electromagnet to mechanically operate a switch.
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4 flex items-center">
+                    <Power className="w-6 h-6 mr-2 text-orange-500"/>
+                    Relays:
+                </h4>
+                <p className="text-gray-700 mb-2">
+                  <span className="font-medium">Definition:</span> An electromechanical switch that uses an electromagnet to operate a set of contacts. They are used to control high-power circuits with low-power control signals (e.g., from a microcontroller).
                 </p>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Why use Relays?</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li>To control high-voltage or high-current circuits (e.g., AC mains, large motors) using a low-voltage, low-current control signal.</li>
-                  <li>To provide electrical isolation between the control circuit and the load circuit.</li>
-                  <li>To switch multiple circuits simultaneously.</li>
-                </ul>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Construction:</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li><span className="font-medium">Coil:</span> An electromagnet that, when energized, generates a magnetic field.</li>
-                  <li><span className="font-medium">Armature:</span> A movable piece of ferromagnetic material attracted by the electromagnet.</li>
-                  <li><span className="font-medium">Contacts:</span> The actual switch contacts (e.g., Normally Open (NO), Normally Closed (NC), Common (COM)).</li>
-                </ul>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Operation:</h4>
-                <p className="text-gray-700 leading-relaxed mb-2">
-                  When current flows through the coil, it becomes magnetized and pulls the armature, which then opens or closes the electrical contacts, controlling the load circuit.
+                <p className="text-gray-700 mb-2">
+                  <span className="font-medium">Operation:</span> When current flows through the relay's coil, it creates a magnetic field that pulls a metal armature, closing (or opening) electrical contacts.
                 </p>
-                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">Flyback Diode across Relay Coil:</h4>
-                <ul className="list-disc list-inside text-gray-700 ml-4">
-                  <li>It's critical to place a <span className="font-medium">flyback diode</span> (snubber or freewheeling diode) in parallel with the relay coil, in reverse bias.</li>
-                  <li><span className="font-medium">Purpose:</span> When the current to the coil is suddenly turned off, the collapsing magnetic field generates a large reverse voltage spike (inductive kickback) that can damage the controlling transistor or microcontroller. The flyback diode provides a path for this inductive current to dissipate safely.</li>
-                </ul>
+                <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h5 className="text-lg font-semibold text-gray-800 mb-2">Flyback Diode (Freewheeling Diode):</h5>
+                  <p className="text-gray-700 mb-1">Crucial for protecting transistors (or other switching devices) when controlling inductive loads like relay coils, motors, or solenoids.</p>
+                  <p className="text-gray-700 mb-2">Purpose: When current through an inductor is suddenly cut off, the collapsing magnetic field induces a large, reverse voltage spike (inductive kickback). The flyback diode is placed in reverse bias across the coil to provide a path for this induced current to safely dissipate, preventing the voltage spike from damaging the switching transistor.</p>
+                </div>
               </section>
             </div>
           );
         };
 
         // LED Resistor Calculator Sandbox
-        const LEDResistorSandbox = () => {
+        const LedResistorCalculator = () => {
           const [batteryVoltage, setBatteryVoltage] = useState('');
           const [ledForwardVoltage, setLedForwardVoltage] = useState('');
           const [ledCurrent, setLedCurrent] = useState('');
-          const [calculatedResistor, setCalculatedResistor] = useState('');
-          const [calculatedPower, setCalculatedPower] = useState('');
+          const [requiredResistor, setRequiredResistor] = useState('');
+          const [powerDissipation, setPowerDissipation] = useState('');
           const [message, setMessage] = useState('');
 
           const calculateResistor = () => {
             setMessage('');
-            const V_battery = parseFloat(batteryVoltage);
-            const V_F = parseFloat(ledForwardVoltage);
-            const I_LED = parseFloat(ledCurrent);
+            const V_batt = parseFloat(batteryVoltage);
+            const V_f = parseFloat(ledForwardVoltage);
+            const I_f = parseFloat(ledCurrent) / 1000; // Convert mA to A
 
-            if (isNaN(V_battery) || isNaN(V_F) || isNaN(I_LED) || I_LED <= 0) {
-              setMessage("Please enter valid numerical values for Battery Voltage, LED Forward Voltage, and LED Current (must be > 0).");
-              setCalculatedResistor('');
-              setCalculatedPower('');
+            if (isNaN(V_batt) || isNaN(V_f) || isNaN(I_f) || V_batt <= V_f || I_f <= 0) {
+              setMessage("Please enter valid positive numbers. Battery voltage must be greater than LED forward voltage, and LED current must be positive.");
+              setRequiredResistor('');
+              setPowerDissipation('');
               return;
             }
 
-            if (V_F >= V_battery) {
-              setMessage("LED Forward Voltage must be less than Battery Voltage for current to flow.");
-              setCalculatedResistor('');
-              setCalculatedPower('');
-              return;
-            }
+            const V_r = V_batt - V_f;
+            const R = V_r / I_f;
+            const P_r = V_r * I_f; // Or I_f * I_f * R
 
-            const V_R = V_battery - V_F;
-            const R = V_R / I_LED;
-            const P_R = V_R * I_LED; // Power dissipated by the resistor
-
-            setCalculatedResistor(R.toFixed(2));
-            setCalculatedPower(P_R.toFixed(3)); // Display power with more precision
+            setRequiredResistor(R.toFixed(2));
+            setPowerDissipation(P_r.toFixed(3));
           };
 
           const resetFields = () => {
             setBatteryVoltage('');
             setLedForwardVoltage('');
             setLedCurrent('');
-            setCalculatedResistor('');
-            setCalculatedPower('');
+            setRequiredResistor('');
+            setPowerDissipation('');
             setMessage('');
           };
 
@@ -364,152 +238,160 @@
             <div className="p-6 bg-white rounded-lg shadow-lg">
               <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">LED Current Limiting Resistor Calculator</h2>
               <p className="text-gray-700 mb-4">
-                Calculate the required current-limiting resistor for an LED circuit.
+                Calculate the necessary current-limiting resistor for an LED circuit.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div className="flex flex-col">
-                  <label htmlFor="batteryVoltage" className="text-lg font-medium text-gray-700 mb-2">Battery Voltage (V)</label>
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="batteryVoltageInput" className="text-lg font-medium text-gray-700 mb-2">Battery/Supply Voltage (V)</label>
                   <input
                     type="number"
-                    id="batteryVoltage"
+                    id="batteryVoltageInput"
                     value={batteryVoltage}
                     onChange={(e) => setBatteryVoltage(e.target.value)}
                     placeholder="e.g., 9"
-                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 mb-3"
                   />
                 </div>
-                <div className="flex flex-col">
-                  <label htmlFor="ledForwardVoltage" className="text-lg font-medium text-gray-700 mb-2">LED Forward Voltage (VF, V)</label>
+
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="ledForwardVoltageInput" className="text-lg font-medium text-gray-700 mb-2">LED Forward Voltage (V<sub>F</sub> in V)</label>
                   <input
                     type="number"
-                    id="ledForwardVoltage"
+                    id="ledForwardVoltageInput"
                     value={ledForwardVoltage}
                     onChange={(e) => setLedForwardVoltage(e.target.value)}
-                    placeholder="e.g., 2.0 (for Red LED)"
-                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="e.g., 2.2"
+                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 mb-3"
                   />
                 </div>
-                <div className="flex flex-col">
-                  <label htmlFor="ledCurrent" className="text-lg font-medium text-gray-700 mb-2">Desired LED Current (I_LED, A)</label>
+
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <label htmlFor="ledCurrentInput" className="text-lg font-medium text-gray-700 mb-2">Desired LED Current (I<sub>F</sub> in mA)</label>
                   <input
                     type="number"
-                    id="ledCurrent"
+                    id="ledCurrentInput"
                     value={ledCurrent}
                     onChange={(e) => setLedCurrent(e.target.value)}
-                    placeholder="e.g., 0.015 (for 15mA)"
-                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label htmlFor="calculatedResistor" className="text-lg font-medium text-gray-700 mb-2">Required Resistor (Ω)</label>
-                  <input
-                    type="text"
-                    id="calculatedResistor"
-                    value={calculatedResistor}
-                    readOnly
-                    placeholder="Calculated Resistance"
-                    className="p-3 bg-gray-100 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label htmlFor="calculatedPower" className="text-lg font-medium text-gray-700 mb-2">Resistor Power Dissipation (W)</label>
-                  <input
-                    type="text"
-                    id="calculatedPower"
-                    value={calculatedPower}
-                    readOnly
-                    placeholder="Calculated Power"
-                    className="p-3 bg-gray-100 border border-gray-300 rounded-md"
+                    placeholder="e.g., 20"
+                    className="p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 mb-3"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-4 mb-4">
+              <div className="flex justify-center mt-4 gap-4">
                 <button
                   onClick={calculateResistor}
-                  className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                  className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md flex-1"
                 >
-                  Calculate
+                  Calculate Resistor
                 </button>
                 <button
                   onClick={resetFields}
-                  className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                  className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md flex-1"
                 >
                   Reset
                 </button>
               </div>
 
+              {(requiredResistor || powerDissipation) && (
+                <div className="mt-6 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-md font-semibold text-center">
+                  <p>Required Resistor: <span className="text-blue-900 text-xl">{requiredResistor} Ω</span></p>
+                  <p>Resistor Power Dissipation: <span className="text-blue-900 text-xl">{powerDissipation} W</span></p>
+                </div>
+              )}
               {message && (
-                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-md relative" role="alert">
+                <div className="mt-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-md relative" role="alert">
                   <span className="block sm:inline">{message}</span>
                 </div>
               )}
-
-              <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">Formula Used:</h3>
-                <p className="formula-box mb-2">`R = (V_battery - V_F) / I_LED`</p>
-                <p className="formula-box">`P_R = (V_battery - V_F) * I_LED`</p>
-                <p className="text-sm text-gray-600 mt-3">
-                  (Always choose a standard resistor value slightly higher than calculated, and a power rating higher than dissipated for safety.)
-                </p>
-              </div>
             </div>
           );
         };
 
+
         // Practice Problems Component
         const PracticeProblems = () => {
-          const [activeTab, setActiveTab] = useState('homework'); // Only homework for now
+          const [activeTab, setActiveTab] = useState('homework');
 
           const homeworkQuestions = [
             {
               id: 1,
               type: 'text',
-              question: 'Explain the difference between N-type and P-type semiconductors, including the type of doping impurity and majority charge carriers for each.',
-              answer: 'N-type semiconductors are doped with donor impurities (Group V elements like Phosphorus), which add extra electrons, making electrons the majority carriers. P-type semiconductors are doped with acceptor impurities (Group III elements like Boron), which create "holes" (absence of an electron), making holes the majority carriers.'
+              question: 'What is a semiconductor, and how is an extrinsic semiconductor created?',
+              answer: 'A semiconductor is a material with electrical conductivity between that of a conductor and an insulator. An extrinsic semiconductor is created by intentionally adding impurities (doping) to a pure (intrinsic) semiconductor material. Doping increases the number of free charge carriers (electrons or holes), thereby increasing its conductivity.',
+              explanation: 'Semiconductors like silicon are naturally poor conductors. To make them useful in electronics, impurities are added in a process called doping. N-type doping adds electrons, and P-type doping creates "holes," both of which increase conductivity and allow for the creation of P-N junctions.'
             },
             {
               id: 2,
               type: 'text',
-              question: 'Describe the behavior of a diode under forward bias and reverse bias. How does it act like a "one-way valve" for electricity?',
-              answer: 'Under forward bias, a positive voltage is applied to the anode relative to the cathode. If this voltage exceeds the diode\'s forward voltage drop (e.g., 0.7V for silicon), the depletion region is overcome, and current flows easily, making the diode act like a closed switch. Under reverse bias, a negative voltage is applied to the anode relative to the cathode. The depletion region widens, creating very high resistance, and only a tiny leakage current flows, making the diode act like an open switch. This directional behavior is why it\'s called a "one-way valve."'
+              question: 'Describe the conditions for a P-N junction diode to be (a) forward-biased and (b) reverse-biased.',
+              answer: '(a) Forward-biased: The positive terminal of the voltage source is connected to the P-type material (anode), and the negative terminal to the N-type material (cathode). This reduces the depletion region, allowing current to flow easily.\n(b) Reverse-biased: The positive terminal of the voltage source is connected to the N-type material (cathode), and the negative terminal to the P-type material (anode). This widens the depletion region, preventing current flow (except for a very small leakage current).',
+              explanation: 'In forward bias, the external voltage pushes charge carriers towards the junction, overcoming the depletion region and allowing current. In reverse bias, the external voltage pulls charge carriers away from the junction, widening the depletion region and effectively blocking current flow.'
             },
             {
               id: 3,
-              type: 'calculation',
-              question: 'LED Resistor Calculation: A red LED has a typical forward voltage (`VF`) of 2.0V and you want to drive it with a current (`I_LED`) of 15mA (0.015A). If you are using a 9V battery, what is the required series current-limiting resistor (R)? What is the power dissipated by this resistor?',
-              subQuestions: [
-                { label: 'Required Resistor (Ω)', key: 'resistor', expected: '466.67' },
-                { label: 'Resistor Power Dissipation (W)', key: 'power', expected: '0.105' }
-              ],
-              explanation: 'Voltage across resistor `VR = V_battery - VF = 9V - 2.0V = 7.0V`. Required Resistor `R = VR / I_LED = 7.0V / 0.015A ≈ 466.67Ω`. Power dissipated by resistor `PR = VR * I_LED = 7.0V * 0.015A = 0.105W`. A standard 470Ω resistor would be suitable, and a 1/4W (0.25W) resistor would be sufficient for power rating.'
+              type: 'text',
+              question: 'An LED has a forward voltage drop of 2.2V and requires a forward current of 20mA. If it is connected to a 9V battery, what value of current-limiting resistor is needed? What is the power dissipated by this resistor?',
+              answer: 'Voltage across the resistor (Vr) = Battery Voltage - LED Forward Voltage = 9V - 2.2V = 6.8V.\nRequired Resistor (R) = Vr / LED Current = 6.8V / 0.020A = 340 Ω.\nPower dissipated by resistor (Pr) = Vr * LED Current = 6.8V * 0.020A = 0.136W.\nSo, a 340 Ω resistor is needed, and it dissipates 0.136W.',
+              explanation: 'The resistor\'s job is to drop the excess voltage from the supply after the LED\'s forward voltage. Ohm\'s Law (R=V/I) is then applied to the resistor to find its value, and power (P=V*I) is calculated for the resistor to ensure it can handle the dissipation.'
             },
             {
               id: 4,
               type: 'text',
-              question: 'Transistor as a Switch: Explain the difference between the "cutoff" and "saturation" regions for a Bipolar Junction Transistor (BJT) when used as a switch. How does a small base current control a larger collector current?',
-              answer: 'In the "cutoff" region (OFF state), no current flows into the Base terminal, and the transistor acts like an open switch between the Collector and Emitter, meaning no current flows through the main path. In the "saturation" region (ON state), a sufficient current flows into the Base, causing the transistor to act like a closed switch between the Collector and Emitter, allowing maximum current to flow through the load. A small base current controls a larger collector current due to the transistor\'s current gain (β or hFE), where `IC = β × IB`.'
+              question: 'Explain how an NPN Bipolar Junction Transistor (BJT) can act as an electronic switch. What are the two main operating regions for this function?',
+              answer: 'An NPN BJT acts as an electronic switch by controlling a larger collector-emitter current with a small base current. When a sufficient positive current is applied to the base (relative to the emitter), the transistor enters the saturation region, acting like a closed switch (low resistance) and allowing maximum current to flow from collector to emitter. When no or insufficient current is applied to the base, the transistor enters the cutoff region, acting like an open switch (very high resistance) and blocking current flow.',
+              explanation: 'BJTs are current-controlled devices. A small current into the base allows a much larger current to flow between the collector and emitter. In cutoff, the base current is zero, and the transistor is off. In saturation, enough base current is supplied to fully turn on the transistor, acting like a closed switch.'
             },
             {
               id: 5,
               type: 'text',
-              question: 'Relay and Flyback Diode: Why is a flyback diode essential when using a transistor to switch an inductive load like a relay coil? Describe its purpose and how it protects the switching component.',
-              answer: 'A flyback diode (or freewheeling diode) is essential because when the current to an inductive load (like a relay coil) is suddenly interrupted, the collapsing magnetic field generates a large, high-voltage spike (inductive kickback). This voltage spike can exceed the breakdown voltage of the switching transistor or microcontroller, damaging it. The flyback diode is placed in parallel with the coil in reverse bias, providing a safe path for this inductive current to circulate and dissipate, thus protecting the switching component from the voltage spike.'
+              question: 'What is the purpose of a flyback diode (or freewheeling diode) when controlling an inductive load (like a relay coil) with a transistor?',
+              answer: 'The purpose of a flyback diode is to protect the switching transistor from high voltage spikes (inductive kickback) generated when the current through an inductive load is suddenly interrupted. When the transistor turns off, the magnetic field in the coil collapses, inducing a large reverse voltage. The flyback diode provides a safe path for this induced current to circulate, dissipating the energy and preventing the voltage from exceeding the transistor\'s breakdown voltage, thus protecting it from damage.',
+              explanation: 'Inductors resist changes in current. When a circuit with an inductor is opened, the inductor tries to maintain current flow by generating a large voltage in the opposite direction. This "inductive kickback" can destroy sensitive components like transistors. The flyback diode provides a bypass path for this energy, safely clamping the voltage.'
+            },
+            {
+              id: 6,
+              type: 'text',
+              question: 'A photoresistor (LDR) is used in a voltage divider with a 10 kΩ fixed resistor and a 3.3V supply. In bright light, the LDR\'s resistance is 1 kΩ. In dim light, its resistance is 50 kΩ. Calculate the output voltage (Vout) across the LDR in both bright and dim light conditions.',
+              answer: 'Voltage Divider Formula: V_out = V_in * (R_LDR / (R_fixed + R_LDR))\nGiven: V_in = 3.3V, R_fixed = 10 kΩ.\nBright Light: R_LDR = 1 kΩ\nV_out = 3.3V * (1 kΩ / (10 kΩ + 1 kΩ)) = 3.3V * (1 / 11) ≈ 0.3V\nDim Light: R_LDR = 50 kΩ\nV_out = 3.3V * (50 kΩ / (10 kΩ + 50 kΩ)) = 3.3V * (50 / 60) = 3.3V * (5 / 6) ≈ 2.75V\nSo, in bright light, Vout is approx. 0.3V. In dim light, Vout is approx. 2.75V. This shows how the voltage changes with light intensity.',
+              explanation: 'This problem demonstrates the practical application of a voltage divider with a sensor. As the LDR\'s resistance changes with light, the voltage across it (Vout) changes proportionally. In bright light, its resistance is low, resulting in a low Vout. In dim light, its resistance is high, resulting in a high Vout.'
             }
           ];
 
           const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
 
-          const handleHomeworkChange = (id, key, value) => {
+          const handleHomeworkChange = (id, value) => {
             setHomeworkAnswers(prev => ({
               ...prev,
-              [id]: {
-                ...(prev[id] || {}),
-                [key]: value
-              }
+              [id]: value
             }));
           };
+
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
+
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
+            });
+            setQuizResults(newResults);
+          };
+
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
+
 
           return (
             <div className="p-6 bg-white rounded-lg shadow-lg">
@@ -533,7 +415,7 @@
                     Homework Questions
                   </h3>
                   <p className="text-gray-700 mb-4">
-                    Instructions: Show all work and steps clearly. Include units in your final answers.
+                    Instructions: Show all work and steps clearly.
                   </p>
                   {homeworkQuestions.map((q) => (
                     <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
@@ -542,24 +424,41 @@
                         <textarea
                           className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
                           placeholder="Type your answer here..."
-                          value={homeworkAnswers[q.id]?.answer || ''}
-                          onChange={(e) => handleHomeworkChange(q.id, 'answer', e.target.value)}
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
                         ></textarea>
-                      ) : (
-                        <div className="space-y-3">
-                          {q.subQuestions.map(sq => (
-                            <div key={sq.key} className="flex flex-col">
-                              <label htmlFor={`hw-${q.id}-${sq.key}`} className="text-md text-gray-700 mb-1">{sq.label}</label>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
                               <input
-                                type="number"
-                                id={`hw-${q.id}-${sq.key}`}
-                                className="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                                value={homeworkAnswers[q.id]?.[sq.key] || ''}
-                                onChange={(e) => handleHomeworkChange(q.id, sq.key, e.target.value)}
-                                placeholder={`Enter ${sq.label}`}
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
                               />
-                            </div>
+                              <span className="ml-2">{option}</span>
+                            </label>
                           ))}
+                        </div>
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
+                        </div>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
                         </div>
                       )}
                       <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
@@ -570,6 +469,20 @@
                       </details>
                     </div>
                   ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -587,7 +500,7 @@
                 <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
                   Mechatronics 1 Study Guide
                 </h1>
-                <p className="text-xl sm:text-2xl text-gray-600">Week 3: Semiconductors, Diodes & Transistors</p>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 3: Semiconductors, Diodes, Transistors, and Relays</p>
                 <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
                     <Home className="w-5 h-5 mr-2" />
                     Back to Course Hub
@@ -620,7 +533,7 @@
 
               <main className="container">
                 {activeSection === 'review' && <ConceptReview />}
-                {activeSection === 'sandbox' && <LEDResistorSandbox />}
+                {activeSection === 'sandbox' && <LedResistorCalculator />}
                 {activeSection === 'practice' && <PracticeProblems />}
               </main>
 
