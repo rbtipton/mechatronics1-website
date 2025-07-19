@@ -3,184 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Mechatronics 1 by Dr. Tipton</title>
+    <title>Mechatronics 1: Course Hub</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .week-card {
-            display: block;
-            padding: 1.5rem; /* Increased padding */
-            border: 1px solid #e0e7ff; /* Lighter blue border */
-            border-radius: 0.75rem; /* More rounded corners */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-            transition: all 0.2s ease-in-out; /* Smooth transition for hover effects */
-            background-color: #f0f4ff; /* Lighter blue background */
-            position: relative;
-            overflow: hidden;
-            text-decoration: none; /* Remove underline from links */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #1f2937; /* Dark gray text */
         }
-        .week-card:hover {
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* Enhanced shadow on hover */
-            transform: translateY(-5px); /* Lift effect on hover */
-            background-color: #e0e7ff; /* Slightly darker blue on hover */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
         }
-        .week-card h3 {
-            font-size: 1.25rem; /* Larger heading */
-            font-weight: 700; /* Bolder heading */
-            color: #1a202c; /* Darker text for heading */
-            margin-bottom: 0.5rem;
-        }
-        .week-card p {
-            font-size: 0.95rem; /* Slightly larger paragraph text */
-            color: #4a5568; /* Darker text for description */
-        }
-        .week-card-status {
-            position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px; /* Pill shape */
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        .status-available {
-            background-color: #d1fae5; /* Green-100 */
-            color: #065f46; /* Green-800 */
-        }
-        .status-coming-soon {
-            background-color: #ffeccf; /* Yellow-100 */
-            color: #92400e; /* Yellow-800 */
-        }
-        .hero-section {
-            background-image: linear-gradient(to right, #1d4ed8, #3b82f6); /* Gradient background */
-            color: white;
-            padding: 4rem 0;
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* Rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
         }
-        .hero-section h1 {
-            font-size: 3.5rem; /* Much larger title */
-            font-weight: 800; /* Extra bold */
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2); /* Text shadow for pop */
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
         }
-        .hero-section p {
-            font-size: 1.3rem; /* Larger intro paragraph */
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
+        .card-icon {
+            margin-bottom: 0.75rem;
+            color: #4f46e5; /* Indigo-600 */
+        }
+        .card-title {
+            font-weight: 600;
+            font-size: 1.125rem; /* lg text */
+            color: #1f2937; /* Dark gray */
+            margin-bottom: 0.5rem;
+        }
+        .card-link {
+            display: inline-block;
+            background-color: #6366f1; /* Indigo-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .card-link:hover {
+            background-color: #4f46e5; /* Indigo-600 */
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
-    <header class="bg-gray-900 text-white shadow-md">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <h1 class="text-3xl font-bold">Mechatronics 1 Course</h1>
-        </nav>
-    </header>
-
-    <main>
-        <section class="hero-section">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1>Welcome to Mechatronics 1 by Dr. Tipton</h1>
-                <p>Embark on an exciting journey into the world of **Mechatronics** – the synergistic integration of mechanical engineering, electronics, computer engineering, and control systems. This course will equip you with the foundational knowledge and practical skills to design, build, and control intelligent machines. Each week's content is meticulously crafted to offer a world-class learning experience, featuring interactive lessons, real-world examples, hands-on sandboxes, and challenging practice problems to solidify your understanding. Get ready to transform theoretical concepts into tangible, functional systems!</p>
+<body class="antialiased">
+    <div class="container min-h-screen flex flex-col">
+        <!-- Header Section -->
+        <header class="text-center py-8 bg-white rounded-b-lg shadow-md mb-8">
+            <h1 class="text-5xl font-extrabold text-indigo-800 mb-3">
+                Mechatronics 1
+            </h1>
+            <p class="text-xl text-gray-600">Sophomore Mechanical Engineering Course Hub</p>
+            <!-- New Introduction Section -->
+            <div class="mt-6 px-4 max-w-3xl mx-auto">
+                <p class="text-lg text-gray-700 leading-relaxed">
+                    Welcome to the Mechatronics 1 course hub! This resource is designed to support your learning journey in this exciting multidisciplinary field, taught by Dr. Roger Tipton. Here, you'll find comprehensive learning guides for each week, along with dedicated study materials for your exams. Dive in and explore the world where mechanical, electrical, computer, and control engineering converge!
+                </p>
             </div>
-        </section>
+        </header>
 
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-white p-8 rounded-lg shadow-xl mb-8">
-                <h2 class="text-3xl font-bold mb-6 text-gray-900 border-b-2 border-blue-600 pb-2">Course Weeks Overview</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    <a href="week1.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 1: Introduction & Basic Electrical Concepts</h3>
-                        <p>Review of fundamental quantities, Ohm's Law, Kirchhoff's Laws (KVL, KCL), and analysis of series/parallel circuits.</p>
-                    </a>
-                    <a href="week2.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 2: DC Circuit Analysis Techniques</h3>
-                        <p>In-depth exploration of Nodal Analysis, Mesh Analysis, Superposition, Thevenin's and Norton's Theorems.</p>
-                    </a>
-                    <a href="week3.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 3: Capacitors, Inductors, and First-Order Circuits</h3>
-                        <p>Understanding energy storage elements, transient analysis of RC and RL circuits, and step responses.</p>
-                    </a>
-                    <a href="week4.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 4: Operational Amplifiers (Op-Amps)</h3>
-                        <p>Ideal op-amp characteristics, inverting/non-inverting amplifiers, voltage followers, and basic op-amp applications.</p>
-                    </a>
-                    <a href="week5.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 5: AC Circuit Fundamentals</h3>
-                        <p>Introduction to phasors, impedance, reactance, and basic AC circuit analysis.</p>
-                    </a>
-                    <a href="week6.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 6: Diodes and Rectifier Circuits</h3>
-                        <p>Diode characteristics, half-wave and full-wave rectifiers, and simple power supply design.</p>
-                    </a>
-                    <a href="week7.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 7: Transistors (BJTs and MOSFETs)</h3>
-                        <p>Introduction to Bipolar Junction Transistors and Metal-Oxide-Semiconductor Field-Effect Transistors as switches and amplifiers.</p>
-                    </a>
-                    <a href="week8.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 8: Control Systems and Feedback</h3>
-                        <p>Fundamentals of open-loop and closed-loop control, feedback principles, and stability concepts.</p>
-                    </a>
-                    <a href="week9.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 9: Digital Logic and Microcontroller Interfacing</h3>
-                        <p>Introduction to logic gates, Boolean algebra, combinational/sequential logic, and digital communication protocols (UART, SPI, I2C).</p>
-                    </a>
-                    <a href="week10.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 10: Microcontroller Programming Basics</h3>
-                        <p>Introduction to embedded C programming, digital I/O, and basic microcontroller peripherals.</p>
-                    </a>
-                    <a href="week11.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 11: Filters and Frequency Response</h3>
-                        <p>Understanding filters (low-pass, high-pass, band-pass), frequency response, and cutoff frequency calculations.</p>
-                    </a>
-                    <a href="week12.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 12: Data Acquisition and Signal Conditioning</h3>
-                        <p>Principles of ADCs/DACs, sampling theorem, amplification, and noise reduction techniques.</p>
-                    </a>
-                    <a href="week13.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 13: Power Electronics and Motor Drives</h3>
-                        <p>Introduction to power semiconductor devices, DC-DC converters (Buck/Boost), and motor control (H-bridges, VFDs).</p>
-                    </a>
-                    <a href="week14.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 14: Robotic Kinematics and Dynamics</h3>
-                        <p>Fundamentals of forward and inverse kinematics, homogeneous transformations, and robot dynamics for motion control.</p>
-                    </a>
-                    <a href="week15.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 15: Introduction to Real-Time Operating Systems</h3>
-                        <p>Concepts of RTOS, task scheduling, inter-task communication, and their role in embedded systems.</p>
-                    </a>
-                    <a href="week16.html" class="week-card">
-                        <span class="week-card-status status-available">Available</span>
-                        <h3 class="text-blue-700">Week 16: Mechatronics System Design Project</h3>
-                        <p>Applying the full design process from requirements to testing for a complete mechatronic system.</p>
-                    </a>
+        <!-- Main Content Area -->
+        <main class="flex-grow">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Learning Guides by Week</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+                <!-- Loop for 15 Weeks -->
+                <script>
+                    for (let i = 1; i <= 15; i++) {
+                        document.write(`
+                            <div class="card">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="card-icon w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                                <h3 class="card-title">Week ${i} Learning Guide</h3>
+                                <p class="text-gray-600 text-sm mb-4">Concepts, Sandbox, Problems</p>
+                                <a href="week${i}.html" class="card-link">Go to Week ${i}</a>
+                            </div>
+                        `);
+                    }
+                </script>
+            </div>
+
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Exam Study Guides</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Exam 1 Study Guide -->
+                <div class="card">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="card-icon w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
+                    <h3 class="card-title">Exam 1 Study Guide</h3>
+                    <p class="text-gray-600 text-sm mb-4">Review for Midterm 1</p>
+                    <a href="exam1-study-guide.html" class="card-link">Go to Guide</a>
+                </div>
+
+                <!-- Exam 2 Study Guide -->
+                <div class="card">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="card-icon w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
+                    <h3 class="card-title">Exam 2 Study Guide</h3>
+                    <p class="text-gray-600 text-sm mb-4">Review for Midterm 2</p>
+                    <a href="exam2-study-guide.html" class="card-link">Go to Guide</a>
+                </div>
+
+                <!-- Final Exam Study Guide -->
+                <div class="card">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="card-icon w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/><path d="M12 12v-6"/></svg>
+                    <h3 class="card-title">Final Exam Study Guide</h3>
+                    <p class="text-gray-600 text-sm mb-4">Comprehensive Final Review</p>
+                    <a href="final-exam-study-guide.html" class="card-link">Go to Guide</a>
                 </div>
             </div>
-        </section>
-    </main>
+        </main>
 
-    <footer class="bg-gray-900 text-white text-center py-6 mt-12">
-        <p>&copy; 2025 Mechatronics 1 Course by Dr. Tipton. All rights reserved.</p>
-    </footer>
+        <!-- Footer Section -->
+        <footer class="text-center text-gray-500 text-sm mt-12 py-6">
+            <p>&copy; <script>document.write(new Date().getFullYear())</script> Mechatronics 1 Course. All rights reserved.</p>
+            <p>Designed for a World-Class Learning Experience</p>
+        </footer>
+    </div>
 </body>
 </html>
