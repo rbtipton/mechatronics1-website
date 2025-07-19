@@ -3,420 +3,574 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechatronics 1: Week 15 - Real-Time Operating Systems</title>
+    <title>Mechatronics 1: Week 15 Study Guide</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chosen Palette: Calm Harmony -->
-    <!-- Application Structure Plan: The application uses a tabbed dashboard structure (Intro, Simulator, Concepts, Quiz) for intuitive, non-linear exploration. The core is the "RTOS Task Scheduler Simulator," designed for hands-on learning. It visualizes how a preemptive scheduler handles tasks with different priorities, making an abstract concept tangible. This is supported by interactive diagrams for inter-task communication and task states, reinforcing the core principles of an RTOS. -->
-    <!-- Visualization & Content Choices:
-        - Task Scheduling -> Goal: Understand preemptive scheduling. -> Viz: A timeline-style chart (using Chart.js) showing tasks running on a virtual CPU. -> Interaction: Buttons to add tasks of different priorities and a "Run" button to trigger the simulation. Justification: A visual timeline is the most effective way to demonstrate how higher-priority tasks interrupt lower-priority ones, which is the cornerstone of RTOS behavior.
-        - Inter-Task Communication -> Goal: Explain Mutexes and Message Queues. -> Viz: HTML/CSS diagrams with styled blocks representing tasks and resources. -> Interaction: Buttons to simulate task actions (e.g., "Acquire Mutex," "Send Message") that visually update the diagram's state. Justification: Interactive diagrams clarify the flow of control and data better than static images or text alone.
-        - Task States -> Goal: Show how tasks move between states. -> Viz: An HTML/CSS state machine diagram. -> Interaction: Buttons trigger transitions (e.g., "Block Task," "Event Occurs") and update the diagram, highlighting the active state. Justification: Makes the lifecycle of a task easy to follow.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background-color: #f5f5f4; color: #1c1917; font-family: 'Inter', sans-serif; }
-        .nav-button { transition: all 0.3s ease; border-bottom: 2px solid transparent; }
-        .nav-button.active, .nav-button:hover { color: #4f46e5; border-bottom-color: #4f46e5; }
-        .card { background-color: #ffffff; border-radius: 0.75rem; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow: hidden; border: 1px solid #e7e5e4; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .content-section { display: none; }
-        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-        .task-state { transition: all 0.3s ease; border: 2px solid #d4d4d8; }
-        .task-state.active { border-color: #4f46e5; transform: scale(1.05); box-shadow: 0 0 15px rgba(79, 70, 229, 0.3); }
-        .arrow { position: absolute; color: #a1a1aa; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .nav-button {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 0.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+          flex: 1; /* Make buttons take equal width */
+          text-align: center;
+        }
+        .nav-button.active {
+          background-color: #4f46e5; /* indigo-600 */
+          color: white;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transform: translateY(-2px);
+        }
+        .nav-button:not(.active) {
+          background-color: #e5e7eb; /* gray-200 */
+          color: #374151; /* gray-700 */
+        }
+        .nav-button:not(.active):hover {
+          background-color: #d1d5db; /* gray-300 */
+        }
+        .nav-button svg {
+          margin-bottom: 0.25rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+          .nav-button {
+            padding: 1rem 1rem;
+          }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+          .nav-button {
+            padding: 1rem 1.5rem;
+          }
+        }
+        .formula-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border-left: 4px solid #38bdf8; /* Blue border on left */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; /* Monospace font */
+            font-size: 1rem;
+            color: #0c4a6e; /* Darker blue text */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="antialiased">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-xl md:text-2xl font-bold text-stone-800">Mechatronics 15: RTOS</h1>
-                <nav class="hidden md:flex space-x-4 lg:space-x-6">
-                    <button class="nav-button active" onclick="showSection('intro')">Introduction</button>
-                    <button class="nav-button" onclick="showSection('simulator')">Scheduler Sim</button>
-                    <button class="nav-button" onclick="showSection('concepts')">Concepts</button>
-                    <button class="nav-button" onclick="showSection('quiz')">Quiz</button>
-                </nav>
-                 <button id="menu-btn" class="md:hidden">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Lucide React icons (inline SVGs for direct use in HTML)
+        const BookOpenText = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+        const FlaskConical = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 2v6c0 2.2-1.8 4-4 4H2"/><path d="M14 2v6c0 2.2 1.8 4 4 4h4"/><path d="M21 15c.8-1 1-2.2.6-3.4-.4-1.1-1.5-1.7-2.7-1.6-1.2.1-2.2.9-2.6 2.1-.4 1.1-.2 2.5.6 3.4l2.9 3.2c1.3 1.4 3.3 1.4 4.6 0 .4-.5.7-1.2.8-1.9L21 15z"/><path d="M9 15c-.8-1-1-2.2-.6-3.4.4-1.1 1.5-1.7 2.7-1.6 1.2.1 2.2.9 2.6 2.1.4 1.1.2 2.5-.6 3.4l-2.9 3.2c-1.3 1.4-3.3 1.4-4.6 0-.4-.5-.7-1.2-.8-1.9L9 15z"/></svg>;
+        const Award = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.15-3.62L6.82 21l1.703-8.11"/></svg>;
+        const CheckCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
+        const XCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>;
+        const Home = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
+
+        // Icons for Week 15
+        const LayoutDashboard = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>;
+        const Wrench = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.77 3.77Z"/></svg>;
+        const Power = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 12V2"/><path d="M18.83 5.27a10 10 0 1 1-13.66 0"/></svg>;
+        const Zap = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+
+
+        // Concept Review Component
+        const ConceptReview = () => {
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Week 15: Mechatronic Design Process & Practical Considerations</h2>
+
+              {/* Mechatronic Design Process Overview */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <LayoutDashboard className="w-7 h-7 mr-3 text-blue-600"/>
+                    1. Mechatronic Design Process Overview
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  Designing a mechatronic system is an iterative process, requiring an interdisciplinary approach integrating mechanical, electrical, and computer science engineering principles.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Define Problem & Requirements:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Clearly articulate what the system needs to do. What problem is it solving?</li>
+                  <li>Define functionality, performance criteria (speed, accuracy, force), environmental conditions, safety, cost, size, power, user interface.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Conceptual Design:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Brainstorm various solutions.</li>
+                  <li>Develop block diagrams (e.g., input -> controller -> output).</li>
+                  <li>Select appropriate sensors, actuators, and control strategies.</li>
+                  <li>Consider open-loop vs. closed-loop control.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">C. Detailed Design:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Select specific components (part numbers, datasheets).</li>
+                  <li>Design mechanical structures, electrical circuits (schematics, PCB layout), and control algorithms (flowcharts, pseudocode).</li>
+                  <li>Perform calculations (e.g., motor sizing, resistor values, power budget).</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">D. Prototyping & Implementation:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Build a physical prototype (breadboard, custom PCB, mechanical assembly).</li>
+                  <li>Write and test software (Arduino sketches, Python scripts).</li>
+                  <li>Integrate hardware and software.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">E. Testing & Validation:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Verify that the system meets all defined requirements.</li>
+                  <li>Perform functional tests, performance tests, and stress tests.</li>
+                  <li>Identify and troubleshoot issues.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">F. Iteration & Refinement:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li>Based on testing, refine the design. This is an iterative loop.</li>
+                  <li>Optimize for performance, cost, size, reliability, etc.</li>
+                </ul>
+              </section>
+
+              {/* Troubleshooting Mechatronic Systems */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Wrench className="w-7 h-7 mr-3 text-red-600"/>
+                    2. Troubleshooting Mechatronic Systems
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-2">
+                  A systematic approach to identifying and resolving problems.
+                </p>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Systematic Approach:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Observe & Document:</span> What exactly is happening (or not happening)? When? Is it consistent? What were the last changes?</li>
+                  <li><span className="font-medium">Isolate the Problem:</span> Divide and conquer. Break the system into smaller modules (power, sensor, controller, actuator). Test each independently.</li>
+                  <li><span className="font-medium">Hypothesize & Test:</span> Formulate a theory about the cause, then design and perform tests to confirm or deny it.</li>
+                  <li><span className="font-medium">Fix & Verify:</span> Implement a fix, then re-test to ensure the problem is resolved and no new issues are introduced.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Common Troubleshooting Tools:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Digital Multimeter (DMM):</span> Measure voltage, current, resistance, continuity. Essential for checking power, ground, and basic circuit integrity.</li>
+                  <li><span className="font-medium">Oscilloscope:</span> Visualize electrical signals over time. Crucial for checking PWM signals, sensor waveforms, communication signals (I2C, SPI, UART).</li>
+                  <li><span className="font-medium">Serial Monitor (Arduino IDE):</span> Print debugging messages from your microcontroller. Invaluable for understanding program flow, variable states, and sensor readings.</li>
+                  <li><span className="font-medium">Logic Analyzer:</span> For complex digital communication protocols (I2C, SPI) to decode and visualize digital signals.</li>
+                </ul>
+              </section>
+
+              {/* Practical Considerations */}
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-indigo-700 mb-3 flex items-center">
+                    <Power className="w-7 h-7 mr-3 text-green-600"/>
+                    3. Practical Considerations
+                </h3>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">A. Power Management:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Power Budgeting:</span> Calculate total current draw for all components. Ensure your power supply can meet peak demands.</li>
+                  <li><span className="font-medium">Voltage Regulation:</span> Use voltage regulators (e.g., 7805 for 5V) to provide stable power to sensitive electronics.</li>
+                  <li><span className="font-medium">Proper Grounding:</span> All grounds in the system should be connected to a common reference point to avoid ground loops and noise.</li>
+                  <li><span className="font-medium">Powering Actuators:</span> Motors and other high-current actuators should typically be powered by a separate, robust power supply, not directly from the microcontroller's regulated output.</li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">B. Wiring and Connections:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Wire Sizing:</span> Use appropriate wire gauge for the expected current. Thicker wires for higher current.</li>
+                  <li><span className="font-medium">Secure Connections:</span> Avoid loose wires. Use soldering, crimping, screw terminals, or proper connectors (e.g., JST, Dupont) for reliable connections, especially in moving parts.</li>
+                  <li><span className="font-medium">Noise Mitigation:</span>
+                    <ul className="list-circle list-inside ml-4">
+                      <li><span className="font-medium">Decoupling Capacitors:</span> Place small capacitors (e.g., 0.1 μF) near IC power pins to filter out high-frequency noise.</li>
+                      <li><span className="font-medium">Twisted Pairs/Shielding:</span> For analog signals or noisy environments, twist signal and ground wires or use shielded cables.</li>
+                      <li><span className="font-medium">Separate Power Planes:</span> Separate digital and analog ground planes if possible.</li>
+                    </ul>
+                  </li>
+                </ul>
+                <h4 className="text-xl font-medium text-gray-800 mb-2 mt-4">C. Enclosures and Packaging:</h4>
+                <ul className="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                  <li><span className="font-medium">Protection:</span> Protect electronics from dust, moisture, physical damage, and electromagnetic interference (EMI).</li>
+                  <li><span className="font-medium">Accessibility:</span> Ensure easy access to power switches, USB ports, adjustment potentiometers, and indicators (LEDs).</li>
+                  <li><span className="font-medium">Thermal Management:</span> Provide adequate ventilation or heat sinks for components that generate heat (e.g., motor drivers, voltage regulators).</li>
+                  <li><span className="font-medium">Mounting:</span> Securely mount all components to prevent movement and damage from vibration.</li>
+                </ul>
+              </section>
             </div>
-             <div id="mobile-menu" class="hidden md:hidden py-2">
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('intro'); closeMenu();">Introduction</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('simulator'); closeMenu();">Scheduler Sim</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('concepts'); closeMenu();">Concepts</button>
-                <button class="block w-full text-left py-2 px-2 rounded hover:bg-stone-100" onclick="showSection('quiz'); closeMenu();">Quiz</button>
+          );
+        };
+
+        // Troubleshooting Simulator Sandbox
+        const TroubleshootingSimulator = () => {
+          const [systemState, setSystemState] = useState('working'); // 'working', 'sensor_fault', 'motor_fault', 'power_issue', 'software_bug'
+          const [dmmReading, setDmmReading] = useState('N/A');
+          const [serialMonitorOutput, setSerialMonitorOutput] = useState('');
+          const [diagnosis, setDiagnosis] = useState('');
+
+          const simulateFault = (faultType) => {
+            setSystemState(faultType);
+            setDmmReading('N/A');
+            setSerialMonitorOutput('');
+            setDiagnosis('');
+            let msg = `Simulating: ${faultType.replace('_', ' ').toUpperCase()}...\n`;
+            switch (faultType) {
+              case 'sensor_fault':
+                msg += "Sensor output is stuck at 0 or max value.\n";
+                setDmmReading("Sensor V_out: 0.0V (Expected: 2.5V)");
+                setSerialMonitorOutput("Sensor_Reading: 0\nSensor_Reading: 0\n...");
+                break;
+              case 'motor_fault':
+                msg += "Motor is not moving or moving erratically.\n";
+                setDmmReading("Motor Voltage: 0.0V (Expected: 5V when active)");
+                setSerialMonitorOutput("Motor_Command: HIGH\nMotor_State: Not Responding\n...");
+                break;
+              case 'power_issue':
+                msg += "System is completely dead or components are underpowered.\n";
+                setDmmReading("Main Supply: 3.2V (Expected: 5V)");
+                setSerialMonitorOutput("System not booting...");
+                break;
+              case 'software_bug':
+                msg += "System behaves unexpectedly, but hardware seems fine.\n";
+                setDmmReading("All voltages nominal.");
+                setSerialMonitorOutput("Looping_Error: Value_X is: -1\nProcessing_Data: Invalid input\n...");
+                break;
+              default:
+                msg += "System is working normally.\n";
+                setDmmReading("All voltages nominal.");
+                setSerialMonitorOutput("System_Status: OK");
+                break;
+            }
+            setDiagnosis(msg);
+          };
+
+          const runDiagnosis = () => {
+            let currentDiagnosis = "Running diagnostic...\n";
+            switch (systemState) {
+              case 'sensor_fault':
+                currentDiagnosis += "DMM shows abnormal sensor voltage. Serial Monitor shows constant sensor readings. Likely a wiring issue to the sensor or a faulty sensor itself. Check connections and replace sensor if needed.";
+                break;
+              case 'motor_fault':
+                currentDiagnosis += "DMM shows no voltage across motor terminals when commanded. Serial Monitor shows motor commands being sent. Likely a faulty motor driver, loose motor wires, or a seized motor. Check driver connections and motor continuity.";
+                break;
+              case 'power_issue':
+                currentDiagnosis += "DMM shows low voltage at main supply or regulator output. System is unresponsive. Check power supply, main power switch, and voltage regulator for proper operation. Ensure sufficient current capacity.";
+                break;
+              case 'software_bug':
+                currentDiagnosis += "DMM shows correct voltages. Serial Monitor shows unexpected values or logic errors. This indicates a software bug. Review code logic, variable types, and conditional statements. Use Serial.print() extensively.";
+                break;
+              case 'working':
+              default:
+                currentDiagnosis += "System appears to be working correctly. No major faults detected.";
+                break;
+            }
+            setDiagnosis(currentDiagnosis);
+          };
+
+          const resetSimulator = () => {
+            setSystemState('working');
+            setDmmReading('N/A');
+            setSerialMonitorOutput('');
+            setDiagnosis('');
+          };
+
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Mechatronic System Troubleshooting Simulator</h2>
+              <p className="text-gray-700 mb-4">
+                Simulate common mechatronic system faults and practice diagnosing them using virtual tools.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Fault Injection */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Simulate Fault</h3>
+                  <div className="space-y-3">
+                    <button onClick={() => simulateFault('working')} className="w-full py-2 px-4 rounded-md font-semibold bg-green-500 text-white hover:bg-green-600 transition duration-300">No Fault (Working)</button>
+                    <button onClick={() => simulateFault('sensor_fault')} className="w-full py-2 px-4 rounded-md font-semibold bg-yellow-500 text-gray-800 hover:bg-yellow-600 transition duration-300">Sensor Fault</button>
+                    <button onClick={() => simulateFault('motor_fault')} className="w-full py-2 px-4 rounded-md font-semibold bg-orange-500 text-white hover:bg-orange-600 transition duration-300">Actuator (Motor) Fault</button>
+                    <button onClick={() => simulateFault('power_issue')} className="w-full py-2 px-4 rounded-md font-semibold bg-red-500 text-white hover:bg-red-600 transition duration-300">Power Issue</button>
+                    <button onClick={() => simulateFault('software_bug')} className="w-full py-2 px-4 rounded-md font-semibold bg-purple-500 text-white hover:bg-purple-600 transition duration-300">Software Bug</button>
+                  </div>
+                </div>
+
+                {/* Diagnostic Tools & Output */}
+                <div className="flex flex-col p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-3">Diagnostic Tools</h3>
+                  <div className="mb-4">
+                    <p className="font-semibold text-gray-700">Digital Multimeter (DMM) Reading:</p>
+                    <div className="bg-gray-800 text-green-400 p-2 rounded-md font-mono text-sm">{dmmReading}</div>
+                  </div>
+                  <div className="mb-4">
+                    <p className="font-semibold text-gray-700">Serial Monitor Output:</p>
+                    <div className="bg-gray-800 text-green-400 p-2 rounded-md h-24 overflow-y-auto font-mono text-sm whitespace-pre-wrap">{serialMonitorOutput}</div>
+                  </div>
+                  <button
+                    onClick={runDiagnosis}
+                    className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md mb-3"
+                  >
+                    Run Diagnosis
+                  </button>
+                  <button
+                    onClick={resetSimulator}
+                    className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                  >
+                    Reset Simulator
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-md font-semibold whitespace-pre-wrap">
+                <h3 className="text-xl font-bold mb-2">Diagnosis:</h3>
+                {diagnosis || "Select a fault to begin diagnosis."}
+              </div>
             </div>
-        </div>
-    </header>
+          );
+        };
 
-    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
 
-        <section id="intro" class="content-section active">
-            <div class="bg-white p-8 rounded-lg shadow-md border border-stone-200">
-                <h2 class="text-3xl font-bold text-stone-800 mb-4">Introduction to Real-Time Operating Systems</h2>
-                <p class="text-lg text-stone-600 mb-6">An RTOS provides the framework to manage multiple, complex tasks with strict timing deadlines. Its core value is not just speed, but **predictability**. This interactive app will help you visualize the key concepts that make real-time systems possible.</p>
-                <div class="mt-6 p-4 bg-indigo-50 border-l-4 border-indigo-500">
-                    <p class="text-indigo-800">Use the tabs above to navigate. The **Scheduler Sim** is the best place to start for hands-on learning!</p>
-                </div>
-            </div>
-        </section>
+        // Practice Problems Component
+        const PracticeProblems = () => {
+          const [activeTab, setActiveTab] = useState('homework');
 
-        <section id="simulator" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">RTOS Scheduler Simulator</h2>
-            <div class="grid lg:grid-cols-3 gap-8 items-start">
-                <div class="lg:col-span-2 card p-6">
-                    <h3 class="text-xl font-bold text-stone-700 mb-4">Task Execution Timeline</h3>
-                    <p class="text-sm text-stone-600 mb-4">This chart shows which task is running on the CPU at each time "tick." Notice how higher priority tasks interrupt (preempt) lower priority ones.</p>
-                    <div class="chart-container" style="position: relative; height:40vh; max-height:400px; width:100%;">
-                        <canvas id="schedulerChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="card p-6 space-y-4">
-                    <h3 class="text-xl font-bold text-stone-700 mb-2">Controls</h3>
-                    <div>
-                        <label for="taskDuration" class="block text-sm font-medium text-stone-700">Task Duration (ticks)</label>
-                        <input type="number" id="taskDuration" value="5" class="mt-1 block w-full rounded-md border-stone-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                    </div>
-                    <div class="grid grid-cols-1 gap-2">
-                        <button class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" onclick="addTask(3)">Add High Priority Task</button>
-                        <button class="w-full px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600" onclick="addTask(2)">Add Medium Priority Task</button>
-                        <button class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700" onclick="addTask(1)">Add Low Priority Task</button>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700" onclick="runScheduler()">Run Simulation</button>
-                        <button class="flex-1 px-4 py-2 bg-stone-500 text-white rounded hover:bg-stone-600" onclick="resetScheduler()">Reset</button>
-                    </div>
-                    <div class="mt-4">
-                        <h4 class="font-semibold text-stone-700">Task Queue:</h4>
-                        <ul id="taskQueueList" class="text-sm text-stone-600 list-disc list-inside h-24 overflow-y-auto bg-stone-50 p-2 rounded">
-                            <li>No tasks added</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <section id="concepts" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Key Concepts Visualized</h2>
-            <div class="grid lg:grid-cols-2 gap-8">
-                <!-- Mutex Visualization -->
-                <div class="card p-6">
-                    <h3 class="text-xl font-bold text-stone-700 mb-4">Mutex (Resource Protection)</h3>
-                    <p class="text-sm text-stone-600 mb-4">A mutex ensures only one task can access a shared resource at a time.</p>
-                    <div class="flex justify-around items-center h-48 bg-stone-50 p-4 rounded-lg">
-                        <div id="mutex-task1" class="text-center p-2 rounded border-2 border-transparent">
-                            <span class="text-4xl">👨‍💻</span><p>Task 1</p>
-                        </div>
-                        <div id="mutex-resource" class="text-center p-4 rounded-full border-2 border-dashed border-stone-400">
-                            <span class="text-4xl">💾</span><p id="mutex-status" class="text-sm font-mono">Free</p>
-                        </div>
-                        <div id="mutex-task2" class="text-center p-2 rounded border-2 border-transparent">
-                            <span class="text-4xl">👩‍💻</span><p>Task 2</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mt-4">
-                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm" onclick="simMutex('task1')">Task 1 Acquires</button>
-                        <button class="px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 text-sm" onclick="simMutex('task2')">Task 2 Acquires</button>
-                        <button class="col-span-2 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 text-sm" onclick="simMutex('release')">Release Resource</button>
-                    </div>
-                </div>
-                
-                 <!-- Task States Visualization -->
-                <div class="card p-6">
-                    <h3 class="text-xl font-bold text-stone-700 mb-4">Task State Transitions</h3>
-                     <p class="text-sm text-stone-600 mb-4">An RTOS manages tasks by moving them between states.</p>
-                     <div class="relative flex justify-center items-center h-48 bg-stone-50 p-4 rounded-lg">
-                        <div id="state-running" class="task-state active p-3 rounded-lg bg-white text-center absolute" style="left: 40%; top: 0;">
-                            <span class="text-2xl">▶️</span><p>Running</p>
-                        </div>
-                         <div id="state-ready" class="task-state p-3 rounded-lg bg-white text-center absolute" style="left: 0; top: 40%;">
-                            <span class="text-2xl">👍</span><p>Ready</p>
-                        </div>
-                         <div id="state-blocked" class="task-state p-3 rounded-lg bg-white text-center absolute" style="right: 0; top: 40%;">
-                             <span class="text-2xl">⛔</span><p>Blocked</p>
-                        </div>
-                        <div class="arrow" style="top: 25%; left: 28%; transform: rotate(135deg);">↑</div>
-                        <div class="arrow" style="top: 25%; right: 28%; transform: rotate(45deg);">↑</div>
-                        <div class="arrow" style="top: 35%; left: 30%;">→</div>
-                        <div class="arrow" style="top: 35%; right: 30%;">←</div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mt-4">
-                        <button class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm" onclick="simState('preempt')">Higher Task Preempts</button>
-                        <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm" onclick="simState('wait')">Task Waits for Event</button>
-                        <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm" onclick="simState('resume')">Task Resumes</button>
-                         <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" onclick="simState('event')">Event Occurs</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="quiz" class="content-section">
-            <h2 class="text-3xl font-bold text-stone-800 mb-6 text-center">Knowledge Check</h2>
-            <div id="quiz-grid" class="space-y-4"></div>
-        </section>
-
-    </main>
-
-<script>
-let schedulerChart;
-let taskQueue = [];
-let taskIdCounter = 1;
-let currentOwner = null;
-
-const quizData = [
-    { question: "What is the primary goal of an RTOS compared to a GPOS?", answer: "The primary goal is **predictability and determinism** (guaranteeing deadlines), not average performance or throughput." },
-    { question: "A car's airbag deployment system is an example of what kind of real-time constraint?", answer: "**Hard real-time**. Missing the deadline for deployment would be catastrophic." },
-    { question: "What is a 'mutex' used for in an RTOS?", answer: "A mutex (Mutual Exclusion) is used to protect a shared resource (like memory or a peripheral) to ensure only one task can access it at a time, preventing data corruption." },
-    { question: "In a preemptive scheduler, if a high-priority task becomes ready while a low-priority task is running, what happens?", answer: "The low-priority task is immediately interrupted (preempted), and the high-priority task begins to run." }
-];
-
-document.addEventListener('DOMContentLoaded', () => {
-    initSchedulerChart();
-    initQuiz();
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-});
-
-function initSchedulerChart() {
-    const ctx = document.getElementById('schedulerChart').getContext('2d');
-    schedulerChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: [], // Time ticks
-            datasets: [{
-                label: 'CPU Usage by Task',
-                data: [], // {x: time, y: priority}
-                backgroundColor: [],
-                borderWidth: 1,
-                barPercentage: 1.0,
-                categoryPercentage: 1.0
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            responsive: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Task ${context.raw.task.id} (Priority: ${context.raw.y})`;
-                        }
-                    }
-                }
+          const homeworkQuestions = [
+            {
+              id: 1,
+              type: 'text',
+              question: 'Outline the typical iterative steps of the mechatronic design process, from defining the problem to refinement.',
+              answer: 'The typical iterative steps of the mechatronic design process are:\n1.  <span class="font-bold">Define Problem & Requirements:</span> Clearly state the problem to be solved and define all functional, performance, environmental, safety, cost, size, and user interface requirements.\n2.  <span class="font-bold">Conceptual Design:</span> Brainstorm potential solutions, develop high-level block diagrams, and select appropriate sensor, actuator, and control strategies (e.g., open-loop vs. closed-loop).\n3.  <span class="font-bold">Detailed Design:</span> Select specific components, design mechanical structures, electrical circuits (schematics, PCB layout), and control algorithms (flowcharts, pseudocode). Perform detailed calculations.\n4.  <span class="font-bold">Prototyping & Implementation:</span> Build a physical prototype, write and test software, and integrate hardware and software components.\n5.  <span class="font-bold">Testing & Validation:</span> Verify that the system meets all defined requirements through functional, performance, and stress tests. Identify and troubleshoot issues.\n6.  <span class="font-bold">Iteration & Refinement:</span> Based on testing results, refine the design, optimize performance, cost, size, and reliability. This step often leads back to earlier design stages.',
+              explanation: 'The mechatronic design process is not linear but iterative, allowing for continuous improvement and problem-solving at each stage. It emphasizes an interdisciplinary approach.'
             },
-            scales: {
-                x: {
-                    type: 'linear',
-                    title: { display: true, text: 'Time Ticks' },
-                    grid: { display: false },
-                    ticks: { stepSize: 1 }
-                },
-                y: {
-                    min: 0,
-                    max: 4,
-                    title: { display: true, text: 'Task Priority' },
-                     ticks: {
-                        stepSize: 1,
-                         callback: function(value, index, values) {
-                            if (value === 0) return 'Idle';
-                            const levels = ['Low', 'Medium', 'High'];
-                            return levels[value-1] || '';
-                        }
-                    }
-                }
+            {
+              id: 2,
+              type: 'text',
+              question: 'You are troubleshooting a mechatronic system where a DC motor is not spinning, even though your Arduino code is sending the correct HIGH signal to the motor driver. Describe a systematic approach using at least two different troubleshooting tools to identify the problem.',
+              answer: 'Systematic Troubleshooting Approach:\n1.  <span class="font-bold">Observe & Document:</span> Confirm the motor is not spinning. Check if any LEDs on the motor driver are behaving unusually. Note the exact conditions.\n2.  <span class="font-bold">Isolate the Problem (Controller vs. Driver vs. Motor):</span>\n    * <span class="font-bold">Check Arduino Output (Controller):</span> Use the <span class="font-bold">Arduino Serial Monitor</span>. Add `Serial.print()` statements in your code to confirm that the digital pin controlling the motor driver is indeed going HIGH as expected. If the Serial Monitor shows the command is sent, the Arduino code is likely okay.\n    * <span class="font-bold">Check Power Supply:</span> Use a <span class="font-bold">Digital Multimeter (DMM)</span> to measure the voltage at the motor driver\'s power input terminals. Ensure it matches the required voltage for the motor/driver (e.g., 12V). Also, check the voltage at the Arduino\'s 5V/3.3V pins to ensure it\'s stable.\n    * <span class="font-bold">Check Driver Output:</span> While the Arduino is commanding the motor ON, use the <span class="font-bold">DMM</span> to measure the voltage directly across the motor terminals connected to the H-bridge output. If the DMM reads 0V (or very low voltage) while the Arduino is commanding HIGH, it suggests the motor driver is faulty or not receiving power/signal correctly.\n    * <span class="font-bold">Check Motor Itself:</span> Disconnect the motor from the driver. Use the <span class="font-bold">DMM</span> to check the motor\'s continuity (resistance) across its terminals. Apply a small voltage directly from a battery to the motor to see if it spins. If it doesn\'t, the motor itself might be faulty (e.g., seized, broken windings).\n3.  <span class="font-bold">Hypothesize & Test:</span> Based on DMM and Serial Monitor readings, form a hypothesis (e.g., "The motor driver is not getting power," "The motor is seized"). Perform specific tests to confirm.\n4.  <span class="font-bold">Fix & Verify:</span> Once the problem is identified (e.g., loose wire, faulty driver, seized motor), implement the fix and re-test the entire system to ensure functionality and that no new issues arise.',
+              explanation: 'A systematic approach helps narrow down the problem. By starting from the controller and moving towards the actuator, and using appropriate tools like the Serial Monitor (for software/logic) and DMM (for electrical measurements), you can efficiently pinpoint the root cause of the malfunction.'
+            },
+            {
+              id: 3,
+              type: 'multiple_choice',
+              question: 'Why is it generally recommended to power high-current actuators (like DC motors) from a separate power supply rather than directly from the microcontroller\'s regulated output (e.g., Arduino\'s 5V pin)?',
+              options: [
+                'A) To prevent the microcontroller from overheating.',
+                'B) To provide higher voltage to the actuators than the microcontroller can supply.',
+                'C) To avoid noise from the motor interfering with sensitive microcontroller operations and to ensure sufficient current.',
+                'D) To make the system more compact and reduce wiring.'
+              ],
+              correctAnswer: 'C) To avoid noise from the motor interfering with sensitive microcontroller operations and to ensure sufficient current.',
+              explanation: 'Motors draw significant, often fluctuating, currents and can generate electrical noise (back-EMF, brush noise). Powering them from the same regulated supply as the microcontroller can cause voltage dips and introduce noise onto the microcontroller\'s power lines, leading to erratic behavior or resets. A separate power supply ensures both components receive stable, clean power, and the motor gets the high current it needs without impacting the microcontroller.'
+            },
+            {
+              id: 4,
+              type: 'text',
+              question: 'When designing the wiring for a mechatronic system, why are "secure connections" (e.g., soldering, crimping, screw terminals) preferred over simple breadboard connections, especially for a final prototype or product?',
+              answer: 'Secure connections like soldering, crimping, and screw terminals are preferred over simple breadboard connections for a final prototype or product due to several critical reasons:\n1.  <span class="font-bold">Reliability:</span> Breadboard connections are temporary and prone to intermittent contact due to vibration, movement, or oxidation. Secure connections provide a much more stable and reliable electrical path, crucial for consistent system operation.\n2.  <span class="font-bold">Current Capacity:</span> Breadboard wires and contacts are typically thin and have limited current-carrying capacity. Soldered or crimped connections, especially with appropriately sized wires, can handle much higher currents safely without overheating.\n3.  <span class="font-bold">Mechanical Robustness:</span> Breadboard wires can easily pull out or become loose with physical stress. Secure connections are mechanically robust, resisting vibration, tugs, and environmental factors, which is vital for deployable systems (e.g., robots, industrial equipment).\n4.  <span class="font-bold">Noise Reduction:</span> Loose or high-resistance connections can introduce electrical noise. Secure connections minimize this, leading to cleaner signals and more stable operation.',
+              explanation: 'Breadboards are excellent for rapid prototyping but are fundamentally unreliable for long-term or high-stress applications. Secure connections address issues of reliability, current handling, mechanical integrity, and noise, which are paramount for robust mechatronic systems.'
+            },
+            {
+              id: 5,
+              type: 'text',
+              question: 'What is the purpose of decoupling capacitors in a mechatronic circuit, and where are they typically placed?',
+              answer: 'Purpose of Decoupling Capacitors: Decoupling capacitors (also known as bypass capacitors) are used to <span class="font-bold">filter out high-frequency noise and provide a stable, local power source</span> for integrated circuits (ICs) and other sensitive components. When an IC rapidly switches (e.g., a microcontroller processing data or a motor driver switching current), it can draw sudden, brief bursts of current, causing momentary voltage dips on the power supply line. Decoupling capacitors act as small, local reservoirs of charge that can quickly supply these current demands, preventing voltage fluctuations and noise from affecting the IC\'s operation or propagating to other parts of the circuit.\n\nPlacement: They are typically placed <span class="font-bold">as close as possible to the power (VCC) and ground (GND) pins of the ICs</span> they are protecting. The closer they are, the more effective they are at suppressing high-frequency noise.',
+              explanation: 'Decoupling capacitors are critical for maintaining power integrity, especially in digital circuits where components draw current in rapid, short pulses. Their close proximity to the IC minimizes inductance and resistance, making them highly effective at filtering out transient noise.'
             }
-        }
-    });
-}
+          ];
 
-function addTask(priority) {
-    const duration = parseInt(document.getElementById('taskDuration').value) || 3;
-    const task = { id: taskIdCounter++, priority, duration };
-    taskQueue.push(task);
-    updateTaskQueueList();
-}
+          const [homeworkAnswers, setHomeworkAnswers] = useState({});
+          const [multipleChoiceSelections, setMultipleChoiceSelections] = useState({});
+          const [quizResults, setQuizResults] = useState({}); // For multiple choice validation
 
-function updateTaskQueueList() {
-    const listEl = document.getElementById('taskQueueList');
-    if (taskQueue.length === 0) {
-        listEl.innerHTML = '<li>No tasks added</li>';
-        return;
-    }
-    listEl.innerHTML = taskQueue.map(t => {
-        const priorityMap = {1: 'Low', 2: 'Medium', 3: 'High'};
-        const colorMap = {1: 'text-green-700', 2: 'text-yellow-700', 3: 'text-red-700'};
-        return `<li class="${colorMap[t.priority]}">Task ${t.id} - Priority: ${priorityMap[t.priority]}, Duration: ${t.duration}</li>`;
-    }).join('');
-}
+          const handleHomeworkChange = (id, value) => {
+            setHomeworkAnswers(prev => ({
+              ...prev,
+              [id]: value
+            }));
+          };
 
-function runScheduler() {
-    let timeline = [];
-    let currentTime = 0;
-    let localTaskQueue = JSON.parse(JSON.stringify(taskQueue)); 
-    
-    // Simple preemptive scheduler simulation
-    while (localTaskQueue.length > 0) {
-        // Find the highest priority task available at the current time
-        let highestPriorityTask = null;
-        for (const task of localTaskQueue) {
-            if (!highestPriorityTask || task.priority > highestPriorityTask.priority) {
-                highestPriorityTask = task;
-            }
-        }
-        
-        if (highestPriorityTask) {
-             const runDuration = 1; // Run for one tick
-             timeline.push({ time: currentTime, task: highestPriorityTask });
-             highestPriorityTask.duration -= runDuration;
+          const handleMultipleChoiceSelect = (questionId, selectedOption) => {
+            setMultipleChoiceSelections(prev => ({
+              ...prev,
+              [questionId]: selectedOption
+            }));
+          };
 
-             if (highestPriorityTask.duration <= 0) {
-                // Remove task if completed
-                localTaskQueue = localTaskQueue.filter(t => t.id !== highestPriorityTask.id);
-             }
-        } else {
-             timeline.push({ time: currentTime, task: {id: 'Idle', priority: 0} });
-        }
-        currentTime++;
-        if (currentTime > 50) break; // Safety break
-    }
+          const checkQuizAnswers = () => {
+            const newResults = {};
+            homeworkQuestions.forEach(q => {
+              if (q.type === 'multiple_choice') {
+                newResults[q.id] = multipleChoiceSelections[q.id] === q.correctAnswer;
+              }
+            });
+            setQuizResults(newResults);
+          };
 
-    // Update chart
-    const labels = timeline.map(t => t.time);
-    const data = timeline.map(t => ({
-        x: t.time,
-        y: t.task.priority,
-        task: t.task
-    }));
-    const colors = data.map(d => {
-        if (d.y === 3) return 'rgba(220, 38, 38, 0.8)'; // High - red
-        if (d.y === 2) return 'rgba(234, 179, 8, 0.8)'; // Medium - yellow
-        if (d.y === 1) return 'rgba(22, 163, 74, 0.8)'; // Low - green
-        return 'rgba(209, 213, 219, 0.8)'; // Idle
-    });
+          const resetQuiz = () => {
+            setMultipleChoiceSelections({});
+            setQuizResults({});
+          };
 
-    schedulerChart.data.labels = labels;
-    schedulerChart.data.datasets[0].data = data;
-    schedulerChart.data.datasets[0].backgroundColor = colors;
-    schedulerChart.options.scales.x.max = currentTime;
-    schedulerChart.update();
-}
 
-function resetScheduler() {
-    taskQueue = [];
-    taskIdCounter = 1;
-    updateTaskQueueList();
-    schedulerChart.data.labels = [];
-    schedulerChart.data.datasets[0].data = [];
-    schedulerChart.update();
-}
+          return (
+            <div className="p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">Practice Problems</h2>
 
-function simMutex(action) {
-    const task1El = document.getElementById('mutex-task1');
-    const task2El = document.getElementById('mutex-task2');
-    const resourceEl = document.getElementById('mutex-resource');
-    const statusEl = document.getElementById('mutex-status');
+              <div className="flex mb-6 space-x-4">
+                <button
+                  onClick={() => setActiveTab('homework')}
+                  className={`px-6 py-3 rounded-md font-semibold transition duration-300 ${
+                    activeTab === 'homework' ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Homework Questions
+                </button>
+              </div>
 
-    if (action === 'release') {
-        currentOwner = null;
-    } else {
-        if (currentOwner === null) {
-            currentOwner = action;
-        }
-    }
-    
-    task1El.classList.remove('border-green-500', 'shadow-lg');
-    task2El.classList.remove('border-green-500', 'shadow-lg');
-    
-    if (currentOwner === 'task1') {
-        statusEl.textContent = 'Locked';
-        resourceEl.classList.add('border-red-500');
-        resourceEl.classList.remove('border-stone-400');
-        task1El.classList.add('border-green-500', 'shadow-lg');
-    } else if (currentOwner === 'task2') {
-        statusEl.textContent = 'Locked';
-        resourceEl.classList.add('border-red-500');
-        resourceEl.classList.remove('border-stone-400');
-        task2El.classList.add('border-green-500', 'shadow-lg');
-    } else {
-        statusEl.textContent = 'Free';
-        resourceEl.classList.remove('border-red-500');
-        resourceEl.classList.add('border-stone-400');
-    }
-}
-
-function simState(action) {
-    const runningEl = document.getElementById('state-running');
-    const readyEl = document.getElementById('state-ready');
-    const blockedEl = document.getElementById('state-blocked');
-    const allStates = [runningEl, readyEl, blockedEl];
-    allStates.forEach(el => el.classList.remove('active'));
-
-    switch(action) {
-        case 'preempt':
-            runningEl.classList.remove('active');
-            readyEl.classList.add('active');
-            break;
-        case 'wait':
-            runningEl.classList.remove('active');
-            blockedEl.classList.add('active');
-            break;
-        case 'resume':
-            readyEl.classList.remove('active');
-            runningEl.classList.add('active');
-            break;
-        case 'event':
-             blockedEl.classList.remove('active');
-             readyEl.classList.add('active');
-             break;
-    }
-}
-
-function initQuiz() {
-    const container = document.getElementById('quiz-grid');
-    container.innerHTML = quizData.map(item => `
-        <div class="card p-6">
-            <h4 class="text-lg font-semibold text-stone-800">${item.question}</h4>
-            <div class="answer" style="display: none; margin-top: 1rem; padding: 1rem; background-color: #f0fdf4; border-left: 4px solid #22c55e; color: #15803d;">
-                <p><strong>Answer:</strong> ${item.answer}</p>
+              {activeTab === 'homework' && (
+                <div>
+                  <h3 className="text-2xl font-semibold text-indigo-700 mb-4 flex items-center">
+                    <BookOpenText className="w-7 h-7 mr-3 text-blue-500"/>
+                    Homework Questions
+                  </h3>
+                  <p className="text-gray-700 mb-4">
+                    Instructions: Show all work and steps clearly.
+                  </p>
+                  {homeworkQuestions.map((q) => (
+                    <div key={q.id} className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      <p className="text-lg font-medium text-gray-900 mb-3">{q.id}. {q.question}</p>
+                      {q.type === 'text' ? (
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 h-24"
+                          placeholder="Type your answer here..."
+                          value={homeworkAnswers[q.id] || ''}
+                          onChange={(e) => handleHomeworkChange(q.id, e.target.value)}
+                        ></textarea>
+                      ) : q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((option, index) => (
+                            <label key={index} className="flex items-center text-gray-700 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`quiz-${q.id}`}
+                                value={option}
+                                checked={multipleChoiceSelections[q.id] === option}
+                                onChange={() => handleMultipleChoiceSelect(q.id, option)}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                              />
+                              <span className="ml-2">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ) : null}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && (
+                        <div className="mt-3 flex items-center">
+                          {quizResults[q.id] ? (
+                            <CheckCircle className="text-green-500 mr-2" />
+                          ) : (
+                            <XCircle className="text-red-500 mr-2" />
+                          )}
+                          <span className={`font-semibold ${quizResults[q.id] ? 'text-green-700' : 'text-red-700'}`}>
+                            {quizResults[q.id] ? 'Correct!' : 'Incorrect.'}
+                          </span>
+                        </div>
+                      )}
+                      {q.type === 'multiple_choice' && quizResults[q.id] !== undefined && !quizResults[q.id] && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          <p className="font-medium">Correct Answer: {q.correctAnswer}</p>
+                        </div>
+                      )}
+                      <details className="mt-4 p-3 bg-indigo-50 rounded-md cursor-pointer">
+                        <summary className="font-semibold text-indigo-800">Show Explanation/Answer</summary>
+                        <div className="mt-2 text-indigo-700">
+                          <p className="whitespace-pre-wrap">{q.explanation}</p>
+                        </div >
+                      </details>
+                    </div>
+                  ))}
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={checkQuizAnswers}
+                      className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Check Multiple Choice Answers
+                    </button>
+                    <button
+                      onClick={resetQuiz}
+                      className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-md hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                    >
+                      Reset Multiple Choice
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-            <button class="mt-4 px-4 py-2 bg-stone-600 text-white rounded hover:bg-stone-700 transition-colors text-sm" onclick="toggleAnswer(this)">Reveal Answer</button>
-        </div>
-    `).join('');
-}
+          );
+        };
 
-function toggleAnswer(button) {
-    const answerEl = button.previousElementSibling;
-    const isVisible = answerEl.style.display === 'block';
-    answerEl.style.display = isVisible ? 'none' : 'block';
-    button.textContent = isVisible ? 'Reveal Answer' : 'Hide Answer';
-}
 
-function showSection(sectionId) {
-    document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    document.querySelectorAll('.nav-button').forEach(button => {
-        button.classList.remove('active');
-        if (button.getAttribute('onclick').includes(sectionId)) {
-            button.classList.add('active');
-        }
-    });
-    window.scrollTo(0, 0);
-}
+        // Main App Component
+        const App = () => {
+          const [activeSection, setActiveSection] = useState('review'); // 'review', 'sandbox', 'practice'
 
-function closeMenu() {
-    document.getElementById('mobile-menu').classList.add('hidden');
-}
+          return (
+            <div className="min-h-screen bg-gray-100 font-inter text-gray-900 p-4 sm:p-6 md:p-8">
+              <header className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-indigo-800 mb-2">
+                  Mechatronics 1 Study Guide
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-600">Week 15: Mechatronic Design Process & Practical Considerations</p>
+                <a href="index.html" className="mt-4 inline-flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+                    <Home className="w-5 h-5 mr-2" />
+                    Back to Course Hub
+                </a>
+              </header>
 
-</script>
+              <nav className="flex justify-center gap-4 mb-8 flex-wrap">
+                <button
+                  onClick={() => setActiveSection('review')}
+                  className={`nav-button ${activeSection === 'review' ? 'active' : ''}`}
+                >
+                  <BookOpenText className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Concept Review</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('sandbox')}
+                  className={`nav-button ${activeSection === 'sandbox' ? 'active' : ''}`}
+                >
+                  <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Interactive Sandbox</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('practice')}
+                  className={`nav-button ${activeSection === 'practice' ? 'active' : ''}`}
+                >
+                  <Award className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="text-sm sm:text-base">Practice Problems</span>
+                </button>
+              </nav>
+
+              <main className="container">
+                {activeSection === 'review' && <ConceptReview />}
+                {activeSection === 'sandbox' && <TroubleshootingSimulator />}
+                {activeSection === 'practice' && <PracticeProblems />}
+              </main>
+
+              <footer className="text-center text-gray-500 text-sm mt-12">
+                <p>&copy; {new Date().getFullYear()} Mechatronics 1 Study Guide. All rights reserved.</p>
+              </footer>
+            </div>
+          );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
 </body>
 </html>
